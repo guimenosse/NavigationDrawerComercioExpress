@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_cadastro_produtos"
+    tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.CadastroProdutos">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="DESCRIÇÃO DO PRODUTO"
+        android:id="@+id/lb_descricaoProduto"
+        android:textColor="@color/black"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Código: "
+        android:id="@+id/lb_cdProduto"
+        android:textColor="@color/black"
+        android:layout_below="@+id/lb_descricaoProduto"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp" />
+
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Estoque Atual: "
+        android:id="@+id/lb_estoqueAtual"
+        android:textColor="@color/black"
+        android:layout_below="@+id/lb_cdProduto"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp" />
+
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Valor Unitário: "
+        android:id="@+id/lb_valorUnitario"
+        android:textColor="@color/black"
+        android:layout_below="@+id/lb_estoqueAtual"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp" />
+
+    <ImageView
+        android:id="@+id/imageViewProduto"
+        android:layout_below="@+id/lb_valorUnitario"
+        android:layout_centerHorizontal="true"
+        android:layout_width="350dp"
+        android:layout_height="250dp"
+        android:src="@drawable/cataflam"
+        android:layout_marginTop="37dp" />
+
+</RelativeLayout>

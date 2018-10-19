@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_camara" android:icon="@android:drawable/ic_menu_save"
+            android:title="Clientes" />
+        <item android:id="@+id/nav_gallery" android:icon="@android:drawable/ic_menu_agenda"
+            android:title="Pedidos" />
+    </group>
+
+    <item android:title="Configurações">
+        <menu>
+            <item android:id="@+id/nav_share" android:icon="@android:drawable/ic_menu_manage"
+                android:title="Opções" />
+            <!--<item android:id="@+id/nav_send" android:icon="@android:drawable/ic_menu_send"
+                android:title="Sincronizar" />-->
+        </menu>
+    </item>
+
+
+</menu>
