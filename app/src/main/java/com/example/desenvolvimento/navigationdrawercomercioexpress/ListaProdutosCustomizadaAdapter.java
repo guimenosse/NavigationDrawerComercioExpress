@@ -3,6 +3,7 @@ package com.example.desenvolvimento.navigationdrawercomercioexpress;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +69,7 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.lista_produtos_customizada, parent, false);
             holder = new ViewHolder();
 
-            holder.imagemFruta = (ImageView) convertView.findViewById(R.id.icone);
+            //holder.imagemFruta = (ImageView) convertView.findViewById(R.id.icone);
             holder.textoDescricao = (TextView) convertView.findViewById(R.id.descricao_item);
             holder.numItensRestantes = (TextView) convertView.findViewById(R.id.itens_restantes);
             holder.valor_produtos = (TextView)convertView.findViewById(R.id.valor_produtos);
@@ -78,7 +79,13 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.imagemFruta.setImageResource(imagem.get(position));
+        //holder.imagemFruta.setImageResource(imagem.get(position));
+        if(Integer.parseInt(itensRestantes.get(position)) < 0) {
+            holder.textoDescricao.setTextColor(Color.RED);
+        }else{
+            holder.textoDescricao.setTextColor(Color.GRAY);
+        }
+
         holder.textoDescricao.setText(descricao.get(position));
         holder.numItensRestantes.setText(itensRestantes.get(position));
         holder.valor_produtos.setText(valorProdutos.get(position));

@@ -45,7 +45,10 @@ public class BancoController {
 
 
     //----------------------- Função para inclusão de um novo cliente --------------------------------------
-    public String inserirCliente(String cdcliente, String rzsocial, String nmfantasia, String cep, String endereco, String numero, String complemento, String bairro, String uf, String cidade, String cgc, String inscestadual, String telefone, String telefoneadicional, String fax, String contato, String email, String tipcliente, String vendedor, String tipopessoa, String dtultalteracao, String dtcadastro, String fgsincronizado, String obscliente, String classificacao, String fidelidade){
+    public String inserirCliente(String cdcliente, String rzsocial, String nmfantasia, String cep, String endereco, String numero, String complemento, String bairro,
+                                 String uf, String cidade, String cgc, String inscestadual, String telefone, String telefoneadicional, String fax, String contato,
+                                 String email, String tipcliente, String vendedor, String tipopessoa, String dtultalteracao, String dtcadastro, String fgsincronizado,
+                                 String obscliente, String classificacao, String fidelidade, String tipopreco){
         ContentValues valores;
         long resultado;
 
@@ -77,6 +80,7 @@ public class BancoController {
         valores.put(CriaBanco.FGSINCRONIZADO, fgsincronizado);
         valores.put(CriaBanco.CLASSIFICACAO, classificacao);
         valores.put(CriaBanco.FIDELIDADE, fidelidade);
+        valores.put(CriaBanco.TIPOPRECO, tipopreco);
 
         resultado = db.insert(CriaBanco.TABELA, null, valores);
         db.close();
@@ -90,7 +94,9 @@ public class BancoController {
     }
 
     //----------------------- Função para alteração de um cliente que ainda não foi sincronizado --------------------------------------
-    public String alterarCliente(int id, String rzsocial, String nmfantasia, String cep, String endereco, String numero, String complemento, String bairro, String uf, String cidade, String cnpj, String inscestadual, String telefone, String telefoneadicional, String fax, String nmcontato, String email, String tipocliente, String tipopessoa, String dtultalteracao, String obscliente){
+    public String alterarCliente(int id, String rzsocial, String nmfantasia, String cep, String endereco, String numero, String complemento, String bairro, String uf,
+                                 String cidade, String cnpj, String inscestadual, String telefone, String telefoneadicional, String fax, String nmcontato, String email,
+                                 String tipocliente, String tipopessoa, String dtultalteracao, String obscliente){
         ContentValues valores;
         String where;
         long resultado;

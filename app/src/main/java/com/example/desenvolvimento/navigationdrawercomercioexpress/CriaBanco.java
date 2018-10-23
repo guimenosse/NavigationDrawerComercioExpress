@@ -39,6 +39,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String OBSCLIENTE = "obscliente";
     public static final String CLASSIFICACAO = "observacao";
     public static final String FIDELIDADE = "fidelidade";
+    public static final String TIPOPRECO = "tipopreco";
     public static final int VERSAO = 1;
 
     public static final String TABELALOGIN = "login";
@@ -53,6 +54,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String DESCRICAO = "descricao";
     public static final String ESTOQUEATUAL = "estoqueatual";
     public static final String VALORUNITARIO = "valorunitario";
+    public static final String VALORATACADO = "valoratacado";
     public static final String DESCMAXPERMITIDO = "descmaxpermitido";
     public static final String DESCMAXPERMITIDOA = "descmaxpermitidoa";
     public static final String DESCMAXPERMITIDOB = "descmaxpermitidob";
@@ -162,6 +164,7 @@ public class CriaBanco extends SQLiteOpenHelper {
                 + OBSCLIENTE + " text, "
                 + CLASSIFICACAO + " text, "
                 + FIDELIDADE + " text, "
+                + TIPOPRECO + " text, "
                 + FGSINCRONIZADO + " text )";
 
         db.execSQL(sql);
@@ -235,13 +238,20 @@ public class CriaBanco extends SQLiteOpenHelper {
 
         db.execSQL(sql);*/
 
+        sql = "ALTER TABLE " + TABELAPRODUTOS + " ADD COLUMN " + VALORATACADO + " real";
+
+        db.execSQL(sql);
+
+        sql = "ALTER TABLE " + TABELA + " ADD COLUMN " + TIPOPRECO + " text";
+
+        db.execSQL(sql);
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int OldVersion, int NewVersion){
 
-        db.execSQL("DROP TABLE IF EXISTS" + TABELA);
+        db.execSQL("DROP TABLE IF EXISTS " + TABELA);
         onCreate(db);
 
     }

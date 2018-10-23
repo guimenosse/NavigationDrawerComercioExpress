@@ -554,7 +554,7 @@ public class CadastroClientes extends AppCompatActivity {
                     if (FU_Consiste("incluir")){
 
                             try {
-                                resultado = crud.inserirCliente(cnpjString, rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, vendedor, tipopessoaString, dtultalteracao, dtcadastro, "N", obsclienteString, "", "");
+                                resultado = crud.inserirCliente(cnpjString, rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, vendedor, tipopessoaString, dtultalteracao, dtcadastro, "N", obsclienteString, "", "", "");
                                 Toast.makeText(getApplicationContext(), "Cliente cadastrado com sucesso!", Toast.LENGTH_LONG).show();
                                 Intent secondActivity;
                                 secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);

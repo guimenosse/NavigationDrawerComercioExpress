@@ -644,7 +644,7 @@ public class Opcoes extends AppCompatActivity
                             }
                         }
 
-                        crud.inserirCliente(jObject.getString("CdCliente"), sRzSocial, sNmFantasia, jObject.getString("Cep"), sEndereco, jObject.getString("NumEndereco"), sComplemento, sBairro, jObject.getString("Uf"), sCidade, VA_Cgc, jObject.getString("InscEst"), VA_telefone.replace(" ", ""), VA_telefoneAdicional.replace(" ", ""), VA_fax.replace(" ", ""), sNmContatoCliente, jObject.getString("Email"), sNmTipo, jObject.getString("CdVendedor"), jObject.getString("FgTipoPessoa"), jObject.getString("DtUltAlteracao"), jObject.getString("DtCadastro"), "S", sObsCliente, jObject.getString("Classificacao"), jObject.getString("Fidelidade"));
+                        crud.inserirCliente(jObject.getString("CdCliente"), sRzSocial, sNmFantasia, jObject.getString("Cep"), sEndereco, jObject.getString("NumEndereco"), sComplemento, sBairro, jObject.getString("Uf"), sCidade, VA_Cgc, jObject.getString("InscEst"), VA_telefone.replace(" ", ""), VA_telefoneAdicional.replace(" ", ""), VA_fax.replace(" ", ""), sNmContatoCliente, jObject.getString("Email"), sNmTipo, jObject.getString("CdVendedor"), jObject.getString("FgTipoPessoa"), jObject.getString("DtUltAlteracao"), jObject.getString("DtCadastro"), "S", sObsCliente, jObject.getString("Classificacao"), jObject.getString("Fidelidade"), jObject.getString("TipoPreco"));
                         countCli += 1;
                     }
 
