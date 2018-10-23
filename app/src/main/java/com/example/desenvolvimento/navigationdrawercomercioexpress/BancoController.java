@@ -336,7 +336,11 @@ public class BancoController {
 
     }
 
-    public String inserirProdutoFilial(String cdproduto, String descricao, String estoqueatual, String valorunitario, String dtultalteracao, String maxdescpermitido, String maxdescpermitidoa, String maxdescpermitidob, String maxdescpermitidoc, String maxdescpermitidod, String maxdescpermitidoe, String maxdescpermitidofidelidade){
+    public String inserirProdutoFilial(String cdproduto, String descricao, String estoqueatual, String valorunitario,
+                                       String valoratacado,
+                                       String dtultalteracao, String maxdescpermitido, String maxdescpermitidoa,
+                                       String maxdescpermitidob, String maxdescpermitidoc, String maxdescpermitidod,
+                                       String maxdescpermitidoe, String maxdescpermitidofidelidade){
         ContentValues valores;
         long resultado;
 
@@ -346,6 +350,7 @@ public class BancoController {
         valores.put(CriaBanco.DESCRICAO, descricao);
         valores.put(CriaBanco.ESTOQUEATUAL, estoqueatual);
         valores.put(CriaBanco.VALORUNITARIO, valorunitario);
+        valores.put(CriaBanco.VALORATACADO, valoratacado);
         valores.put(CriaBanco.DTULTALTERACAO, dtultalteracao);
         valores.put(CriaBanco.DESCMAXPERMITIDO, maxdescpermitido);
         valores.put(CriaBanco.DESCMAXPERMITIDOA, maxdescpermitidoa);
@@ -625,7 +630,7 @@ public class BancoController {
     //-------------------- Função para carregamento do produto de acordo com seu id ----------------------------------------
     public Cursor carregaProdutosById(int id){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.DESCMAXPERMITIDO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO, banco.DESCMAXPERMITIDO};
         String where = CriaBanco.ID + "=" + id;
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null, null);
@@ -1843,6 +1848,40 @@ public class BancoController {
         }
         db.close();
         return cursor;
+    }
+
+    public String buscaTipoPrecoCliente(String cdcliente){
+        String tipoPreco = "N";
+        Cursor cursor;
+        String[] campos = {banco.TIPOPRECO};
+        String where = CriaBanco.CDCLIENTE + "='" + cdcliente + "'";
+        db = banco.getReadableDatabase();
+        cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null);
+
+        if(cursor != null){
+            cursor.moveToFirst();
+            tipoPreco = cursor.getString(cursor.getColumnIndex(banco.TIPOPRECO));
+        }
+        db.close();
+
+        return tipoPreco;
+    }
+
+    public String buscaValorAtacado(String cdproduto){
+        String vlAtacado = "";
+        Cursor cursor;
+        String[] campos = {banco.VALORATACADO};
+        String where = CriaBanco.CDPRODUTO + "='" + cdproduto + "'";
+        db = banco.getReadableDatabase();
+        cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null);
+
+        if(cursor != null){
+            cursor.moveToFirst();
+            vlAtacado = cursor.getString(cursor.getColumnIndex(banco.VALORATACADO));
+        }
+        db.close();
+
+        return vlAtacado;
     }
 
 }

@@ -742,7 +742,7 @@ public class Opcoes extends AppCompatActivity
                         //crud.inserirProdutoFilial(jObject.getString("CdProduto"), sDescricao, jObject.getString("EstAtual"), jObjectPrecoFilial.getString("VlVenda"), jObject.getString("DtUltAlteracao"), VA_Desconto, VA_DescontoA, VA_DescontoB, VA_DescontoC, VA_DescontoD, VA_DescontoE, VA_DescontoFidelidade);
 
 
-                        crud.inserirProdutoFilial(jObject.getString("CdProduto"), s2, jObject.getString("EstAtual"), jObject.getString("VlVenda"), jObject.getString("DtUltAlteracao"), VA_Desconto, jObject.getString("DescontoA"), jObject.getString("DescontoB"), jObject.getString("DescontoC"), jObject.getString("DescontoD"), jObject.getString("DescontoE"), jObject.getString("DescontoFidelidade"));
+                        crud.inserirProdutoFilial(jObject.getString("CdProduto"), s2, jObject.getString("EstAtual"), jObject.getString("VlVenda"), jObject.getString("VlAtacado"), jObject.getString("DtUltAlteracao"), VA_Desconto, jObject.getString("DescontoA"), jObject.getString("DescontoB"), jObject.getString("DescontoC"), jObject.getString("DescontoD"), jObject.getString("DescontoE"), jObject.getString("DescontoFidelidade"));
 
                     }
 

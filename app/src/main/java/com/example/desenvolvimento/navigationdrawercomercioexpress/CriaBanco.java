@@ -238,13 +238,17 @@ public class CriaBanco extends SQLiteOpenHelper {
 
         db.execSQL(sql);*/
 
-        sql = "ALTER TABLE " + TABELAPRODUTOS + " ADD COLUMN " + VALORATACADO + " real";
+        try {
+            sql = "ALTER TABLE " + TABELAPRODUTOS + " ADD COLUMN " + VALORATACADO + " real";
 
-        db.execSQL(sql);
+            db.execSQL(sql);
 
-        sql = "ALTER TABLE " + TABELA + " ADD COLUMN " + TIPOPRECO + " text";
+            sql = "ALTER TABLE " + TABELA + " ADD COLUMN " + TIPOPRECO + " text";
 
-        db.execSQL(sql);
+            db.execSQL(sql);
+        }catch (Exception e){
+
+        }
 
     }
 

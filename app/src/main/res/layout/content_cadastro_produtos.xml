@@ -53,9 +53,20 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="25dp" />
 
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Valor Atacado: "
+        android:id="@+id/lb_valoratacado"
+        android:textColor="@color/black"
+        android:layout_below="@+id/lb_valorUnitario"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp" />
+
     <ImageView
         android:id="@+id/imageViewProduto"
-        android:layout_below="@+id/lb_valorUnitario"
+        android:layout_below="@+id/lb_valoratacado"
         android:layout_centerHorizontal="true"
         android:layout_width="350dp"
         android:layout_height="250dp"

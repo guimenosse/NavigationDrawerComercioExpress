@@ -20,6 +20,7 @@ public class CadastroProdutos extends AppCompatActivity {
     TextView lb_cdProduto;
     TextView lb_estoqueAtual;
     TextView lb_valorUnitario;
+    TextView lb_valorAtacado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class CadastroProdutos extends AppCompatActivity {
         lb_cdProduto = (TextView)findViewById(R.id.lb_cdProduto);
         lb_estoqueAtual = (TextView)findViewById(R.id.lb_estoqueAtual);
         lb_valorUnitario = (TextView)findViewById(R.id.lb_valorUnitario);
+        lb_valorAtacado = (TextView)findViewById(R.id.lb_valoratacado);
 
         codigo = this.getIntent().getStringExtra("codigo");
 
@@ -70,6 +72,16 @@ public class CadastroProdutos extends AppCompatActivity {
             }
         }catch (Exception e){
             lb_valorUnitario.setText("Valor Unitário: R$0.00");
+        }
+
+        try {
+            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).equals("null")) {
+                String valorProduto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO));
+                String valor = String.format("%.2f", Double.parseDouble(valorProduto));
+                lb_valorAtacado.setText("Valor Atacado: R$" + valor.replace(",", "."));
+            }
+        }catch (Exception e){
+            lb_valorAtacado.setText("Valor Atacado: R$0.00");
         }
 
         ImageView imagemProduto = (ImageView)findViewById(R.id.imageViewProduto);

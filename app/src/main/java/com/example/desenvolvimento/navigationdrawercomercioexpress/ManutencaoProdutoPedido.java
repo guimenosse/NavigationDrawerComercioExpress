@@ -219,6 +219,8 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                 tb_valorUnitarioProduto.setText("0.00");
             }
 
+
+
             if(Double.parseDouble(tb_valorUnitarioProduto.getText().toString()) == 0) {
                 tb_valorUnitarioProduto.setEnabled(true);
             }else{
@@ -265,6 +267,23 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     }
                 }catch (Exception e){
                     percdescmaxvendedor = 0;
+                }
+            }
+
+            if(crud.buscaTipoPrecoCliente(VA_CdCliente).equals("A")){
+                String vlAtacado = crud.buscaValorAtacado(tb_codigoProduto.getText().toString());
+
+                try {
+                    if(!vlAtacado.equals("null")) {
+                        tb_valorUnitarioProduto.setText(vlAtacado);
+
+                        String valorProduto = tb_valorUnitarioProduto.getText().toString();
+                        String valor = String.format("%.2f", Double.parseDouble(valorProduto));
+                        tb_valorUnitarioProduto.setText(valor.replace(",", "."));
+                        VL_valorBruto = Double.parseDouble(tb_valorUnitarioProduto.getText().toString());
+                    }
+                }catch (Exception e){
+                    tb_valorUnitarioProduto.setText("0.00");
                 }
             }
 
