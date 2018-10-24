@@ -685,7 +685,7 @@ public class Filial extends AppCompatActivity {
             // Instantiate an HttpClient
             HttpClient httpclient = new DefaultHttpClient(p);
             String url = "http://www.planosistemas.com.br/" +
-                    "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=autorizacao&cdsistema=PAR&cdfuncao=CBFILIAL&nmusuario=" + crud.selecionarNmUsuarioSistema() + "";
+                    "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=autorizacao&cdsistema=PAR&cdfuncao=CBFILIAL&nmusuario=" + crud.selecionarNmUsuarioSistema().replace(" ", "espaco") + "";
             HttpPost httppost = new HttpPost(url);
 
             // Instantiate a GET HTTP method
