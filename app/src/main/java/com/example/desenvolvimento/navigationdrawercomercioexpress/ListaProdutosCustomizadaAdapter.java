@@ -26,14 +26,15 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
     private List<String> descricao;
     private List<String> itensRestantes;
     private List<String> valorProdutos;
+    private List<String> valorAtacado;
 
-    public ListaProdutosCustomizadaAdapter(Context context, List<Integer> imagem, List<String> descricao, List<String> itensRestantes, List<String> valorProdutos){
+    public ListaProdutosCustomizadaAdapter(Context context, List<Integer> imagem, List<String> descricao, List<String> itensRestantes, List<String> valorProdutos, List<String> valorAtacado){
         this.context = context;
         this.imagem = imagem;
         this.descricao = descricao;
         this.itensRestantes = itensRestantes;
         this.valorProdutos = valorProdutos;
-
+        this.valorAtacado = valorAtacado;
     }
 
     private class ViewHolder{
@@ -41,7 +42,7 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
         TextView textoDescricao;
         TextView numItensRestantes;
         TextView valor_produtos;
-
+        TextView valor_atacado;
     }
 
     @Override
@@ -73,6 +74,7 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
             holder.textoDescricao = (TextView) convertView.findViewById(R.id.descricao_item);
             holder.numItensRestantes = (TextView) convertView.findViewById(R.id.itens_restantes);
             holder.valor_produtos = (TextView)convertView.findViewById(R.id.valor_produtos);
+            holder.valor_atacado = (TextView)convertView.findViewById(R.id.valor_atacado);
 
             convertView.setTag(holder);
         } else {
@@ -80,15 +82,20 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
         }
 
         //holder.imagemFruta.setImageResource(imagem.get(position));
-        if(Integer.parseInt(itensRestantes.get(position)) < 0) {
-            holder.textoDescricao.setTextColor(Color.RED);
-        }else{
+        try {
+            if (Integer.parseInt(itensRestantes.get(position)) <= 0) {
+                holder.textoDescricao.setTextColor(Color.RED);
+            } else {
+                holder.textoDescricao.setTextColor(Color.GRAY);
+            }
+        }catch (Exception e){
             holder.textoDescricao.setTextColor(Color.GRAY);
         }
 
         holder.textoDescricao.setText(descricao.get(position));
         holder.numItensRestantes.setText(itensRestantes.get(position));
         holder.valor_produtos.setText(valorProdutos.get(position));
+        holder.valor_atacado.setText(valorAtacado.get(position));
 
 
         return convertView;

@@ -871,10 +871,12 @@ public class ManutencaoPedidos extends AppCompatActivity {
             VL_valorTotal = 0;
             double VA_quantidadeTotal = 0;
             String VA_ValorProduto = "";
+            String VA_ValorAtacado = "";
             VA_ContProdutos = 0;
             List<String> descricaoPedidos = new ArrayList<>();
             List<String> itensRestantesPedidos = new ArrayList<>();
             List<String> valorProdutos = new ArrayList<>();
+            List<String> valorAtacado = new ArrayList<>();
             if (cursorItemPedido != null) {
                 descricaoPedidos.add(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                 itensRestantesPedidos.add(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
@@ -933,7 +935,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             ListView lista = (ListView) findViewById(R.id.listViewItemPedidos);
 
-            ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, descricaoPedidos, itensRestantesPedidos, valorProdutos);
+            ListaProdutosPedido adapter = new ListaProdutosPedido(this, icones, descricaoPedidos, itensRestantesPedidos, valorProdutos);
             lista.setAdapter(adapter);
 
 

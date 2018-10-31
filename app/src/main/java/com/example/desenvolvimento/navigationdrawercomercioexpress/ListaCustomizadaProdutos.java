@@ -58,6 +58,14 @@ public class ListaCustomizadaProdutos extends AppCompatActivity {
         itensRestantes.add("02");
         itensRestantes.add("00");
 
+        List<String> valorAtacado = new ArrayList<>();
+        valorAtacado.add("01");
+        valorAtacado.add("03");
+        valorAtacado.add("04");
+        valorAtacado.add("02");
+        valorAtacado.add("02");
+        valorAtacado.add("00");
+
         ListView lista = (ListView) findViewById(R.id.lista);
 
         View.OnClickListener myhandler = new View.OnClickListener() {
@@ -69,7 +77,7 @@ public class ListaCustomizadaProdutos extends AppCompatActivity {
             }
         };
 
-        ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, descricao, itensRestantes, valorProdutos);
+        ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, descricao, itensRestantes, valorProdutos, valorAtacado);
         lista.setAdapter(adapter);
 
     }

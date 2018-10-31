@@ -44,25 +44,31 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
         numpedido = this.getIntent().getStringExtra("numpedido");
 
         String VA_ValorProduto = "";
+        String VA_ValorAtacado = "";
         VA_ContProdutos = 0;
         BancoController crud = new BancoController(getBaseContext());
         final Cursor cursor = crud.carregaProdutosCompleto();
         List<String> descricao = new ArrayList<>();
         List<String> itensRestantes = new ArrayList<>();
         List<String> valorProduto = new ArrayList<>();
+        List<String> valorAtacado = new ArrayList<>();
         if (cursor != null) {
             descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
             itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
             VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+            VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
             valorProduto.add(VA_ValorProduto);
+            valorAtacado.add(VA_ValorAtacado);
             VA_ContProdutos = VA_ContProdutos + 1;
             while(cursor.moveToNext()) {
                 descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                 itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                 VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
                 valorProduto.add(VA_ValorProduto);
+                valorAtacado.add(VA_ValorAtacado);
                 VA_ContProdutos = VA_ContProdutos + 1;
             }
         }
@@ -85,7 +91,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
 
         lista = (ListView) findViewById(R.id.lista);
 
-        ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, descricao, itensRestantes, valorProduto);
+        ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, descricao, itensRestantes, valorProduto, valorAtacado);
         lista.setAdapter(adapter);
 
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -128,24 +134,30 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
                 final Cursor cursor = crud.carregaProdutosDescricaoPedido(tb_buscarprodutoPedido.getText().toString());
 
                 String VA_ValorProduto = "";
+                String VA_ValorAtacado = "";
                 VA_ContProdutos = 0;
                 List<String> descricao = new ArrayList<>();
                 List<String> itensRestantes = new ArrayList<>();
                 List<String> valorProduto = new ArrayList<>();
+                List<String> valorAtacado = new ArrayList<>();
                 if (cursor != null) {
                     try {
                         descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                         itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                         VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                        VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
                         valorProduto.add(VA_ValorProduto);
+                        valorAtacado.add(VA_ValorAtacado);
                         VA_ContProdutos = VA_ContProdutos + 1;
                         while (cursor.moveToNext()) {
                             descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                             itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                             VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                            VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
                             valorProduto.add(VA_ValorProduto);
+                            valorAtacado.add(VA_ValorAtacado);
                             VA_ContProdutos = VA_ContProdutos + 1;
                         }
                     }catch (Exception e){
@@ -161,7 +173,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
                 }
                 lista = (ListView) findViewById(R.id.lista);
 
-                ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(getBaseContext(), icones, descricao, itensRestantes, valorProduto);
+                ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(getBaseContext(), icones, descricao, itensRestantes, valorProduto, valorAtacado);
                 lista.setAdapter(adapter);
 
 

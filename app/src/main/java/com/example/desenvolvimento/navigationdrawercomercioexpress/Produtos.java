@@ -67,25 +67,31 @@ public class Produtos extends AppCompatActivity
         }
 
         String VA_ValorProduto = "";
+        String VA_ValorAtacado = "";
         VA_ContProdutos = 0;
         BancoController crud = new BancoController(getBaseContext());
         final Cursor cursor = crud.carregaProdutosCompleto();
         List<String> descricao = new ArrayList<>();
         List<String> itensRestantes = new ArrayList<>();
         List<String> valorProduto = new ArrayList<>();
+        List<String> valorAtacado = new ArrayList<>();
         if (cursor != null) {
             descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
             itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
             VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+            VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
             valorProduto.add(VA_ValorProduto);
+            valorAtacado.add(VA_ValorAtacado);
             VA_ContProdutos = VA_ContProdutos + 1;
             while(cursor.moveToNext()) {
                 descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                 itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                 VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
                 valorProduto.add(VA_ValorProduto);
+                valorAtacado.add(VA_ValorAtacado);
                 VA_ContProdutos = VA_ContProdutos + 1;
             }
         }
@@ -108,7 +114,7 @@ public class Produtos extends AppCompatActivity
 
         lista = (ListView) findViewById(R.id.lista);
 
-        ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, descricao, itensRestantes, valorProduto);
+        ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, descricao, itensRestantes, valorProduto, valorAtacado);
         lista.setAdapter(adapter);
 
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -165,24 +171,30 @@ public class Produtos extends AppCompatActivity
                 final Cursor cursor = crud.carregaProdutosDescricaoPedido(tb_buscarprodutoPedido.getText().toString());
 
                 String VA_ValorProduto = "";
+                String VA_ValorAtacado = "";
                 VA_ContProdutos = 0;
                 List<String> descricao = new ArrayList<>();
                 List<String> itensRestantes = new ArrayList<>();
                 List<String> valorProduto = new ArrayList<>();
+                List<String> valorAtacado = new ArrayList<>();
                 if (cursor != null) {
                     try {
                         descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                         itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                         VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                        VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
                         valorProduto.add(VA_ValorProduto);
+                        valorAtacado.add(VA_ValorAtacado);
                         VA_ContProdutos = VA_ContProdutos + 1;
                         while (cursor.moveToNext()) {
                             descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                             itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                             VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                            VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
                             valorProduto.add(VA_ValorProduto);
+                            valorAtacado.add(VA_ValorAtacado);
                             VA_ContProdutos = VA_ContProdutos + 1;
                         }
                     }catch (Exception e){
@@ -198,7 +210,7 @@ public class Produtos extends AppCompatActivity
                 }
                 lista = (ListView) findViewById(R.id.lista);
 
-                ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(getBaseContext(), icones, descricao, itensRestantes, valorProduto);
+                ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(getBaseContext(), icones, descricao, itensRestantes, valorProduto, valorAtacado);
                 lista.setAdapter(adapter);
 
                 lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -219,22 +231,40 @@ public class Produtos extends AppCompatActivity
                             //cursor.moveToPosition(position + 1);
                             codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
                             Intent secondActivity;
-                            Intent intent = new Intent(Produtos.this, ManutencaoProdutoPedido.class);
-                            intent.putExtra("codigo", codigo);
-                            intent.putExtra("numpedido", numpedido);
-                            intent.putExtra("alteracao", "N");
-                            //startActivity(intent);
-                            startActivityForResult(intent, 1);
+                            if (selecaoprodutos.equals("S")) {
+                                Intent intent = new Intent(Produtos.this, ManutencaoProdutoPedido.class);
+                                intent.putExtra("codigo", codigo);
+                                intent.putExtra("numpedido", numpedido);
+                                intent.putExtra("alteracao", "N");
+                                //startActivity(intent);
+                                startActivityForResult(intent, 1);
+                            }else{
+                                Intent intent = new Intent(Produtos.this, CadastroProdutos.class);
+                                intent.putExtra("codigo", codigo);
+
+                                intent.putExtra("numpedido", numpedido);
+                                intent.putExtra("alteracao", "N");
+                                startActivityForResult(intent, 1);
+                            }
                         }catch (Exception e){
                             cursor.moveToPosition(position);
                             codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
                             Intent secondActivity;
-                            Intent intent = new Intent(Produtos.this, ManutencaoProdutoPedido.class);
-                            intent.putExtra("codigo", codigo);
-                            intent.putExtra("numpedido", numpedido);
-                            intent.putExtra("alteracao", "N");
-                            //startActivity(intent);
-                            startActivityForResult(intent, 1);
+                            if (selecaoprodutos.equals("S")) {
+                                Intent intent = new Intent(Produtos.this, ManutencaoProdutoPedido.class);
+                                intent.putExtra("codigo", codigo);
+                                intent.putExtra("numpedido", numpedido);
+                                intent.putExtra("alteracao", "N");
+                                //startActivity(intent);
+                                startActivityForResult(intent, 1);
+                            }else{
+                                Intent intent = new Intent(Produtos.this, CadastroProdutos.class);
+                                intent.putExtra("codigo", codigo);
+
+                                intent.putExtra("numpedido", numpedido);
+                                intent.putExtra("alteracao", "N");
+                                startActivityForResult(intent, 1);
+                            }
                         }
                     }
                 });
