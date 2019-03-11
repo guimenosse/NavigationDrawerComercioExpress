@@ -438,11 +438,12 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                                 Cursor cursor = crud.carregaProdutosById(Integer.parseInt(codigo));
 
 
-                                double valorBruto = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLUNITARIO)).replace(",", "."));
+                                double valorBruto = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", "."));
                                 double valorLiquido = valorBruto - VA_VlUnitarioNovo;
 
 
                                 double porcentagem = ((valorBruto - valorLiquido) / valorBruto) * 100;
+                                porcentagem = 100 - porcentagem;
                                 if (porcentagem > percdescmaxvendedor) {
                                     MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Desconto informado é maior que o permitido!");
                                     tb_valorUnitarioProduto.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)));
@@ -457,7 +458,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
 
                             double valorLiquido = VL_valorBruto - Double.parseDouble(tb_valorUnitarioProduto.getText().toString().replace(",", "."));
-
+                            tb_valorUnitarioProduto.setText(String.format("%.2f", VL_valorBruto));
                             double porcentagem = ((VL_valorBruto - valorLiquido) / VL_valorBruto) * 100;
                             tb_descontoProduto.setText(String.format("%.5f", 100 - porcentagem).replace(",", "."));
                             tb_descontoProduto.setEnabled(true);
@@ -468,7 +469,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                             tb_descontoProduto.setEnabled(true);
                             //tb_descontoProduto.setText("0");
                         }
-
+                        VA_VlUnitarioNovo = VL_valorBruto; //Realizado esse tratamento para que o sistema mantenha o valor incial do produto
 
                 }catch(Exception e){
                     e.printStackTrace();
@@ -752,10 +753,12 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                         try {
                             Cursor cursor = crud.carregaProdutosById(Integer.parseInt(codigo));
 
-                            double valorBruto = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLUNITARIO)).replace(",", "."));
+                            double valorBruto = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", "."));
                             double valorLiquido = valorBruto - VA_VlUnitarioNovo;
 
                             double porcentagem = ((valorBruto - valorLiquido) / valorBruto) * 100;
+                            porcentagem = 100 - porcentagem;
+
                             if (porcentagem > percdescmaxvendedor) {
                                 MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Desconto informado é maior que o permitido!");
                                 tb_valorUnitarioProduto.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)));
@@ -777,6 +780,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     double porcentagem = ((VL_valorBruto - valorLiquido) / VL_valorBruto) * 100;
                     tb_descontoProduto.setText(String.format("%.5f", 100 - porcentagem).replace(",", "."));
                     VA_descontoProduto = 100 - porcentagem;
+                    tb_valorUnitarioProduto.setText(String.format("%.2f", VL_valorBruto));
 
                 } catch (Exception e) {
                     e.printStackTrace();
