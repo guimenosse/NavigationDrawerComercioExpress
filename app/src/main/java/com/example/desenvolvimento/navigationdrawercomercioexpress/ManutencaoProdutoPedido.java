@@ -458,7 +458,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
 
                             double valorLiquido = VL_valorBruto - Double.parseDouble(tb_valorUnitarioProduto.getText().toString().replace(",", "."));
-                            tb_valorUnitarioProduto.setText(String.format("%.2f", VL_valorBruto));
+                            tb_valorUnitarioProduto.setText(String.format("%.2f", VL_valorBruto).replace(".", "").replace(",", "."));
                             double porcentagem = ((VL_valorBruto - valorLiquido) / VL_valorBruto) * 100;
                             tb_descontoProduto.setText(String.format("%.5f", 100 - porcentagem).replace(",", "."));
                             tb_descontoProduto.setEnabled(true);
@@ -596,7 +596,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
             Cursor cursorVlUnitario = crud.carregaDadosProdutosByCdProduto(tb_codigoProduto.getText().toString());
             double vlunitariobruto = Double.parseDouble(cursorVlUnitario.getString(cursorVlUnitario.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)));
 
-            double VA_vlUnitarioProduto = Double.parseDouble(tb_valorUnitarioProduto.getText().toString());
+            double VA_vlUnitarioProduto = Double.parseDouble(tb_valorUnitarioProduto.getText().toString().replace(",", "."));
             double vltotal = Double.parseDouble(tb_quantidadeProduto.getText().toString()) * Double.parseDouble(tb_valorUnitarioProduto.getText().toString());
             double vldesconto = 0;
 
@@ -780,7 +780,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     double porcentagem = ((VL_valorBruto - valorLiquido) / VL_valorBruto) * 100;
                     tb_descontoProduto.setText(String.format("%.5f", 100 - porcentagem).replace(",", "."));
                     VA_descontoProduto = 100 - porcentagem;
-                    tb_valorUnitarioProduto.setText(String.format("%.2f", VL_valorBruto));
+                    tb_valorUnitarioProduto.setText(String.format("%.2f", VL_valorBruto).replace(".", "").replace(",", "."));
 
                 } catch (Exception e) {
                     e.printStackTrace();
