@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Locale;
 
 public class ManutencaoProdutoPedido extends AppCompatActivity {
@@ -743,7 +745,13 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
             Cursor cursorVlUnitario = crud.carregaDadosProdutosByCdProduto(tb_codigoProduto.getText().toString());
 
             VL_valorBruto = Double.parseDouble(cursorVlUnitario.getString(cursorVlUnitario.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", "."));
-
+            if (VL_valorBruto != 0) {
+                DecimalFormat fmt = new DecimalFormat("0.00");   //limita o número de casas decimais
+                String string = fmt.format(VL_valorBruto);
+                //String[] part = string.split("[,]");
+                //String preco = part[0]+"."+part[1];
+                VL_valorBruto = Double.parseDouble(string);
+            }
             if (VA_vlUnitarioProduto < VL_valorBruto) {
 
                 try {

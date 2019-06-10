@@ -1759,7 +1759,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            if(FU_EnviarPedido()) {
+            if(FU_EnviarPedido() == true) {
 
                 validou = "S";
 
