@@ -562,7 +562,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         BancoController crud = new BancoController(getBaseContext());
 
-        int TIMEOUT_MILLISEC = 10000;
+        int TIMEOUT_MILLISEC = 50000;
         try {
 
             HttpParams p = new BasicHttpParams();

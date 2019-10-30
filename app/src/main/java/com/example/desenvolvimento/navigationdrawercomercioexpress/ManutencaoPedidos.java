@@ -1530,6 +1530,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
                 String tipopessoaString = "";
                 String tipoclienteString = "";
                 String obsclienteString = "";
+                String inscestadual = "";
                 String vendedorString = "99";
                 String dtultalteracao = "";
                 String dtcadastro = "";
@@ -1629,6 +1630,11 @@ public class ManutencaoPedidos extends AppCompatActivity {
                 }else{
                     obsclienteString = "espaco";
                 }
+                if(!cursor.getString(cursor.getColumnIndex("inscestadual")).equals("null")  && !cursor.getString(cursor.getColumnIndex("inscestadual")).trim().equals("")) {
+                    inscestadual = cursor.getString(cursor.getColumnIndex("inscestadual")).replace("'", "");
+                }else{
+                    inscestadual = "espaco";
+                }
                 //tipoclienteString = "EXPRESSPLANO";
                 if(!cursor.getString(cursor.getColumnIndex("dtultalteracao")).equals("null")  && !cursor.getString(cursor.getColumnIndex("dtultalteracao")).trim().equals("")) {
                     dtultalteracao = cursor.getString(cursor.getColumnIndex("dtultalteracao"));
@@ -1664,12 +1670,29 @@ public class ManutencaoPedidos extends AppCompatActivity {
                     HttpClient httpclient = new DefaultHttpClient(p);
 
                     String url = "http://www.planosistemas.com.br/" +
-                            "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirClienteNovo&rzsocial=" + rzsocialString.replace(" ", "espaco") + "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
-                            "&cep=" + cepString + "&endereco=" + enderecoString.replace(" ", "espaco") + "&numero=" + numeroString + "&complemento=" + complementoString.replace(" ", "espaco") +
-                            "&bairro=" + bairroString.replace(" ", "espaco") + "&uf=" + estadoString + "&cidade=" + cidadeString.replace(" ", "espaco") + "&tipopessoa=" + tipopessoaString +
-                            "&cgc=" + cnpjString + "&telefone=" + telefoneString + "&telefoneadicional=" + telefoneAdicionalString + "&fax=" + faxString +
-                            "&contato=" + nmcontatoString.replace(" ", "espaco") + "&email=" + emailString + "&vendedor=" + vendedorString + "&tipocliente=" + tipoclienteString.replace(" ", "espaco") + "&dtcadastro=" + dtcadastro.replace(" ", "espaco") + "" +
-                            "&obscliente=" + obsclienteString.replace(" ", "espaco") + "";
+                            "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirClienteNovo&rzsocial=" +
+                            rzsocialString.replace(" ", "espaco") +
+                            "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
+                            "&cep=" + cepString +
+                            "&endereco=" + enderecoString.replace(" ", "espaco") +
+                            "&numero=" + numeroString +
+                            "&complemento=" + complementoString.replace(" ", "espaco") +
+                            "&bairro=" + bairroString.replace(" ", "espaco") +
+                            "&uf=" + estadoString +
+                            "&cidade=" + cidadeString.replace(" ", "espaco") +
+                            "&tipopessoa=" + tipopessoaString +
+                            "&cgc=" + cnpjString +
+                            "&telefone=" + telefoneString +
+                            "&telefoneadicional=" + telefoneAdicionalString +
+                            "&fax=" + faxString +
+                            "&contato=" + nmcontatoString.replace(" ", "espaco") +
+                            "&email=" + emailString +
+                            "&vendedor=" + vendedorString +
+                            "&tipocliente=" + tipoclienteString.replace(" ", "espaco") +
+                            "&dtcadastro=" + dtcadastro.replace(" ", "espaco") +
+                            "" +
+                            "&obscliente=" + obsclienteString.replace(" ", "espaco") + "" +
+                            "&inscestadual=" + inscestadual.replace("", "espaco");
                     HttpPost httppost = new HttpPost(url);
 
                     // Instantiate a GET HTTP method

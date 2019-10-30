@@ -45,10 +45,13 @@ public class BancoController {
 
 
     //----------------------- Função para inclusão de um novo cliente --------------------------------------
-    public String inserirCliente(String cdcliente, String rzsocial, String nmfantasia, String cep, String endereco, String numero, String complemento, String bairro,
-                                 String uf, String cidade, String cgc, String inscestadual, String telefone, String telefoneadicional, String fax, String contato,
-                                 String email, String tipcliente, String vendedor, String tipopessoa, String dtultalteracao, String dtcadastro, String fgsincronizado,
-                                 String obscliente, String classificacao, String fidelidade, String tipopreco){
+    public String inserirCliente(String cdcliente, String rzsocial, String nmfantasia, String cep, String endereco,
+                                 String numero, String complemento, String bairro, String uf, String cidade,
+                                 String cgc, String inscestadual, String telefone, String telefoneadicional,
+                                 String fax, String contato, String email, String tipcliente, String vendedor,
+                                 String tipopessoa, String dtultalteracao, String dtcadastro, String fgsincronizado,
+                                 String obscliente, String classificacao, String fidelidade, String tipopreco)
+    {
         ContentValues valores;
         long resultado;
 
@@ -210,7 +213,13 @@ public class BancoController {
     //----------------------Função para buscar todos os dados de um cliente para a tela de Cadastro de Clientes----------------------------
     public Cursor carregaClienteById(int id){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDCLIENTE, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP, banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.CNPJ, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO, banco.TIPOPESSOA, banco.DTCADASTRO, banco.FGSINCRONIZADO, banco.OBSCLIENTE};
+        String[] campos = {
+                banco.ID, banco.CDCLIENTE, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP,
+                banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF,
+                banco.CIDADE, banco.CNPJ, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX,
+                banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO,
+                banco.TIPOPESSOA, banco.DTCADASTRO, banco.FGSINCRONIZADO, banco.OBSCLIENTE, banco.INSCESTADUAL
+        };
         String where = CriaBanco.ID + "=" + id;
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null, null);
@@ -270,7 +279,14 @@ public class BancoController {
     //-----------------Função para carregar os dados dos clientes nao sincronizados--------------------------------
     public Cursor carregaClientesNaoSincronizados(String fgsincronizado){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDCLIENTE, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP, banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.TIPOPESSOA, banco.CNPJ, banco.INSCESTADUAL, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.OBSCLIENTE};
+        String[] campos = {
+                banco.ID, banco.CDCLIENTE, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP,
+                banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF,
+                banco.CIDADE, banco.TIPOPESSOA, banco.CNPJ, banco.INSCESTADUAL, banco.TELEFONE,
+                banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE,
+                banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.OBSCLIENTE,
+                banco.INSCESTADUAL
+        };
         String where = CriaBanco.FGSINCRONIZADO + " = '" + fgsincronizado + "'";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null);
@@ -1698,7 +1714,7 @@ public class BancoController {
                 CriaBanco.DESCMAXPERMITIDOC + " real, " +
                 CriaBanco.DESCMAXPERMITIDOD + " real, " +
                 CriaBanco.DESCMAXPERMITIDOE + " real, " +
-                CriaBanco.DESCMAXPERMITIDOFIDELIDADE + " real");
+                CriaBanco.DESCMAXPERMITIDOFIDELIDADE + " real ");
 
         db.close();
     }
