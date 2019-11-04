@@ -750,7 +750,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                 String string = fmt.format(VL_valorBruto);
                 //String[] part = string.split("[,]");
                 //String preco = part[0]+"."+part[1];
-                VL_valorBruto = Double.parseDouble(string);
+                VL_valorBruto = Double.parseDouble(string.replace(",", "."));
             }
             if (VA_vlUnitarioProduto < VL_valorBruto) {
 

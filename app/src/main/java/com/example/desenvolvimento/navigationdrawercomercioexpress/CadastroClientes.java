@@ -167,8 +167,8 @@ public class CadastroClientes extends AppCompatActivity {
         maskCNPJ = new MaskEditTextChangedListener("##.###.###/####-##", cnpj);
 
 
-        MaskEditTextChangedListener maskTelefone = new MaskEditTextChangedListener("(##)####-####", telefone);
-        MaskEditTextChangedListener maskTelefoneAdicional = new MaskEditTextChangedListener("(##)####-####", telefoneadicional);
+        MaskEditTextChangedListener maskTelefone = new MaskEditTextChangedListener("(##)#####-####", telefone);
+        MaskEditTextChangedListener maskTelefoneAdicional = new MaskEditTextChangedListener("(##)#####-####", telefoneadicional);
         MaskEditTextChangedListener maskFax = new MaskEditTextChangedListener("(##)####-####", fax);
         MaskEditTextChangedListener maskCep = new MaskEditTextChangedListener("##.###-###", cep);
 
