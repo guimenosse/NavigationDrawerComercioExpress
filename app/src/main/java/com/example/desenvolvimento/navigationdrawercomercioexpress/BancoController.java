@@ -938,7 +938,9 @@ public class BancoController {
     public Cursor carregaProdutosDescricaoPedido(String descricao){
         Cursor cursor;
         String[] campos = {banco.ID, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO};
-        String where = CriaBanco.DESCRICAO + " LIKE '%" + descricao + "%'";
+        String where = "(" + CriaBanco.DESCRICAO + " LIKE '%" + descricao + "%'";
+        where += " OR " + CriaBanco.ID + " LIKE '%" + descricao + "%')";
+
         String orderBy = CriaBanco.DESCRICAO;
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, orderBy, null);

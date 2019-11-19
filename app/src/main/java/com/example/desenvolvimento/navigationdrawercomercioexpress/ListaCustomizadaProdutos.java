@@ -33,6 +33,14 @@ public class ListaCustomizadaProdutos extends AppCompatActivity {
         icones.add(R.drawable.cataflam);
         icones.add(R.drawable.cataflam);
 
+        List<String> codigo = new ArrayList<>();
+        codigo.add("78912345678");
+        codigo.add("78912345678");
+        codigo.add("78912345678");
+        codigo.add("78912345678");
+        codigo.add("78912345678");
+        codigo.add("78912345678");
+
         List<String> descricao = new ArrayList<>();
         descricao.add("Cataflam 01");
         descricao.add("Cataflam 02");
@@ -77,7 +85,7 @@ public class ListaCustomizadaProdutos extends AppCompatActivity {
             }
         };
 
-        ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, descricao, itensRestantes, valorProdutos, valorAtacado);
+        ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(this, icones, codigo, descricao, itensRestantes, valorProdutos, valorAtacado);
         lista.setAdapter(adapter);
 
     }
