@@ -56,7 +56,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
         List<String> valorAtacado = new ArrayList<>();
 
         if (cursor != null) {
-            codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID)));
+            codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
             descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
             itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
             VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
@@ -66,7 +66,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
             valorAtacado.add(VA_ValorAtacado);
             VA_ContProdutos = VA_ContProdutos + 1;
             while(cursor.moveToNext()) {
-                codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID)));
+                codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
                 descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                 itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                 VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
@@ -150,7 +150,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
 
                 if (cursor != null) {
                     try {
-                        codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID)));
+                        codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
                         descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                         itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                         VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
@@ -160,7 +160,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
                         valorAtacado.add(VA_ValorAtacado);
                         VA_ContProdutos = VA_ContProdutos + 1;
                         while (cursor.moveToNext()) {
-                            codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID)));
+                            codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
                             descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
                             itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
                             VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));

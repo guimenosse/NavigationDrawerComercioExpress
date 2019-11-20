@@ -614,7 +614,7 @@ public class BancoController {
     public Cursor carregaProdutosCompleto(){
 
         Cursor cursor;
-        String[] campos = {banco.ID, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO};
         String orderBy = CriaBanco.DESCRICAO;
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, null, null, null, null, orderBy, null);
@@ -937,9 +937,9 @@ public class BancoController {
 
     public Cursor carregaProdutosDescricaoPedido(String descricao){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO};
         String where = "(" + CriaBanco.DESCRICAO + " LIKE '%" + descricao + "%'";
-        where += " OR " + CriaBanco.ID + " LIKE '%" + descricao + "%')";
+        where += " OR " + CriaBanco.CDPRODUTO + " LIKE '%" + descricao + "%')";
 
         String orderBy = CriaBanco.DESCRICAO;
         db = banco.getReadableDatabase();
@@ -1781,13 +1781,13 @@ public class BancoController {
 
         if(cursor!=null){
             cursor.moveToFirst();
-
-            if(cursor.getString(cursor.getColumnIndex(CriaBanco.CLASSIFICACAO)).trim().equals("")){
-                classificacao = "N";
-            }else{
-                classificacao = cursor.getString(cursor.getColumnIndex(CriaBanco.CLASSIFICACAO));
+            if(cursor.getCount() != 0) {
+                if (cursor.getString(cursor.getColumnIndex(CriaBanco.CLASSIFICACAO)).trim().equals("")) {
+                    classificacao = "N";
+                } else {
+                    classificacao = cursor.getString(cursor.getColumnIndex(CriaBanco.CLASSIFICACAO));
+                }
             }
-
         }
         db.close();
         return classificacao;
@@ -1805,9 +1805,9 @@ public class BancoController {
 
         if(cursor!=null){
             cursor.moveToFirst();
-
-            fidelidade = cursor.getString(cursor.getColumnIndex(CriaBanco.FIDELIDADE));
-
+            if(cursor.getCount() != 0){
+                fidelidade = cursor.getString(cursor.getColumnIndex(CriaBanco.FIDELIDADE));
+            }
         }
         db.close();
         return fidelidade;
@@ -1878,7 +1878,9 @@ public class BancoController {
 
         if(cursor != null){
             cursor.moveToFirst();
-            tipoPreco = cursor.getString(cursor.getColumnIndex(banco.TIPOPRECO));
+            if(cursor.getCount() != 0) {
+                tipoPreco = cursor.getString(cursor.getColumnIndex(banco.TIPOPRECO));
+            }
         }
         db.close();
 
