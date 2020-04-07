@@ -23,14 +23,16 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
 
     private Context context;
     private List<Integer> imagem;
+    private List<String> codigo;
     private List<String> descricao;
     private List<String> itensRestantes;
     private List<String> valorProdutos;
     private List<String> valorAtacado;
 
-    public ListaProdutosCustomizadaAdapter(Context context, List<Integer> imagem, List<String> descricao, List<String> itensRestantes, List<String> valorProdutos, List<String> valorAtacado){
+    public ListaProdutosCustomizadaAdapter(Context context, List<Integer> imagem, List<String> codigo, List<String> descricao, List<String> itensRestantes, List<String> valorProdutos, List<String> valorAtacado){
         this.context = context;
         this.imagem = imagem;
+        this.codigo = codigo;
         this.descricao = descricao;
         this.itensRestantes = itensRestantes;
         this.valorProdutos = valorProdutos;
@@ -39,6 +41,7 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
 
     private class ViewHolder{
         ImageView imagemFruta;
+        TextView textoCodigo;
         TextView textoDescricao;
         TextView numItensRestantes;
         TextView valor_produtos;
@@ -71,6 +74,7 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
             holder = new ViewHolder();
 
             //holder.imagemFruta = (ImageView) convertView.findViewById(R.id.icone);
+            holder.textoCodigo = (TextView) convertView.findViewById(R.id.codigo_item);
             holder.textoDescricao = (TextView) convertView.findViewById(R.id.descricao_item);
             holder.numItensRestantes = (TextView) convertView.findViewById(R.id.itens_restantes);
             holder.valor_produtos = (TextView)convertView.findViewById(R.id.valor_produtos);
@@ -82,6 +86,7 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
         }
 
         //holder.imagemFruta.setImageResource(imagem.get(position));
+
         try {
             if (Integer.parseInt(itensRestantes.get(position)) <= 0) {
                 holder.textoDescricao.setTextColor(Color.RED);
@@ -92,6 +97,7 @@ public class ListaProdutosCustomizadaAdapter extends BaseAdapter {
             holder.textoDescricao.setTextColor(Color.GRAY);
         }
 
+        holder.textoCodigo.setText(codigo.get(position));
         holder.textoDescricao.setText(descricao.get(position));
         holder.numItensRestantes.setText(itensRestantes.get(position));
         holder.valor_produtos.setText(valorProdutos.get(position));

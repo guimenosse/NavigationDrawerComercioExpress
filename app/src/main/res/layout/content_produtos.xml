@@ -16,11 +16,11 @@
         android:id="@+id/tb_buscarprodutoPedido"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="Buscar produto"
         android:background="@drawable/edittext_foco"
+        android:hint="Selecione pelo código ou a descrição"
+        android:padding="10dip"
         android:textColor="@color/black"
-        android:textCursorDrawable="@drawable/cursor"
-        android:padding="10dip" >
+        android:textCursorDrawable="@drawable/cursor">
 
     </EditText>
 

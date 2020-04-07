@@ -312,6 +312,7 @@ public class Opcoes extends AppCompatActivity
                 String dtultalteracao = "";
                 String dtcadastro = "";
                 String resultado = "";
+                String inscestString = "";
 
                 if(!cursor.getString(cursor.getColumnIndex("cdcliente")).equals("null") && !cursor.getString(cursor.getColumnIndex("cdcliente")).trim().equals("")) {
                     cdclienteString = cursor.getString(cursor.getColumnIndex("cdcliente")).replace("'", "");
@@ -426,7 +427,11 @@ public class Opcoes extends AppCompatActivity
                 }else{
                     vendedorString = "espaco";
                 }
-
+                if(!cursor.getString(cursor.getColumnIndex("inscestadual")).equals("null")  && !cursor.getString(cursor.getColumnIndex("inscestadual")).trim().equals("")) {
+                    inscestString = cursor.getString(cursor.getColumnIndex("inscestadual"));
+                }else{
+                    inscestString = "espaco";
+                }
 
                 try {
                     // http://androidarabia.net/quran4android/phpserver/connecttoserver.php
@@ -444,12 +449,30 @@ public class Opcoes extends AppCompatActivity
                     // Instantiate an HttpClient
                     HttpClient httpclient = new DefaultHttpClient(p);
                     String url = "http://www.planosistemas.com.br/" +
-                            "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirClienteNovo&rzsocial=" + rzsocialString.replace(" ", "espaco") + "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
-                            "&cep=" + cepString + "&endereco=" + enderecoString.replace(" ", "espaco") + "&numero=" + numeroString + "&complemento=" + complementoString.replace(" ", "espaco") +
-                            "&bairro=" + bairroString.replace(" ", "espaco") + "&uf=" + estadoString + "&cidade=" + cidadeString.replace(" ", "espaco") + "&tipopessoa=" + tipopessoaString +
-                            "&cgc=" + cnpjString + "&telefone=" + telefoneString + "&telefoneadicional=" + telefoneAdicionalString + "&fax=" + faxString +
-                            "&contato=" + nmcontatoString.replace(" ", "espaco") + "&email=" + emailString + "&vendedor=" + vendedorString + "&tipocliente=" + tipoclienteString.replace(" ", "espaco") + "&dtcadastro=" + dtcadastro.replace(" ", "espaco") + "" +
-                            "&obscliente=" + obsclienteString.replace(" ", "espaco") + "&cdfilial=" + crud.buscaFilialSelecionada() + "";
+                            "WebService2.php?user=" + crud.selecionarCdClienteBanco() +
+                            "&format=json&num=10&method=inserirClienteNovo&rzsocial=" + rzsocialString.replace(" ", "espaco") +
+                            "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
+                            "&cep=" + cepString +
+                            "&endereco=" + enderecoString.replace(" ", "espaco") +
+                            "&numero=" + numeroString +
+                            "&complemento=" + complementoString.replace(" ", "espaco") +
+                            "&bairro=" + bairroString.replace(" ", "espaco") +
+                            "&uf=" + estadoString +
+                            "&cidade=" + cidadeString.replace(" ", "espaco") +
+                            "&tipopessoa=" + tipopessoaString +
+                            "&cgc=" + cnpjString +
+                            "&telefone=" + telefoneString +
+                            "&telefoneadicional=" + telefoneAdicionalString +
+                            "&fax=" + faxString +
+                            "&contato=" + nmcontatoString.replace(" ", "espaco") +
+                            "&email=" + emailString +
+                            "&vendedor=" + vendedorString +
+                            "&tipocliente=" + tipoclienteString.replace(" ", "espaco") +
+                            "&dtcadastro=" + dtcadastro.replace(" ", "espaco") + "" +
+                            "&obscliente=" + obsclienteString.replace(" ", "espaco") +
+                            "&inscestadual=" + inscestString.replace(" ", "espaco") +
+                            "&cdfilial=" + crud.buscaFilialSelecionada() + "";
+
                     HttpPost httppost = new HttpPost(url);
 
                     // Instantiate a GET HTTP method

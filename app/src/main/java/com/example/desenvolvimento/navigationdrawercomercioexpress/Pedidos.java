@@ -558,6 +558,7 @@ public class Pedidos extends AppCompatActivity
                 String dtultalteracao = "";
                 String dtcadastro = "";
                 String resultado = "";
+                String inscestadualString = "";
 
                 if(!cursor.getString(cursor.getColumnIndex("rzsocial")).equals("null") && !cursor.getString(cursor.getColumnIndex("rzsocial")).trim().equals("")) {
                     rzsocialString = cursor.getString(cursor.getColumnIndex("rzsocial"));
@@ -667,7 +668,11 @@ public class Pedidos extends AppCompatActivity
                 }else{
                     vendedorString = "espaco";
                 }
-
+                if(!cursor.getString(cursor.getColumnIndex("inscestadual")).equals("null")  && !cursor.getString(cursor.getColumnIndex("inscestadual")).trim().equals("")) {
+                    inscestadualString = cursor.getString(cursor.getColumnIndex("inscestadual"));
+                }else{
+                    inscestadualString = "espaco";
+                }
 
                 try {
                     // http://androidarabia.net/quran4android/phpserver/connecttoserver.php
@@ -685,11 +690,27 @@ public class Pedidos extends AppCompatActivity
                     // Instantiate an HttpClient
                     HttpClient httpclient = new DefaultHttpClient(p);
                     String url = "http://www.planosistemas.com.br/" +
-                            "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirClienteNovo&rzsocial=" + rzsocialString.replace(" ", "espaco") + "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
-                            "&cep=" + cepString + "&endereco=" + enderecoString.replace(" ", "espaco") + "&numero=" + numeroString + "&complemento=" + complementoString.replace(" ", "espaco") +
-                            "&bairro=" + bairroString.replace(" ", "espaco") + "&uf=" + estadoString + "&cidade=" + cidadeString.replace(" ", "espaco") + "&tipopessoa=" + tipopessoaString +
-                            "&cgc=" + cnpjString + "&telefone=" + telefoneString + "&telefoneadicional=" + telefoneAdicionalString + "&fax=" + faxString +
-                            "&contato=" + nmcontatoString.replace(" ", "espaco") + "&email=" + emailString + "&vendedor=" + vendedorString + "&tipocliente=" + tipoclienteString.replace(" ", "espaco") + "&dtcadastro=" + dtcadastro.replace(" ", "espaco") + "" +
+                            "WebService2.php?user=" + crud.selecionarCdClienteBanco() +
+                            "&format=json&num=10&method=inserirClienteNovo&rzsocial=" + rzsocialString.replace(" ", "espaco") +
+                            "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
+                            "&cep=" + cepString +
+                            "&endereco=" + enderecoString.replace(" ", "espaco") +
+                            "&numero=" + numeroString +
+                            "&complemento=" + complementoString.replace(" ", "espaco") +
+                            "&bairro=" + bairroString.replace(" ", "espaco") +
+                            "&uf=" + estadoString +
+                            "&cidade=" + cidadeString.replace(" ", "espaco") +
+                            "&tipopessoa=" + tipopessoaString +
+                            "&cgc=" + cnpjString +
+                            "&telefone=" + telefoneString +
+                            "&telefoneadicional=" + telefoneAdicionalString +
+                            "&fax=" + faxString +
+                            "&contato=" + nmcontatoString.replace(" ", "espaco") +
+                            "&email=" + emailString +
+                            "&vendedor=" + vendedorString +
+                            "&tipocliente=" + tipoclienteString.replace(" ", "espaco") +
+                            "&dtcadastro=" + dtcadastro.replace(" ", "espaco") + "" +
+                            "&inscestadual" + inscestadualString.replace(" ", "espaco") +
                             "&obscliente=" + obsclienteString.replace(" ", "espaco") + "";
                     HttpPost httppost = new HttpPost(url);
 
