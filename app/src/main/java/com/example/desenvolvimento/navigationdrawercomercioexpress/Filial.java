@@ -23,22 +23,32 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -348,21 +358,29 @@ public class Filial extends AppCompatActivity {
 
         int TIMEOUT_MILLISEC = 10000;
         try {
-            // http://androidarabia.net/quran4android/phpserver/connecttoserver.php
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
 
-            // Log.i(getClass().getSimpleName(), "send  task - start");
-            //HttpParams httpParams = new BasicHttpParams();
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
             HttpConnectionParams.setConnectionTimeout(p,
                     TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-            //
-            // p.setParameter("name", pvo.getName());
-            //p.setParameter("user", "1");
 
-            // Instantiate an HttpClient
-            HttpClient httpclient = new DefaultHttpClient(p);
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
             String url = "http://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=filial";
             HttpPost httppost = new HttpPost(url);

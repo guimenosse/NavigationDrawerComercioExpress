@@ -36,28 +36,47 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -506,15 +525,34 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int TIMEOUT_MILLISEC = 20000;
 
         try {
+
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
             HttpConnectionParams.setConnectionTimeout(p,
                     TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
 
-            HttpClient httpclient = new DefaultHttpClient(p);
-            String url = "http://www.planosistemas.com.br/" +
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
+            //httpclient.getConnectionManager().getSchemeRegistry().register(new Scheme("SSLSocketFactory", SSLSocketFactory.getSocketFactory(), 443));
+            String url = "https://www.planosistemas.com.br/" +
                     "WebService.php?user=740&format=json&num=10&method=login&usuario=" + usuarioString + "&senha=" + senhaString + "";
+
             HttpPost httppost = new HttpPost(url);
 
             try {
@@ -565,20 +603,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int TIMEOUT_MILLISEC = 50000;
         try {
 
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
             HttpConnectionParams.setConnectionTimeout(p,
                     TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-            // Instantiate an HttpClient
-            HttpClient httpclient = new DefaultHttpClient(p);
+
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
             Funcoes funcoes = new Funcoes();
             String url = "";
             if(funcoes.verificaAutorizacao("SCV", "SCVF101TOV", crud.selecionarNmUsuarioSistema(), crud.selecionarCdClienteBanco())){
-                url = "http://www.planosistemas.com.br/" +
+                url = "https://www.planosistemas.com.br/" +
                         "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=clientenovo";
             }else {
-                url = "http://www.planosistemas.com.br/" +
+                url = "https://www.planosistemas.com.br/" +
                         "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=clientevendedor&cdvendedor=" + crud.selecionaVendedor();
             }
             HttpPost httppost = new HttpPost(url);
@@ -686,15 +740,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         try {
 
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
             HttpConnectionParams.setConnectionTimeout(p,
                     TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
 
-            // Instantiate an HttpClient
-            HttpClient httpclient = new DefaultHttpClient(p);
-            String url = "http://www.planosistemas.com.br/" +
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
+            String url = "https://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=produtos";
             HttpPost httppost = new HttpPost(url);
 
@@ -776,15 +845,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int TIMEOUT_MILLISEC = 10000;
         try {
 
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
             HttpConnectionParams.setConnectionTimeout(p,
                     TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
 
-            // Instantiate an HttpClient
-            HttpClient httpclient = new DefaultHttpClient(p);
-            String url = "http://www.planosistemas.com.br/" +
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
+            String url = "https://www.planosistemas.com.br/" +
                     "WebService.php?user=740&format=json&num=10&method=nmusuariosistema&usuario=" + usuarioString + "&senha=" + senhaString + "";
             HttpPost httppost = new HttpPost(url);
 
@@ -849,13 +933,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int TIMEOUT_MILLISEC = 10000;
         try {
 
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
+
             HttpConnectionParams.setConnectionTimeout(p,
                     TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
 
-            HttpClient httpclient = new DefaultHttpClient(p);
-            String url = "http://www.planosistemas.com.br/" +
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
+            String url = "https://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=vendedor&nmusuario=" + crud.selecionarNmUsuarioSistema().replace(" ", "espaco") + "";
             HttpPost httppost = new HttpPost(url);
 
@@ -908,14 +1009,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         int TIMEOUT_MILLISEC = 10000;
         try {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
             HttpConnectionParams.setConnectionTimeout(p,
                     TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-            // Instantiate an HttpClient
-            HttpClient httpclient = new DefaultHttpClient(p);
-            String url = "http://www.planosistemas.com.br/" +
+
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
+            String url = "https://www.planosistemas.com.br/" +
                     "WebService.php?user=740&format=json&num=10&method=banco&usuario=" + usuarioString + "&senha=" + senhaString + "";
             HttpPost httppost = new HttpPost(url);
 
@@ -972,15 +1089,30 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int TIMEOUT_MILLISEC = 10000;
         try {
 
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
             HttpConnectionParams.setConnectionTimeout(p,
                     TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
 
-            // Instantiate an HttpClient
-            HttpClient httpclient = new DefaultHttpClient(p);
-            String url = "http://www.planosistemas.com.br/" +
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
+            String url = "https://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=tipocliente";
             HttpPost httppost = new HttpPost(url);
 

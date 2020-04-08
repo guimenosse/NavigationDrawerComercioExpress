@@ -34,23 +34,33 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.security.KeyStore;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1184,21 +1194,29 @@ public class ManutencaoPedidos extends AppCompatActivity {
             }
             int TIMEOUT_MILLISEC = 10000;
             try {
-                // http://androidarabia.net/quran4android/phpserver/connecttoserver.php
+                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore.load(null, null);
 
-                // Log.i(getClass().getSimpleName(), "send  task - start");
-                //HttpParams httpParams = new BasicHttpParams();
+                MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+                sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
                 HttpParams p = new BasicHttpParams();
+
+                HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+                HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+                SchemeRegistry registry = new SchemeRegistry();
+                registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+                registry.register(new Scheme("https", sf, 443));
+
+                ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
                 HttpConnectionParams.setConnectionTimeout(p,
                         TIMEOUT_MILLISEC);
                 HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-                //
-                // p.setParameter("name", pvo.getName());
-                //p.setParameter("user", "1");
 
-                // Instantiate an HttpClient
-                HttpClient httpclient = new DefaultHttpClient(p);
+                HttpClient httpclient = new DefaultHttpClient(ccm, p);
                 String url = "http://www.planosistemas.com.br/" +
                         "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirpedido&vltotal=" + vltotal + "&dtemissao=" + dtemissao + ""
                         + "&cdvendedor=" + cdvendedor + "&cdemitente=" + cdemitente + "&rzsocial=" + rzsocial.replace("\t", "") + "&percdesconto=" + percdesconto + "&vldesconto=" + vldesconto + ""
@@ -1344,21 +1362,29 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
                 int TIMEOUT_MILLISEC = 10000;
                 try {
-                    // http://androidarabia.net/quran4android/phpserver/connecttoserver.php
+                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                    trustStore.load(null, null);
 
-                    // Log.i(getClass().getSimpleName(), "send  task - start");
-                    //HttpParams httpParams = new BasicHttpParams();
+                    MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+                    sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
                     HttpParams p = new BasicHttpParams();
+
+                    HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+                    HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+                    SchemeRegistry registry = new SchemeRegistry();
+                    registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+                    registry.register(new Scheme("https", sf, 443));
+
+                    ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
 
                     HttpConnectionParams.setConnectionTimeout(p,
                             TIMEOUT_MILLISEC);
                     HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-                    //
-                    // p.setParameter("name", pvo.getName());
-                    //p.setParameter("user", "1");
 
-                    // Instantiate an HttpClient
-                    HttpClient httpclient = new DefaultHttpClient(p);
+                    HttpClient httpclient = new DefaultHttpClient(ccm, p);
                     String url = "http://www.planosistemas.com.br/" +
                             "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inseriritempedido&numpedido=" + NumPedido + "&cdproduto="
                             + cdproduto.replace(" ", "espaco") + "&id=" + id + "&qtde=" + qtde + "&vlunitario=" + vlunitario + "&vltotal=" + vltotal + "&dtemissao=" + DtEmissao + "&descricao=" +
@@ -1409,11 +1435,29 @@ public class ManutencaoPedidos extends AppCompatActivity {
         String dataRegistro = getDateTime().substring(0, 16);
         int TIMEOUT_MILLISEC = 10000;
         try {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
 
-            HttpConnectionParams.setConnectionTimeout(p, TIMEOUT_MILLISEC);
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
+
+            HttpConnectionParams.setConnectionTimeout(p,
+                    TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-            HttpClient httpclient = new DefaultHttpClient(p);
+
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
             String url = "http://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=alteraSituacaoPedidoNovo&numpedido=" + NumPedido + "&filial=" + crud.buscaFilialSelecionada() + "&dtregistro=" + dataRegistro.replace(" ", "espaco") + "&usuario=" + crud.selecionarNmUsuarioSistema().replace(" ", "espaco") + "";
             HttpPost httppost = new HttpPost(url);
@@ -1455,11 +1499,29 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
         int TIMEOUT_MILLISEC = 10000;
         try {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
             HttpParams p = new BasicHttpParams();
 
-            HttpConnectionParams.setConnectionTimeout(p, TIMEOUT_MILLISEC);
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
+
+            HttpConnectionParams.setConnectionTimeout(p,
+                    TIMEOUT_MILLISEC);
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-            HttpClient httpclient = new DefaultHttpClient(p);
+
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
             String url = "http://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=cancelarPedido&numpedido=" + NumPedido + "";
             HttpPost httppost = new HttpPost(url);
@@ -1654,20 +1716,29 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
 
                 try {
-                    // http://androidarabia.net/quran4android/phpserver/connecttoserver.php
+                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                    trustStore.load(null, null);
 
-                    // Log.i(getClass().getSimpleName(), "send  task - start");
-                    HttpParams httpParams = new BasicHttpParams();
-                    HttpConnectionParams.setConnectionTimeout(httpParams,
-                            TIMEOUT_MILLISEC);
-                    HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_MILLISEC);
-                    //
+                    MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+                    sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
                     HttpParams p = new BasicHttpParams();
-                    // p.setParameter("name", pvo.getName());
-                    p.setParameter("user", "1");
 
-                    // Instantiate an HttpClient
-                    HttpClient httpclient = new DefaultHttpClient(p);
+                    HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+                    HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+                    SchemeRegistry registry = new SchemeRegistry();
+                    registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+                    registry.register(new Scheme("https", sf, 443));
+
+                    ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
+
+                    HttpConnectionParams.setConnectionTimeout(p,
+                            TIMEOUT_MILLISEC);
+                    HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
+
+                    HttpClient httpclient = new DefaultHttpClient(ccm, p);
 
                     String url = "http://www.planosistemas.com.br/" +
                             "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirClienteNovo&rzsocial=" +
