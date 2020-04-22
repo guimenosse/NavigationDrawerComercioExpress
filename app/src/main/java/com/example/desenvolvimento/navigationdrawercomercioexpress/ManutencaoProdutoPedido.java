@@ -31,7 +31,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
     String codigo, numpedido, operacao, alteracao;
 
     double percdescmaxvendedor;
-
+    double percDescontoClassificacao = 0; //19429
     double VL_valorBruto;
 
     private AlertDialog alerta;
@@ -159,14 +159,19 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                 cursor = crud.buscaDescontos(tb_codigoProduto.getText().toString());
                 if(VA_ClassificacaoCliente.equals("A")){
                     percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOA)));
+                    percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOA)));
                 }else if(VA_ClassificacaoCliente.equals("B")){
                     percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOB)));
+                    percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOB)));
                 }else if(VA_ClassificacaoCliente.equals("C")){
                     percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOC)));
+                    percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOC)));
                 }else if(VA_ClassificacaoCliente.equals("D")){
                     percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOD)));
+                    percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOD)));
                 }else if(VA_ClassificacaoCliente.equals("E")){
                     percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOE)));
+                    percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOE)));
                 }
             }
 
@@ -258,19 +263,27 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     VA_CdProduto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO));
                     if (VA_ClassificacaoCliente.equals("A")) {
                         percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOA)));
+                        percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOA)));
                     } else if (VA_ClassificacaoCliente.equals("B")) {
                         percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOB)));
+                        percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOB)));
                     } else if (VA_ClassificacaoCliente.equals("C")) {
                         percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOC)));
+                        percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOC)));
                     } else if (VA_ClassificacaoCliente.equals("D")) {
                         percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOD)));
+                        percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOD)));
                     } else if (VA_ClassificacaoCliente.equals("E")) {
                         percdescmaxvendedor = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOE)));
+                        percDescontoClassificacao = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCMAXPERMITIDOE)));
                     }
                 }catch (Exception e){
                     percdescmaxvendedor = 0;
+                    percDescontoClassificacao = 0;
                 }
             }
+
+            tb_descontoProduto.setText(String.valueOf(percDescontoClassificacao));
 
             if(crud.buscaTipoPrecoCliente(VA_CdCliente).equals("A")){
                 String vlAtacado = crud.buscaValorAtacado(tb_codigoProduto.getText().toString());
