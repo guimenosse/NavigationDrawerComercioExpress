@@ -47,6 +47,7 @@ public class Cliente extends AppCompatActivity
     EditText complemento;
     EditText cep;
     EditText bairro;
+    EditText classificacao;
     Spinner cidade;
     Spinner estado;
 
@@ -111,6 +112,7 @@ public class Cliente extends AppCompatActivity
         nmfantasia = (EditText)findViewById(R.id.tb_nmfantasia);
         email = (EditText)findViewById(R.id.tb_email);
         endereco = (EditText)findViewById(R.id.tb_endereco);
+        classificacao = (EditText)findViewById(R.id.tb_Classificacao);
         complemento = (EditText)findViewById(R.id.tb_complemento);
         bairro = (EditText)findViewById(R.id.tb_bairro);
         //cidade = (EditText)findViewById(R.id.tb_cidade);
@@ -235,6 +237,11 @@ public class Cliente extends AppCompatActivity
                 endereco.setText("");
             }
             try{
+                classificacao.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CLASSIFICACAO)));
+            }catch (Exception e){
+                classificacao.setText("");
+            }
+            try{
                 complemento.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTO)));
             }catch (Exception e){
                 complemento.setText("");
@@ -290,6 +297,7 @@ public class Cliente extends AppCompatActivity
                     EditText celular = (EditText) findViewById(R.id.tb_telefoneadicional);
 
                     EditText endereco = (EditText) findViewById(R.id.tb_endereco);
+                    EditText classificacao = (EditText) findViewById(R.id.tb_Classificacao);
                     EditText complemento = (EditText) findViewById(R.id.tb_complemento);
                     EditText cep = (EditText) findViewById(R.id.tb_cep);
                     EditText bairro = (EditText) findViewById(R.id.tb_bairro);

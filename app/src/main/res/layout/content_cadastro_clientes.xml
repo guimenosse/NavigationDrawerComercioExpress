@@ -14,6 +14,37 @@
     <RelativeLayout android:layout_width="fill_parent"
         android:layout_height="match_parent" >
 
+        <TextView
+            android:id="@+id/lb_email2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tb_nmcontato"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="15dp"
+            android:text="@string/email"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/black" />
+
+        <EditText
+            android:id="@+id/tb_email2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lb_email"
+            android:layout_alignEnd="@+id/tb_endereco"
+            android:layout_alignRight="@+id/tb_endereco"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:ems="10"
+            android:hint="email@provedor.com.br"
+            android:inputType="textEmailAddress"
+            android:padding="10dip"
+            android:singleLine="true"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textColorHint="@color/cor_dica"
+            android:textCursorDrawable="@drawable/cursor" />
+
         <TextView android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
@@ -192,21 +223,27 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="15dp" />
 
-        <EditText android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <EditText
             android:id="@+id/tb_complemento"
-            android:inputType="textCapSentences"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/lb_complemento"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignRight="@+id/tb_cnpj"
             android:layout_alignEnd="@+id/tb_cnpj"
+            android:layout_alignRight="@+id/tb_cnpj"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="-5dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
             android:hint="Casa, Apartamento, etc"
-            android:textColorHint="@color/cor_dica"
+            android:inputType="textCapSentences"
             android:padding="10dip"
-            android:textColor="@color/black"
             android:singleLine="true"
             android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textColorHint="@color/cor_dica"
             android:textCursorDrawable="@drawable/cursor" />
 
 
@@ -482,13 +519,45 @@
             android:textCursorDrawable="@drawable/cursor" />
 
         <TextView
+            android:id="@+id/lb_Classificacao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tb_email"
+            android:layout_alignParentStart="true"
+
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="15dp"
+            android:text="@string/classificacao"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/black" />
+
+
+        <EditText
+            android:id="@+id/tb_Classificacao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lb_Classificacao"
+            android:layout_alignParentStart="true"
+
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:ems="10"
+            android:enabled="true"
+            android:inputType="textPersonName"
+            android:maxLength="1"
+            android:padding="10dip"
+            android:textColor="@color/black"
+            android:textCursorDrawable="@drawable/cursor" />
+
+        <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Observação do Cliente"
             android:id="@+id/lb_obsCliente"
             android:textColor="@color/black"
-            android:layout_below="@+id/tb_email"
+            android:layout_below="@+id/tb_Classificacao"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="15dp" />

@@ -37,6 +37,7 @@ public class CadastroClientes extends AppCompatActivity {
     EditText nmfantasia;
     EditText cep;
     EditText endereco;
+    EditText classificacao;
     EditText numero;
     EditText complemento;
     EditText bairro;
@@ -63,6 +64,7 @@ public class CadastroClientes extends AppCompatActivity {
     String rzsocialString, nmfantasiaString;
     String cepString;
     String enderecoString;
+    String classificacaoString;
     String numeroString;
     String complementoString;
     String bairroString;
@@ -107,6 +109,7 @@ public class CadastroClientes extends AppCompatActivity {
         nmfantasia = (EditText)findViewById(R.id.tb_nmfantasia);
         cep = (EditText)findViewById(R.id.tb_cep);
         endereco = (EditText)findViewById(R.id.tb_endereco);
+        classificacao = (EditText)findViewById(R.id.tb_Classificacao);
         numero = (EditText)findViewById(R.id.tb_numero);
         complemento = (EditText)findViewById(R.id.tb_complemento);
         bairro = (EditText)findViewById(R.id.tb_bairro);
@@ -303,6 +306,13 @@ public class CadastroClientes extends AppCompatActivity {
                 endereco.setText("");
             }
             try{
+                if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CLASSIFICACAO)).equals("null")) {
+                    classificacao.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CLASSIFICACAO)));
+                }
+            }catch (Exception e){
+                classificacao.setText("");
+            }
+            try{
                 if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.NUMERO)).equals("null")) {
                     numero.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.NUMERO)));
                 }
@@ -481,6 +491,7 @@ public class CadastroClientes extends AppCompatActivity {
                 nmfantasia.setEnabled(false);
                 cep.setEnabled(false);
                 endereco.setEnabled(false);
+                classificacao.setEnabled(false);
                 numero.setEnabled(false);
                 complemento.setEnabled(false);
                 bairro.setEnabled(false);
@@ -530,6 +541,7 @@ public class CadastroClientes extends AppCompatActivity {
                 nmfantasiaString = nmfantasia.getText().toString().toUpperCase();
                 cepString = cep.getText().toString();
                 enderecoString = endereco.getText().toString().toUpperCase();
+                classificacaoString = classificacao.getText().toString().toUpperCase();
                 numeroString = numero.getText().toString();
                 complementoString = complemento.getText().toString().toUpperCase();
                 bairroString = bairro.getText().toString().toUpperCase();
@@ -554,7 +566,7 @@ public class CadastroClientes extends AppCompatActivity {
                     if (FU_Consiste("incluir")){
 
                             try {
-                                resultado = crud.inserirCliente(cnpjString, rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, vendedor, tipopessoaString, dtultalteracao, dtcadastro, "N", obsclienteString, "", "", "");
+                                resultado = crud.inserirCliente(cnpjString, rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, vendedor, tipopessoaString, dtultalteracao, dtcadastro, "N", obsclienteString, classificacaoString, "", "");
                                 Toast.makeText(getApplicationContext(), "Cliente cadastrado com sucesso!", Toast.LENGTH_LONG).show();
                                 Intent secondActivity;
                                 secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
@@ -567,7 +579,7 @@ public class CadastroClientes extends AppCompatActivity {
                     }
                 }else{
                     try {
-                        resultado = crud.alterarCliente(Integer.parseInt(codigo), rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, tipopessoaString, dtultalteracao, obsclienteString);
+                        resultado = crud.alterarCliente(Integer.parseInt(codigo), rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, tipopessoaString, dtultalteracao, obsclienteString, classificacaoString);
                         Toast.makeText(getApplicationContext(), "Cliente alterado com sucesso!", Toast.LENGTH_LONG).show();
                         Intent secondActivity;
                         secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
@@ -608,6 +620,7 @@ public class CadastroClientes extends AppCompatActivity {
                 nmfantasiaString = nmfantasia.getText().toString().toUpperCase();
                 cepString = cep.getText().toString();
                 enderecoString = endereco.getText().toString().toUpperCase();
+                classificacaoString = classificacao.getText().toString().toUpperCase();
                 numeroString = numero.getText().toString();
                 complementoString = complemento.getText().toString().toUpperCase();
                 bairroString = bairro.getText().toString().toUpperCase();
@@ -628,7 +641,7 @@ public class CadastroClientes extends AppCompatActivity {
 
                 if (FU_Consiste("alterar")){
                     try {
-                        resultado = crud.alterarCliente(Integer.parseInt(codigo), rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, tipopessoaString, dtultalteracao, obsclienteString);
+                        resultado = crud.alterarCliente(Integer.parseInt(codigo), rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, tipopessoaString, dtultalteracao, obsclienteString, classificacaoString);
                         Toast.makeText(getApplicationContext(), "Cliente alterado com sucesso!", Toast.LENGTH_LONG).show();
                         Intent secondActivity;
                         secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);

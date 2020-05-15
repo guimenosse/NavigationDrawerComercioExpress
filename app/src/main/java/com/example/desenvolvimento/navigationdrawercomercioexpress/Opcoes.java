@@ -304,6 +304,7 @@ public class Opcoes extends AppCompatActivity
                 String nmfantasiaString = "";
                 String cepString = "";
                 String enderecoString = "";
+                String classificacaoString = "";
                 String numeroString = "";
                 String complementoString = "";
                 String bairroString = "";
@@ -349,6 +350,11 @@ public class Opcoes extends AppCompatActivity
                     enderecoString = cursor.getString(cursor.getColumnIndex("endereco")).replace("'", "");
                 }else{
                     enderecoString = "espaco";
+                }
+                if(!cursor.getString(cursor.getColumnIndex("classificacao")).equals("null")  && !cursor.getString(cursor.getColumnIndex("classificacao")).trim().equals("")) {
+                    classificacaoString = cursor.getString(cursor.getColumnIndex("classificacao")).replace("'", "");
+                }else{
+                    classificacaoString = "espaco";
                 }
                 if(!cursor.getString(cursor.getColumnIndex("numero")).equals("null")  && !cursor.getString(cursor.getColumnIndex("numero")).trim().equals("")) {
                     numeroString = cursor.getString(cursor.getColumnIndex("numero"));
@@ -473,6 +479,7 @@ public class Opcoes extends AppCompatActivity
                             "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
                             "&cep=" + cepString +
                             "&endereco=" + enderecoString.replace(" ", "espaco") +
+                            "&classificacao=" + classificacaoString.replace(" ", "espaco") +
                             "&numero=" + numeroString +
                             "&complemento=" + complementoString.replace(" ", "espaco") +
                             "&bairro=" + bairroString.replace(" ", "espaco") +

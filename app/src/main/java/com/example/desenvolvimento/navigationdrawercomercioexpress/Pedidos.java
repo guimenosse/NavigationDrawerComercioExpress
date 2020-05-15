@@ -550,6 +550,7 @@ public class Pedidos extends AppCompatActivity
                 String nmfantasiaString = "";
                 String cepString = "";
                 String enderecoString = "";
+                String classificacaoString = "";
                 String numeroString = "";
                 String complementoString = "";
                 String bairroString = "";
@@ -590,6 +591,11 @@ public class Pedidos extends AppCompatActivity
                     enderecoString = cursor.getString(cursor.getColumnIndex("endereco"));
                 }else{
                     enderecoString = "espaco";
+                }
+                if(!cursor.getString(cursor.getColumnIndex("classificacao")).equals("null")  && !cursor.getString(cursor.getColumnIndex("classificacao")).trim().equals("")) {
+                    classificacaoString = cursor.getString(cursor.getColumnIndex("classificacao"));
+                }else{
+                    classificacaoString = "espaco";
                 }
                 if(!cursor.getString(cursor.getColumnIndex("numero")).equals("null")  && !cursor.getString(cursor.getColumnIndex("numero")).trim().equals("")) {
                     numeroString = cursor.getString(cursor.getColumnIndex("numero"));
@@ -714,6 +720,7 @@ public class Pedidos extends AppCompatActivity
                             "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
                             "&cep=" + cepString +
                             "&endereco=" + enderecoString.replace(" ", "espaco") +
+                            "&classificacao=" + classificacaoString.replace(" ", "espaco") +
                             "&numero=" + numeroString +
                             "&complemento=" + complementoString.replace(" ", "espaco") +
                             "&bairro=" + bairroString.replace(" ", "espaco") +
@@ -1630,6 +1637,7 @@ public class Pedidos extends AppCompatActivity
                 String nmfantasiaString = "";
                 String cepString = "";
                 String enderecoString = "";
+                String classificacaoString = "";
                 String numeroString = "";
                 String complementoString = "";
                 String bairroString = "";
@@ -1672,6 +1680,11 @@ public class Pedidos extends AppCompatActivity
                     enderecoString = cursor.getString(cursor.getColumnIndex("endereco")).replace("'", "");
                 }else{
                     enderecoString = "espaco";
+                }
+                if(!cursor.getString(cursor.getColumnIndex("classificacao")).equals("null")  && !cursor.getString(cursor.getColumnIndex("classificacao")).trim().equals("")) {
+                    classificacaoString = cursor.getString(cursor.getColumnIndex("classificacao")).replace("'", "");
+                }else{
+                    classificacaoString = "espaco";
                 }
                 if(!cursor.getString(cursor.getColumnIndex("numero")).equals("null")  && !cursor.getString(cursor.getColumnIndex("numero")).trim().equals("")) {
                     numeroString = cursor.getString(cursor.getColumnIndex("numero"));
@@ -1790,7 +1803,7 @@ public class Pedidos extends AppCompatActivity
                             "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirClienteNovo&rzsocial=" + rzsocialString.replace(" ", "espaco") + "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
                             "&cep=" + cepString + "&endereco=" + enderecoString.replace(" ", "espaco") + "&numero=" + numeroString + "&complemento=" + complementoString.replace(" ", "espaco") +
                             "&bairro=" + bairroString.replace(" ", "espaco") + "&uf=" + estadoString + "&cidade=" + cidadeString.replace(" ", "espaco") + "&tipopessoa=" + tipopessoaString +
-                            "&cgc=" + cnpjString + "&telefone=" + telefoneString + "&telefoneadicional=" + telefoneAdicionalString + "&fax=" + faxString +
+                            "&cgc=" + cnpjString + "&telefone=" + telefoneString + "&telefoneadicional=" + telefoneAdicionalString + "&fax=" + faxString + "&classificacao=" + classificacaoString +
                             "&contato=" + nmcontatoString.replace(" ", "espaco") + "&email=" + emailString + "&vendedor=" + vendedorString + "&tipocliente=" + tipoclienteString.replace(" ", "espaco") + "&dtcadastro=" + dtcadastro.replace(" ", "espaco") + "" +
                             "&obscliente=" + obsclienteString.replace(" ", "espaco") + "";
                     HttpPost httppost = new HttpPost(url);

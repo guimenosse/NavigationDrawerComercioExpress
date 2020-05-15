@@ -23,6 +23,7 @@
     <string name="estado">Estado</string>
     <string name="nmcontato">Contato</string>
     <string name="tipcliente">Tipo do Cliente</string>
+    <string name="classificacao">Classificação</string>
     <string name="inscestadual">Inscrição Estadual</string>
 
     <string name="btn_cadastrar"><b>Cadastrar</b></string>
@@ -221,6 +222,6 @@
     <string name="title_activity_manutencao_produto_pedido">Produto</string>
     <string name="title_activity_filial">Filial</string>
 
-    <string name="versao">2.0</string>
+    <string name="versao">2.2</string>
 
 </resources>

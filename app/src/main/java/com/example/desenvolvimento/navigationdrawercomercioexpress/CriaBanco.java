@@ -37,7 +37,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String FGSINCRONIZADO = "fgsincronizado";
     public static final String DTCADASTRO = "dtcadastro";
     public static final String OBSCLIENTE = "obscliente";
-    public static final String CLASSIFICACAO = "observacao";
+    public static final String CLASSIFICACAO = "classificacao";
     public static final String FIDELIDADE = "fidelidade";
     public static final String TIPOPRECO = "tipopreco";
     public static final int VERSAO = 1;

@@ -99,7 +99,7 @@ public class BancoController {
     //----------------------- Função para alteração de um cliente que ainda não foi sincronizado --------------------------------------
     public String alterarCliente(int id, String rzsocial, String nmfantasia, String cep, String endereco, String numero, String complemento, String bairro, String uf,
                                  String cidade, String cnpj, String inscestadual, String telefone, String telefoneadicional, String fax, String nmcontato, String email,
-                                 String tipocliente, String tipopessoa, String dtultalteracao, String obscliente){
+                                 String tipocliente, String tipopessoa, String dtultalteracao, String obscliente, String classificacao){
         ContentValues valores;
         String where;
         long resultado;
@@ -127,6 +127,7 @@ public class BancoController {
         valores.put(CriaBanco.TIPCLIENTE, tipocliente);
         valores.put(CriaBanco.OBSCLIENTE, obscliente);
         valores.put(CriaBanco.DTULTALTERACAO, dtultalteracao);
+        valores.put(CriaBanco.CLASSIFICACAO, classificacao);
 
         resultado = db.update(CriaBanco.TABELA,valores,where,null);
         db.close();
@@ -162,7 +163,7 @@ public class BancoController {
     public Cursor carregaClientes(){
 
         Cursor cursor;
-        String[] campos = {banco.ID, banco.RZSOCIAL};
+        String[] campos = {banco.ID, banco.CDCLIENTE, banco.RZSOCIAL};
         String orderBy = "rzsocial";
         db = banco.getReadableDatabase();
         cursor = db.query(banco.TABELA, campos, null, null, null, null, orderBy, null);
@@ -218,7 +219,7 @@ public class BancoController {
                 banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF,
                 banco.CIDADE, banco.CNPJ, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX,
                 banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO,
-                banco.TIPOPESSOA, banco.DTCADASTRO, banco.FGSINCRONIZADO, banco.OBSCLIENTE, banco.INSCESTADUAL
+            banco.TIPOPESSOA, banco.DTCADASTRO, banco.FGSINCRONIZADO, banco.OBSCLIENTE, banco.INSCESTADUAL, banco.CLASSIFICACAO
         };
         String where = CriaBanco.ID + "=" + id;
         db = banco.getReadableDatabase();
@@ -234,7 +235,7 @@ public class BancoController {
     //---------------Função para carregar os dados do cliente pelo seu codigo de cliente---------------------------------
     public Cursor carregaClienteByCdCliente(String cdcliente){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP, banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.CNPJ, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.TIPOPESSOA, banco.FGSINCRONIZADO, banco.OBSCLIENTE};
+        String[] campos = {banco.ID, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP, banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.CNPJ, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.TIPOPESSOA, banco.FGSINCRONIZADO, banco.OBSCLIENTE, banco.CLASSIFICACAO};
         String where = CriaBanco.ID + "=" + cdcliente + "";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null, null);
@@ -249,7 +250,7 @@ public class BancoController {
     //---------------Função para carregar os dados do cliente pelo seu cgc para novos clientes serem sincronizados---------------------------------
     public Cursor carregaClienteByCGCNovoCliente(String cdcliente){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP, banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.CNPJ, banco.INSCESTADUAL, banco.INSCESTADUAL, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.TIPOPESSOA, banco.FGSINCRONIZADO, banco.OBSCLIENTE};
+        String[] campos = {banco.ID, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP, banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.CNPJ, banco.INSCESTADUAL, banco.INSCESTADUAL, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.TIPOPESSOA, banco.FGSINCRONIZADO, banco.OBSCLIENTE, banco.CLASSIFICACAO};
         String where = CriaBanco.CDCLIENTE + "='" + cdcliente + "'";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null, null);
@@ -264,7 +265,7 @@ public class BancoController {
     //-----------------Função para carregar os dados do cliente de acordo com seu código de cliente-----------------------
     public Cursor carregaClienteByCdClienteNovoCliente(String cdcliente){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDCLIENTE, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP, banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.CNPJ, banco.INSCESTADUAL, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.TIPOPESSOA, banco.FGSINCRONIZADO, banco.OBSCLIENTE};
+        String[] campos = {banco.ID, banco.CDCLIENTE, banco.RZSOCIAL, banco.NMFANTASIA, banco.CEP, banco.ENDERECO, banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.CNPJ, banco.INSCESTADUAL, banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE, banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.TIPOPESSOA, banco.FGSINCRONIZADO, banco.OBSCLIENTE, banco.CLASSIFICACAO};
         String where = CriaBanco.CDCLIENTE + "='" + cdcliente + "'";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null, null);
@@ -285,7 +286,7 @@ public class BancoController {
                 banco.CIDADE, banco.TIPOPESSOA, banco.CNPJ, banco.INSCESTADUAL, banco.TELEFONE,
                 banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE,
                 banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.OBSCLIENTE,
-                banco.INSCESTADUAL
+                banco.INSCESTADUAL, banco.CLASSIFICACAO
         };
         String where = CriaBanco.FGSINCRONIZADO + " = '" + fgsincronizado + "'";
         db = banco.getReadableDatabase();
@@ -1774,7 +1775,7 @@ public class BancoController {
 
         Cursor cursor;
         String[] campos = {banco.ID, banco.CLASSIFICACAO};
-        String where = CriaBanco.CDCLIENTE + "=" + cdcliente;
+        String where = CriaBanco.CDCLIENTE + "='" + cdcliente + "'";
         String classificacao = "N";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null);
@@ -1798,7 +1799,7 @@ public class BancoController {
 
         Cursor cursor;
         String[] campos = {banco.ID, banco.FIDELIDADE};
-        String where = CriaBanco.CDCLIENTE + "=" + cdcliente;
+        String where = CriaBanco.CDCLIENTE + "='" + cdcliente + "'";
         String fidelidade = "N";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null);
