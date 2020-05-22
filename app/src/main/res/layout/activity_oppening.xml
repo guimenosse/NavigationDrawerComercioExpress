@@ -5,7 +5,18 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="@drawable/fundo_oppening_tres"
+    android:background="@drawable/gradient"
     tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.Oppening">
+
+    <ImageView
+        android:id="@+id/img_LogoCentro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:scaleType="fitCenter"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/logo_expres_mobile" />
 
 </RelativeLayout>

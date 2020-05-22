@@ -2,18 +2,35 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/nav_camara" android:icon="@android:drawable/ic_menu_save"
-            android:title="Clientes" />
-        <item android:id="@+id/nav_gallery" android:icon="@android:drawable/ic_menu_agenda"
+        <item android:id="@+id/nav_visaogeral"
+            android:icon="@drawable/ic_visaogeral"
+            android:title="Visão Geral" />
+        <item android:id="@+id/nav_pedidos"
+            android:icon="@drawable/ic_pedidos_novo"
             android:title="Pedidos" />
     </group>
 
+    <item android:title="Cadastros">
+        <menu>
+            <item android:id="@+id/nav_clientes"
+                android:icon="@drawable/ic_clientes_novo"
+                android:title="Clientes" />
+
+            <item android:id="@+id/nav_produtos"
+                android:icon="@drawable/ic_produtos_novo"
+                android:title="Produtos" />
+            <!--<item android:id="@+id/nav_send" android:icon="@android:drawable/ic_menu_send"
+                 android:title="Sincronizar" />-->
+        </menu>
+    </item>
+
     <item android:title="Configurações">
         <menu>
-            <item android:id="@+id/nav_share" android:icon="@android:drawable/ic_menu_manage"
+            <item android:id="@+id/nav_opcoes"
+                android:icon="@drawable/ic_opcoes_novo"
                 android:title="Opções" />
             <!--<item android:id="@+id/nav_send" android:icon="@android:drawable/ic_menu_send"
-                android:title="Sincronizar" />-->
+                 android:title="Sincronizar" />-->
         </menu>
     </item>
 

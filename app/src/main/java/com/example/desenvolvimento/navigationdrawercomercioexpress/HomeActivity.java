@@ -28,7 +28,10 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -64,12 +67,19 @@ public class HomeActivity extends AppCompatActivity
 
     int countCli;
 
+    MaterialSearchView sv_Clientes;
+
+    MenuItem me_BuscarCliente;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        sv_Clientes = (MaterialSearchView) findViewById(R.id.sv_Clientes);
+        sv_Clientes.setVoiceSearch(true); //or false
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -158,7 +168,67 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
+        final TextView lb_TituloClientes = (TextView) findViewById(R.id.lb_TituloClientes);
 
+        sv_Clientes.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String vf_Nome) {
+
+                String vf_RazaoSocialNome = vf_Nome;
+                try{
+                    BancoController crud = new BancoController(getBaseContext());
+                    final Cursor cursor = crud.carregaClientesNome(vf_RazaoSocialNome);
+
+                    String[] nomeCampos = new String[]{CriaBanco.RZSOCIAL};
+                    int[] idViews = new int[]{R.id.rzsociallist};
+
+                    SimpleCursorAdapter adaptador = new SimpleCursorAdapter(getBaseContext(), R.layout.listviewteste, cursor, nomeCampos, idViews, 0);
+                    lista = (ListView) findViewById(R.id.listView);
+                    lista.setAdapter(adaptador);
+
+                    lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            String codigo;
+                            cursor.moveToPosition(position);
+                            codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
+                            Intent intent = new Intent(HomeActivity.this, CadastroClientes.class);
+                            intent.putExtra("codigo", codigo);
+                            startActivity(intent);
+                        }
+                    });
+                }catch (Exception e){
+                    MensagemUtil.addMsg(HomeActivity.this, "Não foi possível selecionar o cliente");
+                }
+
+                return false;
+            }
+        });
+
+        sv_Clientes.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+                me_BuscarCliente.setVisible(false);
+                lb_TituloClientes.setWidth(0);
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+
+                me_BuscarCliente.setVisible(true);
+                lb_TituloClientes.setWidth(550);
+            }
+        });
 
     }
 
@@ -176,6 +246,11 @@ public class HomeActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.home, menu);
+        MenuItem item = menu.findItem(R.id.buscar_cliente);
+
+        sv_Clientes.setMenuItem(item);
+
+        me_BuscarCliente = menu.findItem(R.id.buscar_cliente);
         return true;
     }
 
@@ -202,35 +277,34 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
+        if (id == R.id.nav_clientes) {
             Intent secondActivity;
             secondActivity = new Intent(HomeActivity.this, HomeActivity.class);
             startActivity(secondActivity);
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_pedidos) {
             Intent secondActivity;
             secondActivity = new Intent(HomeActivity.this, Pedidos.class);
             startActivity(secondActivity);
 
 
-        }
-        else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_produtos) {
             Intent secondActivity;
             secondActivity = new Intent(HomeActivity.this, Produtos.class);
             secondActivity.putExtra("selecaoProdutos", "N");
             startActivity(secondActivity);
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_opcoes) {
             Intent secondActivity;
             secondActivity = new Intent(HomeActivity.this, Opcoes.class);
             startActivity(secondActivity);
 
-        } /*else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_visaogeral) {
             Intent secondActivity;
-            secondActivity = new Intent(HomeActivity.this, Sincronizar.class);
+            secondActivity = new Intent(HomeActivity.this, VisaoGeralNova.class);
             startActivity(secondActivity);
 
-        }*/
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

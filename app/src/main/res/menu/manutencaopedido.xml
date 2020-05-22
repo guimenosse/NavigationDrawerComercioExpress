@@ -7,6 +7,10 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_cancelarpedido" android:title="Cancelar Pedido"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_duplicarpedido" android:title="Duplicar Pedido"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_gerarpdf" android:title="Gerar PDF"
+        android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_excluirpedido" android:title="Excluir Pedido"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

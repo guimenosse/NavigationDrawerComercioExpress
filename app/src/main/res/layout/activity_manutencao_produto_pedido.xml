@@ -17,5 +17,15 @@
 
     <include layout="@layout/content_manutencao_produto_pedido" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_SalvarManutencaoProdutoPedido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_salvar"
+        android:backgroundTint="@color/corVerde"
+        app:borderWidth="0dp"
+        />
 
 </android.support.design.widget.CoordinatorLayout>

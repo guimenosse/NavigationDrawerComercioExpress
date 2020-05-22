@@ -9,14 +9,35 @@
     <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
         android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
-            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" app:popupTheme="@style/AppTheme.PopupOverlay" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
+
+            <TextView
+                android:id="@+id/lb_TituloClientesPedidos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecionar Cliente"
+                android:textColor="@color/corBranca"
+                android:textSize="20dp"/>
+
+            <com.miguelcatalan.materialsearchview.MaterialSearchView
+                android:id="@+id/sv_ClientesPedidos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Buscar pelo nome"
+                style="@style/MaterialSearchViewStyle"
+                >
+
+            </com.miguelcatalan.materialsearchview.MaterialSearchView>
+
+        </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_selecao_cliente" />
-
-
 
 </android.support.design.widget.CoordinatorLayout>

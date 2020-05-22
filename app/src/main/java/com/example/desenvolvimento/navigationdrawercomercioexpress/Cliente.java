@@ -174,12 +174,12 @@ public class Cliente extends AppCompatActivity
         });*/
 
 
-        Button botao = (Button)findViewById(R.id.button);
+        //Button botao = (Button)findViewById(R.id.button);
 
         codigo = this.getIntent().getStringExtra("codigo");
 
         if(codigo.equals("0")) {
-            botao.setText("Cadastrar");
+            //botao.setText("Cadastrar");
         }else{
             crud = new BancoController(getBaseContext());
             cursor = crud.carregaClienteById(Integer.parseInt(codigo));
@@ -277,12 +277,12 @@ public class Cliente extends AppCompatActivity
 
 
             //botao.setText("Alterar");
-            botao.setVisibility(View.INVISIBLE);
+            //botao.setVisibility(View.INVISIBLE);
         }
 
 
 
-            botao.setOnClickListener(new View.OnClickListener() {
+            /*botao.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Button botao = (Button)findViewById(R.id.button);
@@ -336,7 +336,7 @@ public class Cliente extends AppCompatActivity
                         }/*else{
                             resultado = crud.alteraRegistro(Integer.parseInt(codigo), rzsocial.getText().toString(),nmfantasia.getText().toString(), cnpj.getText().toString(), email.getText().toString(), telefone.getText().toString(), celular.getText().toString(), endereco.getText().toString(), complemento.getText().toString(), cep.getText().toString(), bairro.getText().toString(), cidade.getText().toString(), estado.getSelectedItem().toString(), tipopessoaString);
 
-                        }*/
+                        }
                         Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
                         Intent secondActivity;
                         secondActivity = new Intent(Cliente.this, HomeActivity.class);
@@ -344,19 +344,19 @@ public class Cliente extends AppCompatActivity
                     }
 
                 }
-            });
+            });*/
 
 
-        Button botaoCancelar = (Button)findViewById(R.id.sc_cancelar);
+        //Button botaoCancelar = (Button)findViewById(R.id.sc_cancelar);
 
-        botaoCancelar.setOnClickListener(new View.OnClickListener() {
+        /*botaoCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent secondActivity;
                 secondActivity = new Intent(Cliente.this, HomeActivity.class);
                 startActivity(secondActivity);
             }
-        });
+        });*/
     }
 
     private String getDateTime() {
@@ -403,17 +403,17 @@ public class Cliente extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
+        if (id == R.id.nav_clientes) {
             // Handle the camera action
             Intent secondActivity;
             secondActivity = new Intent(Cliente.this, HomeActivity.class);
             startActivity(secondActivity);
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_pedidos) {
             Intent secondActivity;
             secondActivity = new Intent(Cliente.this, Pedidos.class);
             startActivity(secondActivity);
 
-        }  else if (id == R.id.nav_share) {
+        }  else if (id == R.id.nav_opcoes) {
             Intent secondActivity;
             secondActivity = new Intent(Cliente.this, Opcoes.class);
             startActivity(secondActivity);

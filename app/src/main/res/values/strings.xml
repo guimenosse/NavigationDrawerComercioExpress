@@ -121,7 +121,7 @@
     <string name="title_activity_atualizar_dados">Atualizar Dados</string>
     <string name="title_activity_cadastro_clientes">Cadastro de Clientes</string>
 
-    <string name="mensagemlogin">Para realizar o acesso ao aplicativo é necessária que haja conexão com a internet.</string>
+    <string name="mensagemlogin">Para realizar o acesso ao aplicativo é necessário que haja conexão com a internet.</string>
     <string name="title_activity_produtos">Produtos</string>
     <string name="title_activity_cadastro_produtos">Cadastro de Produtos</string>
     <string name="title_activity_manutencao_pedidos">Pedido</string>
@@ -222,6 +222,60 @@
     <string name="title_activity_manutencao_produto_pedido">Produto</string>
     <string name="title_activity_filial">Filial</string>
 
-    <string name="versao">2.2</string>
+    <string name="versao">3.0</string>
+
+    <string name="menu_salvar">Salvar</string>
+    <string name="menu_excluir">Excluir</string>
+
+    //---------------------------------------Strings da nova tela de visão geral do app
+    -----------------------------------
+    ---------------------------------------------------------------------------------------------------------------------//
+    <string name="title_activity_visao_geral_completa">Visão Geral</string>
+
+    //Strings do primeiro layout das movimentações diárias
+    <string name="campo_visaogeral_valor_venda_bruta">Pedido bruto:</string>
+    <string name="campo_visaogeral_valor_descontos">Descontos:</string>
+    <string name="campo_visaogeral_valor_liquido">Pedido liquido:</string>
+    <string name="campo_visaogeral_lucro_medio">Lucro médio:</string>
+
+    <string name="label_quantidade_tipovenda_pedido">Número de pedidos em aberto: </string>
+
+    <string name="label_quantidade_tipovenda_cancelados_pedidos">Número de pedidos cancelados: </string>
+    <string name="label_valordescontos_tipovenda">Valor total de descontos: </string>
+
+    <string name="label_valortotal_tipovenda_pedidos">Valor total dos pedidos em aberto: </string>
+
+    <string name="label_semprodutosatencao">No momento você não possui produtos que necessitam da sua atenção.</string>
+    <string name="label_produtoatencaounico"> produto que necessita da sua atenção.</string>
+    <string name="label_produtosatencao"> produtos que necessitam da sua atenção</string>
+
+    //-----------Strings das mensagens da tela de visão geral------------------
+    <string name="mensagem_visaogeral_falhacarregamentovendas">Não foi possível carregar os dados das </string>
+    <string name="mensagem_visaogeral_falhacarregamentopedidos">Não foi possível carregar os dados dos </string>
+    <string name="mensagem_visaogeral_falhacarregamentografico">Não foi possível atualizar o gráfico de movimentação mensal devido à seguinte situação: </string>
+    <string name="title_activity_formas_pagamento_pedido">FormasPagamentoPedido</string>
+    <string name="title_activity_descontos_pedido">Descontos do Pedido</string>
+    <string name="title_activity_visao_geral_nova">Visão Geral</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+
+
+    <string name="campo_lb_selecionarcliente">Selecionar cliente</string>
+    <string name="campo_lb_selecionarproduto">Adicionar produto</string>
+    <string name="campo_dtemissao">Data de emissão: </string>
+    <string name="campo_vldescontopedido">Valor do desconto: </string>
+    <string name="campo_vlfrete">Valor frete: </string>
+    <string name="campo_condpagamento">Condição de Pagamento: </string>
+    <string name="campo_observacaopedido">Observação do Pedido: </string>
+    <string name="campo_vltotalpedido">Total Liquido do Pedido: </string>
+    <string name="campo_mostrarprodutos">Mostrar Produtos</string>
 
 </resources>

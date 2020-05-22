@@ -68,6 +68,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String CONDPGTO = "condpgto";
     public static final String VLTOTAL = "vltotal";
     public static final String VLDESCONTO = "vldesconto";
+    public static final String VLFRETE = "vlfrete";
     public static final String CDEMITENTE = "cdemitente";
     public static final String OBS = "obs";
     public static final String DTEMISSAO = "dtemissao";
@@ -198,6 +199,7 @@ public class CriaBanco extends SQLiteOpenHelper {
                 VLTOTAL + " real, " +
                 PERCDESCONTO + " real, " +
                 VLDESCONTO + " real, " +
+                VLFRETE + " real, " +
                 CDEMITENTE + " text, " +
                 RZSOCIAL + " text, " +
                 OBS + " text, " +

@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".VisaoGeralNova"
+    android:background="@color/corBranca"
+    android:orientation="vertical"
+    tools:showIn="@layout/app_bar_visao_geral_nova">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:id="@+id/layout_movimentacaoDiariaBackground"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:alpha="0.1"
+            android:background="@drawable/layoutstylemovimentacaodiaria">
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_movimentacaoDiaria"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_below="@+id/layout_movimentacaoDiariaBackground"
+            android:layout_marginTop="-180dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/lb_dataMovimentacaoDiaria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center_horizontal"
+                    android:text="Quinta-feira, 01 de Agosto de 2019"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corPreta"
+                    android:textSize="16dp" />
+
+                <ImageView
+                    android:id="@+id/img_dtEmissaoPicker"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignTop="@+id/lb_dataMovimentacaoDiaria"
+                    android:layout_alignBottom="@+id/lb_dataMovimentacaoDiaria"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="-5dp"
+                    android:layout_toEndOf="@+id/lb_dataMovimentacaoDiaria"
+                    android:src="@drawable/ic_dtemissao_picker" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+
+                <ImageView
+                    android:id="@+id/img_movimentacaoDiaria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginBottom="20dp"
+                    android:src="@drawable/imagem_icone_vendas_diarias" />
+
+                <TextView
+                    android:id="@+id/lb_vlVendaBruta"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/img_movimentacaoDiaria"
+                    android:layout_alignBottom="@+id/img_movimentacaoDiaria"
+                    android:layout_marginTop="20dp"
+                    android:layout_toEndOf="@+id/img_movimentacaoDiaria"
+                    android:text="@string/campo_visaogeral_valor_venda_bruta"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_vlVendaBrutaResultado"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_vlVendaBruta"
+                    android:layout_alignBottom="@+id/lb_vlVendaBruta"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_vlVendaBruta"
+                    android:text="R$ 1500,00"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_vlDescontosVenda"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/img_movimentacaoDiaria"
+                    android:layout_alignBottom="@+id/img_movimentacaoDiaria"
+                    android:layout_marginTop="40dp"
+                    android:layout_toEndOf="@+id/img_movimentacaoDiaria"
+                    android:text="@string/campo_visaogeral_valor_descontos"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_vlDescontosVendaResultado"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_vlDescontosVenda"
+                    android:layout_alignBottom="@+id/lb_vlDescontosVenda"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_vlDescontosVenda"
+                    android:text="R$ 200,00"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_vlVendaLiquida"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/img_movimentacaoDiaria"
+                    android:layout_alignBottom="@+id/img_movimentacaoDiaria"
+                    android:layout_marginTop="60dp"
+                    android:layout_toEndOf="@+id/img_movimentacaoDiaria"
+                    android:text="@string/campo_visaogeral_valor_liquido"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_vlVendaLiquidaResultado"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_vlVendaLiquida"
+                    android:layout_alignBottom="@+id/lb_vlVendaLiquida"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_vlVendaLiquida"
+                    android:text="R$ 1300,00"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_vlLucroMedio"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/img_movimentacaoDiaria"
+                    android:layout_alignBottom="@+id/img_movimentacaoDiaria"
+                    android:layout_marginTop="80dp"
+                    android:layout_toEndOf="@+id/img_movimentacaoDiaria"
+                    android:text="@string/campo_visaogeral_lucro_medio"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/lb_vlLucroMedioResultado"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_vlLucroMedio"
+                    android:layout_alignBottom="@+id/lb_vlLucroMedio"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_vlLucroMedio"
+                    android:text="51%"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold"
+                    android:visibility="invisible" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_demonstrativoTiposVendaBackground"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_below="@+id/layout_movimentacaoDiariaBackground"
+            android:alpha="0.1"
+            android:background="@drawable/layoutstyletiposvenda">
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_demonstrativoTiposVenda"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_below="@+id/layout_demonstrativoTiposVendaBackground"
+            android:layout_marginTop="-110dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/lb_quantidadeTipoVendaAbertos"
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp"
+                    android:text="@string/label_quantidade_tipovenda_pedido"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_quantidadeTipoVendaAbertosResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_quantidadeTipoVendaAbertos"
+                    android:layout_alignBottom="@+id/lb_quantidadeTipoVendaAbertos"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_quantidadeTipoVendaAbertos"
+                    android:text="7 pedidos"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_quantidadeTipoVendaCancelados"
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lb_quantidadeTipoVendaAbertos"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/label_quantidade_tipovenda_cancelados_pedidos"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_quantidadeTipoVendaCanceladosResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_quantidadeTipoVendaCancelados"
+                    android:layout_alignBottom="@+id/lb_quantidadeTipoVendaCancelados"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_quantidadeTipoVendaCancelados"
+                    android:text="2 pedidos"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_vlDescontoTipoVenda"
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lb_quantidadeTipoVendaCancelados"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/label_valordescontos_tipovenda"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_vlDescontoTipoVendaResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_vlDescontoTipoVenda"
+                    android:layout_alignBottom="@+id/lb_vlDescontoTipoVenda"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_vlDescontoTipoVenda"
+                    android:text="R$ 230,00"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_vlTotalTipoVenda"
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lb_vlDescontoTipoVenda"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="5dp"
+                    android:text="Valor total dos pedidos em aberto: "
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_vlTotalTipoVendaResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_vlTotalTipoVenda"
+                    android:layout_alignBottom="@+id/lb_vlTotalTipoVenda"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_vlTotalTipoVenda"
+                    android:text="R$ 1500,00"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_estoqueProdutosBackground"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_below="@+id/layout_demonstrativoTiposVenda"
+            android:alpha="0.1"
+            android:layout_marginTop="-25dp"
+            android:background="@drawable/layoutstyleestoqueprodutos">
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_estoqueProdutos"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_below="@+id/layout_estoqueProdutosBackground"
+            android:layout_marginTop="-100dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+
+                <ImageView
+                    android:id="@+id/img_estoqueProdutos"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/imagem_icone_produtos" />
+
+                <TextView
+                    android:id="@+id/lb_produtosAtencao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/img_estoqueProdutos"
+                    android:layout_alignBottom="@+id/img_estoqueProdutos"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_toEndOf="@+id/img_estoqueProdutos"
+                    android:text="@string/label_semprodutosatencao"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+</ScrollView>

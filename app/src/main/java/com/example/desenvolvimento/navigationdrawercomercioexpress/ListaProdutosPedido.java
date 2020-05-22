@@ -14,14 +14,12 @@ import java.util.List;
 public class ListaProdutosPedido extends BaseAdapter {
 
     private Context context;
-    private List<Integer> imagem;
     private List<String> descricao;
     private List<String> itensRestantes;
     private List<String> valorProdutos;
 
-    public ListaProdutosPedido(Context context, List<Integer> imagem, List<String> descricao, List<String> itensRestantes, List<String> valorProdutos){
+    public ListaProdutosPedido(Context context, List<String> descricao, List<String> itensRestantes, List<String> valorProdutos){
         this.context = context;
-        this.imagem = imagem;
         this.descricao = descricao;
         this.itensRestantes = itensRestantes;
         this.valorProdutos = valorProdutos;
@@ -36,12 +34,12 @@ public class ListaProdutosPedido extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return imagem.size();
+        return descricao.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return imagem.get(position);
+        return descricao.get(position);
     }
 
     @Override
@@ -73,11 +71,9 @@ public class ListaProdutosPedido extends BaseAdapter {
         try {
             if (Integer.parseInt(itensRestantes.get(position)) <= 0) {
                 holder.textoDescricao.setTextColor(Color.RED);
-            } else {
-                holder.textoDescricao.setTextColor(Color.GRAY);
             }
         }catch (Exception e){
-            holder.textoDescricao.setTextColor(Color.GRAY);
+            //holder.textoDescricao.setTextColor(Color.GRAY);
         }
 
         holder.textoDescricao.setText(descricao.get(position));

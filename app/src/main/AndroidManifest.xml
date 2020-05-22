@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.desenvolvimento.navigationdrawercomercioexpress">
-
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
@@ -15,33 +14,33 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".VisaoGeralNova"
+            android:label="@string/title_activity_visao_geral_nova"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".HomeActivity"
             android:label="Seleção de Clientes"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Cliente"
             android:label="Cadastro de Clientes"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Login" >
-        </activity>
+            android:theme="@style/AppTheme.Login" />
         <activity
             android:name=".Pedidos"
             android:label="@string/title_activity_pedidos"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Oppening"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -52,13 +51,12 @@
             android:name=".Opcoes"
             android:label="@string/title_activity_opcoes"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CadastroClientes"
             android:label="@string/title_activity_cadastro_clientes"
             android:parentActivityName=".HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.HomeActivity" />
@@ -66,17 +64,15 @@
         <activity
             android:name=".Produtos"
             android:label="@string/title_activity_produtos"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CadastroProdutos"
             android:label="@string/title_activity_cadastro_produtos"
             android:parentActivityName=".Produtos"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.Produtos"
-                />
+                android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.Produtos" />
         </activity>
         <activity
             android:name=".ManutencaoPedidos"
@@ -85,7 +81,7 @@
             android:parentActivityName=".Pedidos"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.Pedidos" />
@@ -94,7 +90,7 @@
             android:name=".SelecaoCliente"
             android:label="@string/title_activity_selecao_cliente"
             android:parentActivityName=".ManutencaoPedidos"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos" />
@@ -103,7 +99,7 @@
             android:name=".AdicionarProdutos"
             android:label="@string/title_activity_adicionar_produtos"
             android:parentActivityName=".ManutencaoPedidos"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos" />
@@ -112,7 +108,7 @@
             android:name=".ListaCustomizadaProdutos"
             android:label="SelecionarProdutos"
             android:parentActivityName=".ManutencaoPedidos"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos" />
@@ -121,7 +117,7 @@
             android:name=".AdicionarProdutosCustomizada"
             android:label="@string/title_activity_adicionar_produtos_customizada"
             android:parentActivityName=".ManutencaoPedidos"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos" />
@@ -130,7 +126,7 @@
             android:name=".ManutencaoProdutoPedido"
             android:label="@string/title_activity_manutencao_produto_pedido"
             android:parentActivityName=".AdicionarProdutosCustomizada"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.AdicionarProdutosCustomizada" />
@@ -139,7 +135,7 @@
             android:name=".Filial"
             android:label="@string/title_activity_filial"
             android:parentActivityName=".Opcoes"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.Opcoes" />

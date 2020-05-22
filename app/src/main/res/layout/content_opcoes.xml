@@ -28,7 +28,7 @@
         android:layout_gravity="center"
         android:textColor="@color/white"
         android:textStyle="bold"
-        android:background="@drawable/estilo_botao"
+        android:background="@drawable/estilobotaoazul"
         android:layout_below="@+id/tb_usuarioOpcoes"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"/>
@@ -62,7 +62,7 @@
         android:layout_gravity="center"
         android:textColor="@color/white"
         android:textStyle="bold"
-        android:background="@drawable/estilo_botao"
+        android:background="@drawable/estilobotaoazul"
         android:layout_below="@+id/lb_ultimaatualizacaoData"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"/>
@@ -85,7 +85,7 @@
         android:layout_gravity="center"
         android:textColor="@color/white"
         android:textStyle="bold"
-        android:background="@drawable/estilo_botao"
+        android:background="@drawable/estilobotaoazul"
         android:layout_below="@+id/lb_filialselecionada"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"/>

@@ -20,6 +20,9 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,15 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
 
     ListView lista;
 
+    FloatingActionButton fab_SalvarProdutosPedido;
+
+    //sv_ProdutosPedidos
+
+    MaterialSearchView sv_ProdutosPedidos;
+
+
+    MenuItem me_BuscarProduto, me_Concluir;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +51,24 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        sv_ProdutosPedidos = (MaterialSearchView) findViewById(R.id.sv_ProdutosPedidos);
+        sv_ProdutosPedidos.setVoiceSearch(true); //or false
+
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        fab_SalvarProdutosPedido = (FloatingActionButton) findViewById(R.id.fab_SalvarProdutosPedido);
+        fab_SalvarProdutosPedido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //suSalvarCliente();
+                Intent intent = new Intent();
+                intent.putExtra("numpedido", numpedido);
+                setResult(2, intent);
+                //intent.putExtra("codigo", codigo);
+                //startActivity(intent);
+                finish();
+            }
+        });
 
         numpedido = this.getIntent().getStringExtra("numpedido");
 
@@ -135,8 +164,36 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
         tb_buscarprodutoPedido.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        final TextView lb_TituloProdutos = (TextView) findViewById(R.id.lb_TituloProdutosPedidos);
+
+                sv_ProdutosPedidos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String cdProdutoDescricao) {
+
+                String vf_CdProdutoDescricao = cdProdutoDescricao;
+
                 BancoController crud = new BancoController(getBaseContext());
-                final Cursor cursor = crud.carregaProdutosDescricaoPedido(tb_buscarprodutoPedido.getText().toString());
+                final Cursor cursor = crud.carregaProdutosDescricaoPedido(vf_CdProdutoDescricao);
 
                 String VA_ValorProduto = "";
                 String VA_ValorAtacado = "";
@@ -223,20 +280,29 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
                         }
                     }
                 });
-            }
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
+                return false;
             }
         });
 
+        sv_ProdutosPedidos.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+                me_BuscarProduto.setVisible(false);
+                lb_TituloProdutos.setWidth(0);
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+
+                me_BuscarProduto.setVisible(true);
+                lb_TituloProdutos.setWidth(550);
+            }
+        });
 
 
     }
@@ -245,6 +311,11 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.adicionarproduto, menu);
+        MenuItem item = menu.findItem(R.id.buscar_produto);
+
+        sv_ProdutosPedidos.setMenuItem(item);
+
+        me_BuscarProduto = menu.findItem(R.id.buscar_produto);
         return true;
     }
 

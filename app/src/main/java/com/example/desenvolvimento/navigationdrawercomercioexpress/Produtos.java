@@ -22,7 +22,10 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +38,20 @@ public class Produtos extends AppCompatActivity
 
     ListView lista;
 
+
+    MaterialSearchView sv_Produtos;
+
+    MenuItem me_BuscarProduto;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_produtos);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        sv_Produtos = (MaterialSearchView) findViewById(R.id.sv_Produtos);
+        sv_Produtos.setVoiceSearch(true); //or false
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -300,6 +311,147 @@ public class Produtos extends AppCompatActivity
         });
 
 
+        final TextView lb_TituloProdutos = (TextView) findViewById(R.id.lb_TituloProdutos);
+
+        sv_Produtos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String cdProdutoDescricao) {
+
+                String vf_CdProdutoDescricao = cdProdutoDescricao;
+
+                BancoController crud = new BancoController(getBaseContext());
+                final Cursor cursor = crud.carregaProdutosDescricaoPedido(vf_CdProdutoDescricao);
+
+                String VA_ValorProduto = "";
+                String VA_ValorAtacado = "";
+                VA_ContProdutos = 0;
+
+                List<String> codigo = new ArrayList<>();
+                List<String> descricao = new ArrayList<>();
+                List<String> itensRestantes = new ArrayList<>();
+                List<String> valorProduto = new ArrayList<>();
+                List<String> valorAtacado = new ArrayList<>();
+                if (cursor != null) {
+                    try {
+                        codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
+                        descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+                        itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                        VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                        VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
+
+                        valorProduto.add(VA_ValorProduto);
+                        valorAtacado.add(VA_ValorAtacado);
+                        VA_ContProdutos = VA_ContProdutos + 1;
+                        while (cursor.moveToNext()) {
+                            codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
+                            descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+                            itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                            VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                            VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
+
+                            valorProduto.add(VA_ValorProduto);
+                            valorAtacado.add(VA_ValorAtacado);
+                            VA_ContProdutos = VA_ContProdutos + 1;
+                        }
+                    }catch (Exception e){
+
+                    }
+                }
+
+                List<Integer> icones = new ArrayList<>();
+
+
+                for(int i = 0; i < VA_ContProdutos; i++) {
+                    icones.add(R.drawable.sem_foto);
+                }
+                lista = (ListView) findViewById(R.id.lista);
+
+                ListaProdutosCustomizadaAdapter adapter = new ListaProdutosCustomizadaAdapter(getBaseContext(), icones, codigo, descricao, itensRestantes, valorProduto, valorAtacado);
+                lista.setAdapter(adapter);
+
+                lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String codigo;
+                        try {
+                            ListAdapter adapter2 = lista.getAdapter();
+                            int lenght = adapter2.getCount();
+                            if(position == 0){
+                                cursor.moveToPosition(position);
+                            }else if(position < lenght - 1) {
+                                cursor.moveToPosition(position);
+                            }else{
+                                cursor.moveToPosition(position + 1);
+                            }
+                            //cursor.moveToPosition(position + 1);
+                            codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
+                            Intent secondActivity;
+                            if (selecaoprodutos.equals("S")) {
+                                Intent intent = new Intent(Produtos.this, ManutencaoProdutoPedido.class);
+                                intent.putExtra("codigo", codigo);
+                                intent.putExtra("numpedido", numpedido);
+                                intent.putExtra("alteracao", "N");
+                                //startActivity(intent);
+                                startActivityForResult(intent, 1);
+                            }else{
+                                Intent intent = new Intent(Produtos.this, CadastroProdutos.class);
+                                intent.putExtra("codigo", codigo);
+
+                                intent.putExtra("numpedido", numpedido);
+                                intent.putExtra("alteracao", "N");
+                                startActivityForResult(intent, 1);
+                            }
+                        }catch (Exception e){
+                            cursor.moveToPosition(position);
+                            codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
+                            Intent secondActivity;
+                            if (selecaoprodutos.equals("S")) {
+                                Intent intent = new Intent(Produtos.this, ManutencaoProdutoPedido.class);
+                                intent.putExtra("codigo", codigo);
+                                intent.putExtra("numpedido", numpedido);
+                                intent.putExtra("alteracao", "N");
+                                //startActivity(intent);
+                                startActivityForResult(intent, 1);
+                            }else{
+                                Intent intent = new Intent(Produtos.this, CadastroProdutos.class);
+                                intent.putExtra("codigo", codigo);
+
+                                intent.putExtra("numpedido", numpedido);
+                                intent.putExtra("alteracao", "N");
+                                startActivityForResult(intent, 1);
+                            }
+                        }
+                    }
+                });
+
+                return false;
+            }
+        });
+
+        sv_Produtos.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+                me_BuscarProduto.setVisible(false);
+                lb_TituloProdutos.setWidth(0);
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+
+                me_BuscarProduto.setVisible(true);
+                lb_TituloProdutos.setWidth(550);
+            }
+        });
 
     }
 
@@ -318,6 +470,11 @@ public class Produtos extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.produtos, menu);
+        MenuItem item = menu.findItem(R.id.buscar_produto);
+
+        sv_Produtos.setMenuItem(item);
+
+        me_BuscarProduto = menu.findItem(R.id.buscar_produto);
         return true;
     }
 
@@ -345,34 +502,34 @@ public class Produtos extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
+        if (id == R.id.nav_clientes) {
             Intent secondActivity;
             secondActivity = new Intent(Produtos.this, HomeActivity.class);
             startActivity(secondActivity);
-        } else if (id == R.id.nav_gallery) {
+            // Handle the camera action
+        } else if (id == R.id.nav_pedidos) {
             Intent secondActivity;
             secondActivity = new Intent(Produtos.this, Pedidos.class);
             startActivity(secondActivity);
 
-        }
-        else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_produtos) {
             Intent secondActivity;
             secondActivity = new Intent(Produtos.this, Produtos.class);
             secondActivity.putExtra("selecaoProdutos", "N");
             startActivity(secondActivity);
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_opcoes) {
             Intent secondActivity;
             secondActivity = new Intent(Produtos.this, Opcoes.class);
             startActivity(secondActivity);
 
-        }/* else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_visaogeral) {
             Intent secondActivity;
-            secondActivity = new Intent(Opcoes.this, Sincronizar.class);
+            secondActivity = new Intent(Produtos.this, VisaoGeralNova.class);
             startActivity(secondActivity);
 
-        }*/
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

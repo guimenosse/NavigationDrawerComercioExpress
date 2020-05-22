@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FFFFFF</color>
+    <color name="colorAccent">#3F51B5</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="white_FFE1FF">#FFE1FF</color>
@@ -24,4 +24,16 @@
     <color name="cor_botao_excluir">#CD5C5C</color>
     <color name="cor_botao_press_excluir">#CD0000</color>
     <color name="cor_botao_foco_excluir">#FF0000</color>
+
+    <color name="corPreta">#000000</color>
+    <color name="corCinza">#9C9C9C</color>
+    <color name="corCinzaEscuro">#8f8f8f</color>
+    <color name="corBranca">#FFFFFF</color>
+    <color name="corVerde">#5cd055</color>
+    <color name="corVermelhoMuitoTransparente">#CCFF4040</color>
+    <color name="corAzulMuitoTransparente">#CC5c7daa</color>
+    <color name="corVerdeMuitoTransparente">#CC5cd055</color>
+    <color name="azulEscuroNovaIdentidade">#1673B0</color>
+    <color name="corTransparente">#99000000</color>
+
 </resources>

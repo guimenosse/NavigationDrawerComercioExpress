@@ -18,6 +18,7 @@
         android:hint="Selecione pelo código ou a descrição"
         android:padding="10dip"
         android:textColor="@color/black"
+        android:visibility="gone"
         android:textCursorDrawable="@drawable/cursor">
 
     </EditText>
@@ -27,6 +28,7 @@
         android:padding="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_alignTop="@+id/tb_buscarprodutoPedido"
         android:layout_alignBottom="@+id/tb_buscarprodutoPedido"
         android:layout_alignRight="@+id/tb_buscarprodutoPedido"
@@ -40,6 +42,6 @@
         android:id="@+id/lista"
         android:fastScrollAlwaysVisible="true"
         android:fastScrollEnabled="true"
-        android:layout_marginTop="50dp"/>
+        android:layout_marginTop="10dp"/>
 
 </RelativeLayout>

@@ -12,6 +12,7 @@
 
     <ImageView android:layout_width="80dp" android:layout_height="90dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:layout_marginTop="10dp"
         android:src="@drawable/logo_express" android:id="@+id/imageView" />
 
     <TextView android:layout_width="match_parent" android:layout_height="wrap_content"

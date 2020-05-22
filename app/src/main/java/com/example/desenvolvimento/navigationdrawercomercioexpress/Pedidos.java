@@ -33,6 +33,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -66,10 +68,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import classes.CL_ItemPedido;
+import classes.CL_Pedidos;
+import controllers.CTL_ItemPedido;
+import controllers.CTL_Pedidos;
+import sync.SYNC_Pedidos;
+
 public class Pedidos extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final static String SERVICE_URI = "";
+    CL_Pedidos cl_Pedidos;
+    CTL_Pedidos ctl_Pedidos;
 
     private ListView lista;
 
@@ -82,12 +91,21 @@ public class Pedidos extends AppCompatActivity
 
     String codigo_lista;
 
+    MaterialSearchView sv_Pedidos;
+
+    MenuItem me_ExcluirPedidos;
+    MenuItem me_Sincronizar;
+    MenuItem me_BuscarPedido;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pedidos);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        sv_Pedidos = (MaterialSearchView) findViewById(R.id.sv_Pedidos);
+        sv_Pedidos.setVoiceSearch(true); //or false
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +114,7 @@ public class Pedidos extends AppCompatActivity
                 Intent secondActivity;
                 secondActivity = new Intent(Pedidos.this, ManutencaoPedidos.class);
                 secondActivity.putExtra("operacao", "I");
-                startActivity(secondActivity);
+                startActivityForResult(secondActivity, 1);
             }
         });
 
@@ -114,420 +132,113 @@ public class Pedidos extends AppCompatActivity
             StrictMode.setThreadPolicy(policy);
         }
 
+        cl_Pedidos = new CL_Pedidos();
+        ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
+
         FU_CalculaPrazoSincronizacao();
+        suCarregarPedidos("");
 
-        try {
-            BancoController crud = new BancoController(getBaseContext());
-            final Cursor cursor = crud.carregaTodosPedidos();
+        final TextView lb_TituloPedidos = (TextView) findViewById(R.id.lb_TituloPedidos);
 
-            String[] nomeCamposPedidos = new String[]{CriaBanco.ID, CriaBanco.FGSITUACAO, CriaBanco.RZSOCIAL};
-            int[] idViewsPedidos = new int[]{R.id.numPedido, R.id.situacaoPedido, R.id.clientepedido};
-
-            SimpleCursorAdapter adaptadorPedidos = new SimpleCursorAdapter(getBaseContext(), R.layout.listviewpedidos, cursor, nomeCamposPedidos, idViewsPedidos, 0);
-            lista = (ListView) findViewById(R.id.listViewPedidos);
-            lista.setAdapter(adaptadorPedidos);
-
-            lista.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                     @Override
-                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                         final String codigo, situacao;
-                         cursor.moveToPosition(position);
-                         codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
-                         situacao = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGSITUACAO));
-
-                         //Lista de itens
-                             ArrayList<String> itens = new ArrayList<String>();
-
-                             itens.add("Consultar");
-                             itens.add("Enviar Online");
-                             itens.add("Cancelar Pedido");
-                             itens.add("Excluir");
-                             itens.add("Sair");
-
-                             //adapter utilizando um layout customizado (TextView)
-                             ArrayAdapter adapter = new ArrayAdapter(getBaseContext(), R.layout.item_alerta, itens);
-
-                             AlertDialog.Builder builder = new AlertDialog.Builder(Pedidos.this);
-                             builder.setTitle("O que você deseja fazer com o pedido nº" + codigo + "? ");
-                             //define o diálogo como uma lista, passa o adapter.
-                             builder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
-                                 public void onClick(DialogInterface arg0, int arg1) {
-                                     if (arg1 == 0) {
-                                         Intent intent = new Intent(Pedidos.this, ManutencaoPedidos.class);
-                                         intent.putExtra("operacao", "A");
-                                         intent.putExtra("codigo", codigo);
-                                         startActivity(intent);
-                                     } else if (arg1 == 1) {
-
-                                         //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para enviar online");
-                                         if(situacao.equals("ENVIADO")) {
-                                             MensagemUtil.addMsg(Pedidos.this, "Pedido já foi enviado para o sistema online.");
-                                         }else if(situacao.equals("CANCELADO")){
-                                             MensagemUtil.addMsg(Pedidos.this, "Pedido não pode ser enviado, pois o pedido foi cancelado!");
-                                         }else {
-                                             try {
-                                                 if (FU_ConsisteEnviarOnline(codigo)) {
-                                                     alerta.dismiss();
-                                                     codigo_lista = codigo;
-
-                                                     new LoadingAsyncOpcoes().execute();
-                                                     /*FU_EnviarPedido(codigo);
-                                                     BancoController crud = new BancoController(getBaseContext());
-                                                     crud.alteraSituacaoPedido(codigo, "ENVIADO");
-                                                     MensagemUtil.addMsg(Pedidos.this, "Pedido enviado com sucesso!");
-                                                     Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                                                     startActivity(intent);*/
-
-                                                 }
-                                             } catch (Exception e) {
-                                                 MensagemUtil.addMsg(Pedidos.this, "Não foi possivel realizar o envio do pedido");
-                                             }
-                                         }
-                                     } else if (arg1 == 2) {
-                                         //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para cancelar pedido");
-                                         //alerta.dismiss();
-                                         if(situacao.equals("ENVIADO")) {
-                                             MensagemUtil.addMsg(Pedidos.this, "Pedido não pode ser cancelado, pois já foi enviado para o sistema online.");
-                                         }else {
-                                             BancoController crud = new BancoController(getBaseContext());
-                                             try {
-                                                 crud.alteraSituacaoPedido(codigo, "CANCELADO");
-                                                 MensagemUtil.addMsg(Pedidos.this, "Pedido cancelado com sucesso!");
-                                                 Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                                                 startActivity(intent);
-                                             } catch (Exception e) {
-                                                 MensagemUtil.addMsg(Pedidos.this, "Não foi possivel cancelar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                                             }
-                                         }
-
-                                     } else if (arg1 == 3) {
-                                         //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para excluir pedido");
-                                         BancoController crud = new BancoController(getBaseContext());
-                                         try {
-                                             crud.deletaPedido(Integer.parseInt(codigo));
-                                             MensagemUtil.addMsg(Pedidos.this, "Pedido excluido com sucesso!");
-                                             Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                                             startActivity(intent);
-                                         } catch (Exception e) {
-                                             MensagemUtil.addMsg(Pedidos.this, "Não foi possivel excluir o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                                         }
-                                     } else if (arg1 == 4) {
-                                         alerta.dismiss();
-                                     }
-
-                                 }
-                             });
-
-                         /*if(situacao.substring(0, 1).equals("A")) {
-
-                         }else if(situacao.substring(0, 1).equals("E")){
-                             ArrayList<String> itens = new ArrayList<String>();
-
-                             itens.add("Consultar");
-                             itens.add("Excluir");
-                             itens.add("Sair");
-
-                             //adapter utilizando um layout customizado (TextView)
-                             ArrayAdapter adapter = new ArrayAdapter(getBaseContext(), R.layout.item_alerta, itens);
-
-                             AlertDialog.Builder builder = new AlertDialog.Builder(Pedidos.this);
-                             builder.setTitle("O que você deseja fazer com o pedido nº" + codigo + "? ");
-                             //define o diálogo como uma lista, passa o adapter.
-                             builder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
-                                 public void onClick(DialogInterface arg0, int arg1) {
-                                     if (arg1 == 0) {
-                                         Intent intent = new Intent(Pedidos.this, ManutencaoPedidos.class);
-                                         intent.putExtra("operacao", "A");
-                                         intent.putExtra("codigo", codigo);
-                                         startActivity(intent);
-                                     } else if (arg1 == 1) {
-                                         //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para excluir pedido");
-                                         BancoController crud = new BancoController(getBaseContext());
-                                         try {
-                                             crud.deletaPedido(Integer.parseInt(codigo));
-                                             MensagemUtil.addMsg(Pedidos.this, "Pedido excluido com sucesso!");
-                                             Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                                             startActivity(intent);
-                                         } catch (Exception e) {
-                                             MensagemUtil.addMsg(Pedidos.this, "Não foi possivel excluir o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                                         }
-                                     } else if (arg1 == 2) {
-                                         alerta.dismiss();
-                                     }
-
-                                 }
-                             });
-                         }else if(situacao.substring(0, 1).equals("C")){
-                             ArrayList<String> itens = new ArrayList<String>();
-
-                             itens.add("Consultar");
-                             itens.add("Excluir");
-                             itens.add("Sair");
-
-                             //adapter utilizando um layout customizado (TextView)
-                             ArrayAdapter adapter = new ArrayAdapter(getBaseContext(), R.layout.item_alerta, itens);
-
-                             AlertDialog.Builder builder = new AlertDialog.Builder(Pedidos.this);
-                             builder.setTitle("O que você deseja fazer com o pedido nº" + codigo + "? ");
-                             //define o diálogo como uma lista, passa o adapter.
-                             builder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
-                                 public void onClick(DialogInterface arg0, int arg1) {
-                                     if (arg1 == 0) {
-                                         Intent intent = new Intent(Pedidos.this, ManutencaoPedidos.class);
-                                         intent.putExtra("operacao", "A");
-                                         intent.putExtra("codigo", codigo);
-                                         startActivity(intent);
-                                     } else if (arg1 == 1) {
-                                         //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para excluir pedido");
-                                         BancoController crud = new BancoController(getBaseContext());
-                                         try {
-                                             crud.deletaPedido(Integer.parseInt(codigo));
-                                             MensagemUtil.addMsg(Pedidos.this, "Pedido excluido com sucesso!");
-                                             Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                                             startActivity(intent);
-                                         } catch (Exception e) {
-                                             MensagemUtil.addMsg(Pedidos.this, "Não foi possivel excluir o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                                         }
-                                     } else if (arg1 == 2) {
-                                         alerta.dismiss();
-                                     }
-
-                                 }
-                             });
-                         }*/
-
-
-
-                         alerta = builder.create();
-                         alerta.show();
-
-
-
-                         /*if(situacao.substring(0, 1).equals("A")) {
-
-
-                             //define o titulo
-                             builder.setTitle("Enviar Pedido!");
-                             //define a mensagem
-                             builder.setMessage("Você deseja enviar o pedido online?");
-
-                             //define um botão como positivo
-                             builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-                                 public void onClick(DialogInterface arg0, int arg1) {
-                                     //Toast.makeText(ManutencaoProdutoPedido.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
-                                     try {
-                                         //if(FU_ConsisteEnviarOnline(codigo)) {
-                                             //FU_EnviarPedido(codigo);
-                                             //BancoController crud = new BancoController(getBaseContext());
-                                             //crud.alteraSituacaoPedido(codigo, "ENVIADO");
-                                             MensagemUtil.addMsg(Pedidos.this, "Pedido enviado com sucesso!");
-                                             Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                                             startActivity(intent);
-
-                                         //}
-                                     }catch (Exception e){
-                                         MensagemUtil.addMsg(Pedidos.this, "Não foi possivel realizar o envio do pedido");
-                                     }
-                                 }
-
-                             });
-
-                             builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
-                                 public void onClick(DialogInterface arg0, int arg1) {
-                                     //Toast.makeText(ManutencaoProdutoPedido.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-                                 }
-                             });
-                             return true;
-                         }else{
-                             MensagemUtil.addMsg(Pedidos.this, "Pedido não pode ser enviado online, pois ele já foi enviado ou cancelado!");
-                             return false;
-                         }*/
-                         return true;
-                     }
-                 }
-
-            );
-
-            lista.setOnItemClickListener(new AdapterView.OnItemClickListener()
-
-                                         {
-
-                                             @Override
-                                             public void onItemClick(AdapterView<?> parent, View view, int position,
-                                                                     long id) {
-                                                 String codigo;
-                                                 cursor.moveToPosition(position);
-                                                 codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
-                                                 Intent intent = new Intent(Pedidos.this, ManutencaoPedidos.class);
-                                                 intent.putExtra("operacao", "A");
-                                                 intent.putExtra("codigo", codigo);
-                                                 startActivity(intent);
-                                             }
-                                         }
-
-            );
-
-        }catch (Exception e){
-            MensagemUtil.addMsg(Pedidos.this, e.getMessage().toString());
-        }
-
-        final EditText tb_buscarpedido = (EditText)findViewById(R.id.tb_buscarclienteSelecaoPedidos);
-
-        tb_buscarpedido.addTextChangedListener(new TextWatcher() {
+        sv_Pedidos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                try {
-                    BancoController crud = new BancoController(getBaseContext());
-                    final Cursor cursor = crud.carregaTodosPedidosByCliente(tb_buscarpedido.getText().toString());
-
-                    String[] nomeCamposPedidos = new String[]{CriaBanco.ID, CriaBanco.FGSITUACAO, CriaBanco.RZSOCIAL};
-                    int[] idViewsPedidos = new int[]{R.id.numPedido, R.id.situacaoPedido, R.id.clientepedido};
-
-                    SimpleCursorAdapter adaptadorPedidos = new SimpleCursorAdapter(getBaseContext(), R.layout.listviewpedidos, cursor, nomeCamposPedidos, idViewsPedidos, 0);
-                    lista = (ListView) findViewById(R.id.listViewPedidos);
-                    lista.setAdapter(adaptadorPedidos);
-
-                    lista.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                             @Override
-                             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                                 final String codigo, situacao;
-                                 cursor.moveToPosition(position);
-                                 codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
-                                 situacao = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGSITUACAO));
-
-                                 //Lista de itens
-                                 ArrayList<String> itens = new ArrayList<String>();
-
-                                 itens.add("Consultar");
-                                 itens.add("Enviar Online");
-                                 itens.add("Cancelar Pedido");
-                                 itens.add("Excluir");
-                                 itens.add("Sair");
-
-                                 //adapter utilizando um layout customizado (TextView)
-                                 ArrayAdapter adapter = new ArrayAdapter(getBaseContext(), R.layout.item_alerta, itens);
-
-                                 AlertDialog.Builder builder = new AlertDialog.Builder(Pedidos.this);
-                                 builder.setTitle("O que você deseja fazer com o pedido nº" + codigo + "? ");
-                                 //define o diálogo como uma lista, passa o adapter.
-                                 builder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
-                                     public void onClick(DialogInterface arg0, int arg1) {
-                                         if (arg1 == 0) {
-                                             Intent intent = new Intent(Pedidos.this, ManutencaoPedidos.class);
-                                             intent.putExtra("operacao", "A");
-                                             intent.putExtra("codigo", codigo);
-                                             startActivity(intent);
-                                         } else if (arg1 == 1) {
-
-                                             //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para enviar online");
-                                             if (situacao.equals("ENVIADO")) {
-                                                 MensagemUtil.addMsg(Pedidos.this, "Pedido já foi enviado para o sistema online.");
-                                             } else if (situacao.equals("CANCELADO")) {
-                                                 MensagemUtil.addMsg(Pedidos.this, "Pedido não pode ser enviado, pois o pedido foi cancelado!");
-                                             } else {
-                                                 try {
-                                                     if (FU_ConsisteEnviarOnline(codigo)) {
-                                                         alerta.dismiss();
-                                                         codigo_lista = codigo;
-
-                                                         new LoadingAsyncOpcoes().execute();
-                         /*FU_EnviarPedido(codigo);
-                         BancoController crud = new BancoController(getBaseContext());
-                         crud.alteraSituacaoPedido(codigo, "ENVIADO");
-                         MensagemUtil.addMsg(Pedidos.this, "Pedido enviado com sucesso!");
-                         Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                         startActivity(intent);*/
-
-                                                     }
-                                                 } catch (Exception e) {
-                                                     MensagemUtil.addMsg(Pedidos.this, "Não foi possivel realizar o envio do pedido");
-                                                 }
-                                             }
-                                         } else if (arg1 == 2) {
-                                             //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para cancelar pedido");
-                                             //alerta.dismiss();
-                                             if (situacao.equals("ENVIADO")) {
-                                                 MensagemUtil.addMsg(Pedidos.this, "Pedido não pode ser cancelado, pois já foi enviado para o sistema online.");
-                                             } else {
-                                                 BancoController crud = new BancoController(getBaseContext());
-                                                 try {
-                                                     crud.alteraSituacaoPedido(codigo, "CANCELADO");
-                                                     MensagemUtil.addMsg(Pedidos.this, "Pedido cancelado com sucesso!");
-                                                     Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                                                     startActivity(intent);
-                                                 } catch (Exception e) {
-                                                     MensagemUtil.addMsg(Pedidos.this, "Não foi possivel cancelar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                                                 }
-                                             }
-
-                                         } else if (arg1 == 3) {
-                                             //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para excluir pedido");
-                                             BancoController crud = new BancoController(getBaseContext());
-                                             try {
-                                                 crud.deletaPedido(Integer.parseInt(codigo));
-                                                 MensagemUtil.addMsg(Pedidos.this, "Pedido excluido com sucesso!");
-                                                 Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                                                 startActivity(intent);
-                                             } catch (Exception e) {
-                                                 MensagemUtil.addMsg(Pedidos.this, "Não foi possivel excluir o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                                             }
-                                         } else if (arg1 == 4) {
-                                             alerta.dismiss();
-                                         }
-
-                                     }
-                                 });
-
-
-                                 alerta = builder.create();
-                                 alerta.show();
-
-
-                                 return true;
-                             }
-                         }
-
-                    );
-
-                    lista.setOnItemClickListener(new AdapterView.OnItemClickListener()
-
-                                                 {
-
-                                                     @Override
-                                                     public void onItemClick(AdapterView<?> parent, View view, int position,
-                                                                             long id) {
-                                                         String codigo;
-                                                         cursor.moveToPosition(position);
-                                                         codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
-                                                         Intent intent = new Intent(Pedidos.this, ManutencaoPedidos.class);
-                                                         intent.putExtra("operacao", "A");
-                                                         intent.putExtra("codigo", codigo);
-                                                         startActivity(intent);
-                                                     }
-                                                 }
-
-                    );
-
-                } catch (Exception e) {
-                    MensagemUtil.addMsg(Pedidos.this, e.getMessage().toString());
-                }
-
-
+            public boolean onQueryTextSubmit(String query) {
+                return false;
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
-            }
+            public boolean onQueryTextChange(String vf_Nome) {
 
-            @Override
-            public void afterTextChanged(Editable s) {
+                suCarregarPedidos(vf_Nome);
 
+                return false;
             }
         });
 
+        sv_Pedidos.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+                me_ExcluirPedidos.setVisible(false);
+                me_Sincronizar.setVisible(false);
+                me_BuscarPedido.setVisible(false);
+
+                lb_TituloPedidos.setWidth(0);
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+
+                //vc_RazaoSocialNome = "";
+                //su_AtualizarListaFiltros();
+
+                me_ExcluirPedidos.setVisible(true);
+                me_Sincronizar.setVisible(true);
+                me_BuscarPedido.setVisible(true);
+
+                lb_TituloPedidos.setWidth(550);
+            }
+        });
+
+    }
+
+    protected void suCarregarPedidos(String nomeRazaoSocial){
+
+        String vf_NomeRazaoSocial = nomeRazaoSocial;
+
+        try {
+            if(ctl_Pedidos.fuCarregaTodosPedidos(vf_NomeRazaoSocial)) {
+
+                final Cursor cursor = ctl_Pedidos.rs_Pedido;
+
+                String[] nomeCamposPedidos = new String[]{CriaBanco.ID, CriaBanco.FGSITUACAO, CriaBanco.RZSOCIAL};
+                int[] idViewsPedidos = new int[]{R.id.numPedido, R.id.situacaoPedido, R.id.clientepedido};
+
+                SimpleCursorAdapter adaptadorPedidos = new SimpleCursorAdapter(getBaseContext(), R.layout.listviewpedidos, cursor, nomeCamposPedidos, idViewsPedidos, 0);
+                lista = (ListView) findViewById(R.id.listViewPedidos);
+                lista.setAdapter(adaptadorPedidos);
+
+                lista.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                                     @Override
+                                                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                                                         final String codigo, situacao;
+                                                         cursor.moveToPosition(position);
+                                                         codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
+                                                         situacao = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGSITUACAO));
+
+                                                         suCliqueLongoLista(codigo, situacao);
+
+                                                         return true;
+                                                     }
+                                                 }
+
+                );
+
+                lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                                                 @Override
+                                                 public void onItemClick(AdapterView<?> parent, View view, int position,
+                                                                         long id) {
+                                                     String codigo;
+                                                     cursor.moveToPosition(position);
+                                                     codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
+                                                     Intent intent = new Intent(Pedidos.this, ManutencaoPedidos.class);
+                                                     intent.putExtra("operacao", "A");
+                                                     intent.putExtra("codigo", codigo);
+                                                     //startActivity(intent);
+                                                     startActivityForResult(intent, 1);
+                                                 }
+                                             }
+
+                );
+            }
+
+        } catch (Exception e) {
+            MensagemUtil.addMsg(Pedidos.this, e.getMessage().toString());
+        }
     }
 
     //---------------------------------------Funções para sincronização de pedidos, items de pedido e clientes novos ---------------------
@@ -1874,7 +1585,20 @@ public class Pedidos extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.pedidos, menu);
+        MenuItem item = menu.findItem(R.id.buscar_pedido);
+
+        sv_Pedidos.setMenuItem(item);
+
+        me_ExcluirPedidos = menu.findItem(R.id.action_excluirtodospedidos);
+        me_Sincronizar = menu.findItem(R.id.sincronizar_pedidos);
+        me_BuscarPedido = menu.findItem(R.id.buscar_pedido);
+
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int codigo, int resultado, Intent intent) {
+        suCarregarPedidos("");
     }
 
     @Override
@@ -1885,10 +1609,7 @@ public class Pedidos extends AppCompatActivity
 
         int id = item.getItemId();
 
-        switch (item.getItemId()) {
-
-            // Id correspondente ao botão Up/Home da actionbar
-            case R.id.action_excluirtodospedidos:
+        if (id == R.id.action_excluirtodospedidos) {
 
                 builder = new AlertDialog.Builder(this);
 
@@ -1901,28 +1622,33 @@ public class Pedidos extends AppCompatActivity
                 builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface arg0, int arg1) {
                         //Toast.makeText(ManutencaoProdutoPedido.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
-                        BancoController crud = new BancoController(getBaseContext());
                         try {
-                            Cursor cursor = crud.carregaTodosPedidos();
 
-                            if (cursor != null) {
-                                if(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGSITUACAO)).equals("ENVIADO")){
-                                    crud.deletaPedido(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID))));
+                            CL_Pedidos cl_Pedidos = new CL_Pedidos();
+                            CTL_Pedidos ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
+
+                            if(ctl_Pedidos.fuCarregaTodosPedidosEnviados()){
+                                Cursor rs_Pedidos = ctl_Pedidos.rs_Pedido;
+                                while (!rs_Pedidos.isAfterLast()){
+
+                                    cl_Pedidos.setNumPedido(rs_Pedidos.getString(rs_Pedidos.getColumnIndexOrThrow(CriaBanco.ID)));
+                                    ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
+
+                                    ctl_Pedidos.fuDeletarPedido();
+
+                                    rs_Pedidos.moveToNext();
                                 }
-                                while(cursor.moveToNext()) {
-                                    if(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGSITUACAO)).equals("ENVIADO")){
-                                        crud.deletaPedido(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID))));
-                                    }
-                                }
+
+                                MensagemUtil.addMsg(Pedidos.this, "Pedidos enviados excluídos com sucesso!");
+                                Intent intent = new Intent(Pedidos.this, Pedidos.class);
+                                startActivity(intent);
+                            }else{
+                                MensagemUtil.addMsg(Pedidos.this, "Não foi encontrado nenhum pedido enviado para ser excluído.");
                             }
 
-                            MensagemUtil.addMsg(Pedidos.this, "Pedidos enviados excluídos com sucesso!");
-                            Intent intent = new Intent(Pedidos.this, Pedidos.class);
-                            startActivity(intent);
                         } catch (Exception e) {
                             MensagemUtil.addMsg(Pedidos.this, "Não foi possivel excluir os pedidos enviados devido à seguinte situação: " + e.getMessage().toString() + ".");
                         }
-
 
                     }
                 });
@@ -1940,6 +1666,44 @@ public class Pedidos extends AppCompatActivity
 
                 return true;
 
+         //Atendimento 19441
+        }else if(id == R.id.sincronizar_pedidos){
+            if(verificaConexao()){
+
+                builder = new AlertDialog.Builder(this);
+
+                //define o titulo
+                builder.setTitle("Sincronizar todos os pedidos abertos");
+                //define a mensagem
+                builder.setMessage("Deseja mesmo enviar online todos os seus pedidos em aberto?");
+
+                //define um botão como positivo
+                builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        try {
+                            LoadingAsyncTodosPedidos async_TodosPedidos = new LoadingAsyncTodosPedidos();
+                            async_TodosPedidos.execute();
+                        } catch (Exception e) {
+                            MensagemUtil.addMsg(Pedidos.this, "Não foi possível realizar a sincronização de todos os seus pedidos em aberto");
+                        }
+                    }
+                });
+                //define um botão como negativo.
+                builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+
+                    }
+                });
+                //cria o AlertDialog
+                alerta = builder.create();
+                //Exibe
+                alerta.show();
+
+            }else{
+                MensagemUtil.addMsg(Pedidos.this, "Por favor se conecte à internet para sincronizar todos os seus pedidos em aberto");
+            }
+
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -1981,42 +1745,40 @@ public class Pedidos extends AppCompatActivity
         }
     }
 
-
-
      @SuppressWarnings("StatementWithEmptyBody")
      @Override
      public boolean onNavigationItemSelected(MenuItem item) {
          // Handle navigation view item clicks here.
          int id = item.getItemId();
 
-         if (id == R.id.nav_camara) {
+         if (id == R.id.nav_clientes) {
              Intent secondActivity;
              secondActivity = new Intent(Pedidos.this, HomeActivity.class);
              startActivity(secondActivity);
              // Handle the camera action
-         } else if (id == R.id.nav_gallery) {
+         } else if (id == R.id.nav_pedidos) {
              Intent secondActivity;
              secondActivity = new Intent(Pedidos.this, Pedidos.class);
              startActivity(secondActivity);
 
-         } else if (id == R.id.nav_slideshow) {
+
+         } else if (id == R.id.nav_produtos) {
              Intent secondActivity;
              secondActivity = new Intent(Pedidos.this, Produtos.class);
              secondActivity.putExtra("selecaoProdutos", "N");
              startActivity(secondActivity);
 
-         } else if (id == R.id.nav_share) {
+         } else if (id == R.id.nav_opcoes) {
              Intent secondActivity;
              secondActivity = new Intent(Pedidos.this, Opcoes.class);
              startActivity(secondActivity);
 
-         } /*else if (id == R.id.nav_send) {
-    Intent secondActivity;
-    secondActivity = new Intent(Pedidos.this, Sincronizar.class);
-    startActivity(secondActivity);
+         } else if (id == R.id.nav_visaogeral) {
+             Intent secondActivity;
+             secondActivity = new Intent(Pedidos.this, VisaoGeralNova.class);
+             startActivity(secondActivity);
 
-}*/
-
+         }
          DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
          drawer.closeDrawer(GravityCompat.START);
          return true;
@@ -2186,6 +1948,213 @@ public class Pedidos extends AppCompatActivity
         }
     }
 
+    /*Funções referentes ao atendimento 19441
+    A primeira função ira mostrar uma mensagem na tela informando que a sincronização de todos os pedidos esta sendo feita
+    e chamará a função que realizará o envio dos pedidos.
+    A segunda função irá fazer uma varredura no banco de dados e verificar se existem atendimentos em aberto
+    caso existam então o aplicativo irá realizar o envio de todos os pedidos
+    */
 
+    private class LoadingAsyncTodosPedidos extends AsyncTask<Void, Void, Void> {
+
+        ProgressDialog progressDialogPedidos;
+        String validou = "N";
+
+        @Override
+        protected void onPreExecute() {
+            progressDialogPedidos = ProgressDialog.show(Pedidos.this, "Sincronizando todos os pedidos", "Sincronizando todos pedidos em aberto...");
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            if (fuSincronizarTodosPedidosAbertos()) {
+                validou = "S";
+
+            } else {
+                validou = "N";
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            progressDialogPedidos.dismiss();
+
+            if (validou.equals("N")) {
+                MensagemUtil.addMsg(Pedidos.this, "Todos os seus pedidos que estavam em aberto foram sincronizados com o servidor");
+            }else{
+                MensagemUtil.addMsg(Pedidos.this, "Não foi possível realizar a sincronização de todos os seus pedidos em aberto");
+            }
+        }
+    }
+
+    protected boolean fuSincronizarTodosPedidosAbertos(){
+
+        CL_Pedidos cl_Pedidos = new CL_Pedidos();
+        CTL_Pedidos ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
+
+        if(ctl_Pedidos.fuPossuiPedidosAbertos()){
+            Cursor rs_Pedidos = ctl_Pedidos.rs_Pedido;
+            SYNC_Pedidos sync_Pedidos = new SYNC_Pedidos(getApplicationContext());
+
+            if(sync_Pedidos.FU_EnviarTodosPedidos(rs_Pedidos)){
+                return true;
+            }else{
+                return false;
+            }
+
+        }else{
+            MensagemUtil.addMsg(Pedidos.this, "Não foi encontrado nenhum pedido em aberto para sincronização");
+            return false;
+        }
+
+    }
+
+    //Função referente ao atendimento 19449 de duplicação do pedido
+    protected void suCliqueLongoLista(String numPedido, String fgSituacao){
+
+        final String vf_NumPedido = numPedido;
+        final String vf_FgSituacao = fgSituacao;
+        //Lista de itens
+        ArrayList<String> itens = new ArrayList<String>();
+
+        itens.add("Consultar");
+        itens.add("Enviar Online");
+        itens.add("Cancelar Pedido");
+        itens.add("Duplicar Pedido");
+        itens.add("Excluir");
+        itens.add("Sair");
+
+        //adapter utilizando um layout customizado (TextView)
+        ArrayAdapter adapter = new ArrayAdapter(getBaseContext(), R.layout.item_alerta, itens);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Pedidos.this);
+        builder.setTitle("O que você deseja fazer com o pedido nº" + vf_NumPedido + "? ");
+        //define o diálogo como uma lista, passa o adapter.
+        builder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface arg0, int arg1) {
+                if (arg1 == 0) {
+                    Intent intent = new Intent(Pedidos.this, ManutencaoPedidos.class);
+                    intent.putExtra("operacao", "A");
+                    intent.putExtra("codigo", vf_NumPedido);
+                    startActivityForResult(intent, 1);
+                } else if (arg1 == 1) {
+
+                    //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para enviar online");
+                    if(vf_FgSituacao.equals("ENVIADO")) {
+                        MensagemUtil.addMsg(Pedidos.this, "Pedido já foi enviado para o sistema online.");
+                    }else if(vf_FgSituacao.equals("CANCELADO")){
+                        MensagemUtil.addMsg(Pedidos.this, "Pedido não pode ser enviado, pois o pedido foi cancelado!");
+                    }else {
+                        try {
+                            if (FU_ConsisteEnviarOnline(vf_NumPedido)) {
+                                alerta.dismiss();
+                                codigo_lista = vf_NumPedido;
+
+                                new LoadingAsyncOpcoes().execute();
+
+                            }
+                        } catch (Exception e) {
+                            MensagemUtil.addMsg(Pedidos.this, "Não foi possivel realizar o envio do pedido");
+                        }
+                    }
+                } else if (arg1 == 2) {
+                    //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para cancelar pedido");
+                    //alerta.dismiss();
+                    if(vf_FgSituacao.equals("ENVIADO")) {
+                        MensagemUtil.addMsg(Pedidos.this, "Pedido não pode ser cancelado, pois já foi enviado para o sistema online.");
+                    }else {
+                        BancoController crud = new BancoController(getBaseContext());
+                        try {
+                            crud.alteraSituacaoPedido(vf_NumPedido, "CANCELADO");
+                            MensagemUtil.addMsg(Pedidos.this, "Pedido cancelado com sucesso!");
+                            Intent intent = new Intent(Pedidos.this, Pedidos.class);
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            MensagemUtil.addMsg(Pedidos.this, "Não foi possivel cancelar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
+                        }
+                    }
+                } else if (arg1 == 3) {
+
+                    AlertDialog al_DuplicarPedido;
+                    AlertDialog.Builder bu_DuplicarPedido;
+
+                    bu_DuplicarPedido = new AlertDialog.Builder(Pedidos.this);
+
+                    //define o titulo
+                    bu_DuplicarPedido.setTitle("Duplicar pedido " + vf_NumPedido);
+                    //define a mensagem
+                    bu_DuplicarPedido.setMessage("Deseja mesmo duplicar o pedido " + vf_NumPedido + "?");
+
+                    //define um botão como positivo
+                    bu_DuplicarPedido.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            CL_Pedidos cl_Pedido = new CL_Pedidos();
+                            cl_Pedido.setNumPedido(vf_NumPedido);
+
+                            CTL_Pedidos ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedido);
+
+                            if(ctl_Pedidos.fuCarregarPedido()){
+                                try {
+                                    String vf_NumPedidoOriginal = cl_Pedido.getNumPedido();
+                                    if(ctl_Pedidos.fuDuplicarPedido()){
+
+                                        CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
+                                        cl_ItemPedido.setNumPedido(cl_Pedido.getNumPedido());
+
+                                        CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
+
+                                        if(ctl_ItemPedido.fuDuplicarItensPedidoDuplicado(vf_NumPedidoOriginal)) {
+                                            MensagemUtil.addMsg(Pedidos.this, "Pedido duplicado com sucesso!");
+                                            Intent intent = new Intent(Pedidos.this, Pedidos.class);
+                                            startActivity(intent);
+                                        }else{
+                                            MensagemUtil.addMsg(Pedidos.this, "Não foi possível duplicar os itens do pedido!");
+                                        }
+                                    }else{
+                                        MensagemUtil.addMsg(Pedidos.this, "Não foi possível duplicar o pedido!");
+                                    }
+                                }catch (Exception e){
+                                    MensagemUtil.addMsg(Pedidos.this, "Não foi possivel duplicar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
+                                }
+
+                            }
+                        }
+                    });
+                    //define um botão como negativo.
+                    bu_DuplicarPedido.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface arg0, int arg1) {
+
+                        }
+                    });
+                    //cria o AlertDialog
+                    al_DuplicarPedido = bu_DuplicarPedido.create();
+                    //Exibe
+                    al_DuplicarPedido.show();
+
+                } else if (arg1 == 4) {
+                    //MensagemUtil.addMsg(Pedidos.this, "Foi clicado para excluir pedido");
+                    BancoController crud = new BancoController(getBaseContext());
+                    try {
+                        crud.deletaPedido(Integer.parseInt(vf_NumPedido));
+                        MensagemUtil.addMsg(Pedidos.this, "Pedido excluido com sucesso!");
+                        Intent intent = new Intent(Pedidos.this, Pedidos.class);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        MensagemUtil.addMsg(Pedidos.this, "Não foi possivel excluir o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
+                    }
+                } else if (arg1 == 5) {
+                    alerta.dismiss();
+                }
+
+            }
+        });
+
+        alerta = builder.create();
+        alerta.show();
+
+    }
 
 }

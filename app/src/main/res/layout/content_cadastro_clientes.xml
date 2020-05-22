@@ -14,37 +14,6 @@
     <RelativeLayout android:layout_width="fill_parent"
         android:layout_height="match_parent" >
 
-        <TextView
-            android:id="@+id/lb_email2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tb_nmcontato"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginTop="15dp"
-            android:text="@string/email"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/black" />
-
-        <EditText
-            android:id="@+id/tb_email2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/lb_email"
-            android:layout_alignEnd="@+id/tb_endereco"
-            android:layout_alignRight="@+id/tb_endereco"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:ems="10"
-            android:hint="email@provedor.com.br"
-            android:inputType="textEmailAddress"
-            android:padding="10dip"
-            android:singleLine="true"
-            android:textAllCaps="true"
-            android:textColor="@color/black"
-            android:textColorHint="@color/cor_dica"
-            android:textCursorDrawable="@drawable/cursor" />
-
         <TextView android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
@@ -54,8 +23,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:textAlignment="center"
-            android:visibility="invisible"
-            android:layout_marginTop="-5dp" />
+            android:visibility="gone"
+            android:layout_marginTop="5dp" />
 
         <TextView android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -603,113 +572,7 @@
             android:layout_alignEnd="@+id/tb_cnpj"
             />
 
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text=" "
-            android:id="@+id/lb_sccadastrar"
-            android:textColor="@color/black"
-            android:layout_below="@+id/cb_tipcliente"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="0dp" />
 
-        <Button android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_cadastrar"
-            android:id="@+id/button"
-            android:layout_below="@+id/lb_sccadastrar"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="15dp"
-            android:layout_alignRight="@+id/tb_bairro"
-            android:layout_alignEnd="@+id/tb_bairro"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:background="@drawable/estilo_botao"/>
-
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text=" "
-            android:id="@+id/lb_scalterar"
-            android:textColor="@color/black"
-            android:layout_below="@+id/button"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="0dp" />
-
-        <Button android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_alterar"
-            android:id="@+id/sc_alterar"
-            android:layout_below="@+id/lb_scalterar"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="15dp"
-            android:layout_alignRight="@+id/tb_bairro"
-            android:layout_alignEnd="@+id/tb_bairro"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:background="@drawable/estilo_botao"/>
-
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text=" "
-            android:id="@+id/lb_scexcluir"
-            android:textColor="@color/black"
-            android:layout_below="@+id/sc_alterar"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="0dp" />
-
-        <Button android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Excluir"
-            android:id="@+id/sc_excluir"
-            android:layout_below="@+id/lb_scexcluir"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="15dp"
-            android:layout_alignRight="@+id/tb_bairro"
-            android:layout_alignEnd="@+id/tb_bairro"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:background="@drawable/estilo_botao_excluir"/>
-
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text=" "
-            android:id="@+id/lb_sccancelar"
-            android:textColor="@color/black"
-            android:layout_below="@+id/sc_excluir"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="0dp" />
-
-        <Button android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_cancelar"
-            android:id="@+id/sc_cancelar"
-            android:layout_below="@+id/lb_sccancelar"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="15dp"
-            android:layout_alignRight="@+id/tb_bairro"
-            android:layout_alignEnd="@+id/tb_bairro"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:background="@drawable/estilo_botao"/>
 
         <TextView android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -719,7 +582,9 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:layout_below="@+id/cb_tipcliente"
+            android:layout_marginBottom="30dp"/>
 
     </RelativeLayout>
 

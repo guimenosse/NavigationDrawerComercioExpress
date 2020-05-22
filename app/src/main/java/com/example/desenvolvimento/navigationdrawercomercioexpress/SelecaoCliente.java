@@ -18,12 +18,18 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 public class SelecaoCliente extends AppCompatActivity {
 
     private ListView lista;
     private Toast toast;
+
+    MaterialSearchView sv_ClientesPedido;
+    MenuItem me_BuscarCliente, me_Cancelar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +39,9 @@ public class SelecaoCliente extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        sv_ClientesPedido = (MaterialSearchView) findViewById(R.id.sv_ClientesPedidos);
+        sv_ClientesPedido.setVoiceSearch(true); //or false
 
         BancoController crud = new BancoController(getBaseContext());
         final Cursor cursor = crud.carregaClientes();
@@ -65,8 +74,34 @@ public class SelecaoCliente extends AppCompatActivity {
         tb_buscarcliente.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        final TextView lb_TituloClientesPedidos = (TextView) findViewById(R.id.lb_TituloClientesPedidos);
+
+        sv_ClientesPedido.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String nomeRazaoSocial) {
+
                 BancoController crud = new BancoController(getBaseContext());
-                final Cursor cursor = crud.carregaClientesNome(tb_buscarcliente.getText().toString());
+                final Cursor cursor = crud.carregaClientesNome(nomeRazaoSocial);
 
                 String[] nomeCampos = new String[]{CriaBanco.RZSOCIAL};
                 int[] idViews = new int[]{R.id.rzsociallist};
@@ -89,17 +124,27 @@ public class SelecaoCliente extends AppCompatActivity {
                         finish();
                     }
                 });
+
+                return false;
+            }
+        });
+
+        sv_ClientesPedido.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+                me_BuscarCliente.setVisible(false);
+                lb_TituloClientesPedidos.setWidth(0);
+
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
-            }
+            public void onSearchViewClosed() {
+                //Do some magic
 
-            @Override
-            public void afterTextChanged(Editable s) {
-
+                me_BuscarCliente.setVisible(true);
+                lb_TituloClientesPedidos.setWidth(550);
             }
         });
     }
@@ -108,6 +153,11 @@ public class SelecaoCliente extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.selecaocliente, menu);
+        MenuItem item = menu.findItem(R.id.buscar_clientepedido);
+
+        sv_ClientesPedido.setMenuItem(item);
+
+        me_BuscarCliente = menu.findItem(R.id.buscar_clientepedido);
         return true;
     }
 

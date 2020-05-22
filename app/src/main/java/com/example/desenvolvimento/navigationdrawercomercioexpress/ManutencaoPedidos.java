@@ -1,17 +1,27 @@
 package com.example.desenvolvimento.navigationdrawercomercioexpress;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -33,6 +43,27 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.Section;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
@@ -59,7 +90,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -69,19 +105,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import classes.CL_Clientes;
+import classes.CL_ItemPedido;
+import classes.CL_Pedidos;
+import classes.CL_Usuario;
+import controllers.CTL_Clientes;
+import controllers.CTL_ItemPedido;
+import controllers.CTL_Pedidos;
+import controllers.CTL_Usuario;
+import sync.SYNC_Pedidos;
+
 public class ManutencaoPedidos extends AppCompatActivity {
 
-    ImageView imagemProdutos;
-    TextView lb_descricaoProdutoPedidos, lb_descricaoProdutoPedidosTeste, lb_ocultarProdutos, lb_valorTotal;
-    EditText tb_percDesconto, tb_condPgto, tb_obsPedido, tb_vldesconto;
+    Funcoes funcoes = new Funcoes();
 
-    String operacao, numpedido, fgcancelado, fgenviado;
-    int VA_ContProdutos;
-    double VL_valorTotal;
-    public String nmcliente;
+    CL_Pedidos cl_Pedidos;
+    CTL_Pedidos ctl_Pedidos;
+
+    CL_Usuario cl_Usuario;
+    CTL_Usuario ctl_Usuario;
+
+    TextView lb_SelecionarClienteResultado, lb_SelecionarProdutoResultado, lb_ocultarProdutos, lb_valorTotalProdutos,
+            lb_qtdeTotalProdutos, lb_dtEmissao, lb_dtEmissaoResultado, lb_vlDesconto, lb_percDesconto, lb_condPgto,
+            lb_obsPedido, lb_valorTotal, lb_vlTotalResultado;
+
+    FloatingActionButton fab_SelecionarEmitente, fab_AdicionarProduto;
+
+    ListView lv_ItensPedido;
+
+    EditText tb_vlDesconto, tb_percDesconto, tb_vlFrete, tb_condPgto, tb_obsPedido;
+
+    String vc_Operacao;
 
     private AlertDialog alerta;
     AlertDialog.Builder builder;
+
+    FloatingActionButton fab_SalvarPedidos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,243 +151,97 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        fab_SalvarPedidos = (FloatingActionButton) findViewById(R.id.fab_SalvarPedido);
+        fab_SalvarPedidos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                suSalvarPedido();
+            }
+        });
+
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
 
-        if(savedInstanceState != null){
-            EstadoPedido estadoPedido = (EstadoPedido) savedInstanceState.getSerializable(EstadoPedido.KEY);
-            TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-            tb_rzsocial.setText(estadoPedido.cliente);
+        suInstanciarCampos();
+
+        if (vc_Operacao.equals("A")) {
+            suCarregarPedido();
+            suCarregaItemPedido();
+            suCalcularValorPedido();
         }
 
-        FU_VisibilidadeProdutos(false);
-
-        operacao = this.getIntent().getStringExtra("operacao");
-
-        if(operacao.equals("A")){
-            numpedido = this.getIntent().getStringExtra("codigo");
-            FU_CarregaPedido();
-            FU_CarregaItemPedido();
-            FU_CalcularValorPedido();
-        }else{
-            fgcancelado = "N";
-            fgenviado = "N";
+        if (cl_Pedidos.getFgSituacao().equals("E") || cl_Pedidos.getFgSituacao().equals("C")) {
+            suBloqueiaCampos(false);
         }
-        BancoController crud = new BancoController(getBaseContext());
 
-        //----------------------------- Comandos para o botao de clientes, para seleção ou alteração do cliente do pedido---------
-        Button sc_selecionarCliente = (Button) findViewById(R.id.sc_selecionarcliente);
-        TextView lb_rzsocialClientePedidos = (TextView)findViewById(R.id.lb_rzsocialClientePedidos);
-
-        lb_rzsocialClientePedidos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent secondActivity;
-                secondActivity = new Intent(ManutencaoPedidos.this, SelecaoCliente.class);
-                //secondActivity.putExtra("codigo", "0");
-                startActivityForResult(secondActivity, 1);
-            }
-        });
-
-        lb_ocultarProdutos = (TextView)findViewById(R.id.lb_ocultarProdutos);
-
-        TextView sc_selecionarProduto = (TextView)findViewById(R.id.lb_descricaoProdutoPedidosTeste);
-
-        sc_selecionarProduto.setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        BancoController crud = new BancoController(getBaseContext());
-                                                        TextView tb_cdcliente = (TextView) findViewById(R.id.lb_rzsocialClientePedidos);
-                                                        TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-                                                        TextView tb_dtemissao = (TextView) findViewById(R.id.tb_dtemissaoResultado);
-                                                        EditText tb_condpgto = (EditText) findViewById(R.id.tb_condPgto);
-                                                        EditText tb_percdesconto = (EditText)findViewById(R.id.tb_percdescontoPedido);
-                                                        EditText tb_vldesconto = (EditText) findViewById(R.id.tb_vldescontoPedido);
-                                                        EditText tb_obs = (EditText) findViewById(R.id.tb_obsPedido);
-                                                        if(operacao.equals("I")) {
-                                                            numpedido = crud.carregaNumPedido();
-
-                                                        }
-                                                        FU_CalcularValorPedido();
-                                                        crud.alteraPedido(numpedido, tb_cdcliente.getText().toString(), tb_rzsocial.getText().toString().toUpperCase(), tb_condpgto.getText().toString().toUpperCase(), lb_valorTotal.getText().toString().substring(0, 27), tb_percdesconto.getText().toString(), tb_vldesconto.getText().toString(), tb_obs.getText().toString().toUpperCase(), "ABERTO");
-
-                                                        if(lb_ocultarProdutos.getText().toString().equals("Ocultar Produtos")) {
-                                                        /*---------------- É necessário ocultar a listview quando clica em adicionar produtos ------------------*/
-                                                            ListView lista = (ListView) findViewById(R.id.listViewItemPedidos);
-                                                            lista.setVisibility(View.INVISIBLE);
-                                                            lb_ocultarProdutos.setText("Mostrar Produtos");
-
-                                                            TextView lb_dtemissao = (TextView) findViewById(R.id.tb_dtemissao);
-                                                            RelativeLayout.LayoutParams p_endereco = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                                                    ViewGroup.LayoutParams.WRAP_CONTENT);
-                                                            p_endereco.addRule(RelativeLayout.BELOW, R.id.lb_fundoOcultarProdutos);
-                                                            p_endereco.setMargins(0, 25, 0, 0);
-                                                            lb_dtemissao.setLayoutParams(p_endereco);
-                                                        }
-
-                                                        Intent secondActivity;
-                                                        secondActivity = new Intent(ManutencaoPedidos.this, AdicionarProdutosCustomizada.class);
-                                                        secondActivity.putExtra("numpedido", numpedido);
-                                                        secondActivity.putExtra("selecaoProdutos", "S");
-                                                        startActivityForResult(secondActivity, 2);
-            }
-        }
-        );
-
-
-
-        lb_ocultarProdutos.setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                    ListView lista = (ListView) findViewById(R.id.listViewItemPedidos);
-                    if(lb_ocultarProdutos.getText().toString().equals("Mostrar Produtos")) {
-                        lista.setVisibility(View.VISIBLE);
-                        lb_ocultarProdutos.setText("Ocultar Produtos");
-
-                        TextView lb_dtemissao = (TextView) findViewById(R.id.tb_dtemissao);
-                        RelativeLayout.LayoutParams p_endereco = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                        p_endereco.addRule(RelativeLayout.BELOW, R.id.listViewItemPedidos);
-                        p_endereco.setMargins(0, 25, 0, 0);
-                        lb_dtemissao.setLayoutParams(p_endereco);
-
-                        calculeHeightListView();
-                    }else{
-                        lista.setVisibility(View.INVISIBLE);
-                        lb_ocultarProdutos.setText("Mostrar Produtos");
-
-                        TextView lb_dtemissao = (TextView) findViewById(R.id.tb_dtemissao);
-                        RelativeLayout.LayoutParams p_endereco = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                        p_endereco.addRule(RelativeLayout.BELOW, R.id.lb_fundoOcultarProdutos);
-                        p_endereco.setMargins(0, 25, 0, 0);
-                        lb_dtemissao.setLayoutParams(p_endereco);
-
-                        calculeHeigthListViewReverse();
-                    }
-                }
-            }
-        );
-
-        //Fazer a mudança do valor do percentual de desconto também.
-
-        tb_vldesconto = (EditText)findViewById(R.id.tb_vldescontoPedido);
-        tb_percDesconto = (EditText)findViewById(R.id.tb_percdescontoPedido);
-        tb_vldesconto.addTextChangedListener(new TextWatcher() {
+        tb_vlDesconto.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,
                                           int after) {
                 // TODO Auto-generated method stub
-
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    if(tb_vldesconto.getText().toString().trim().equals("")){
+                    if (tb_vlDesconto.getText().toString().trim().equals("")) {
                         tb_percDesconto.setText("");
-                    }else {
-                        BancoController crud = new BancoController(getBaseContext());
+                    } else {
 
+                        if (!cl_Pedidos.getQtdeItens().trim().equals("") || !cl_Pedidos.getQtdeItens().equals("0")) {
+                            double vf_VlBruto = Double.parseDouble(cl_Pedidos.getVlTotalItens());
+                            double vf_VlLiquido = vf_VlBruto - Double.parseDouble(tb_vlDesconto.getText().toString().replace(",", "."));
 
-                        if (crud.verificaItemPedido(numpedido).equals("S")) {
-                            TextView lb_valorTotalProdutos = (TextView) findViewById(R.id.lb_valorTotalProdutos);
-                            //String.format("%.2f", vltotal);
+                            double vf_Porcentagem = ((vf_VlBruto - vf_VlLiquido) / vf_VlBruto) * 100;
+                            tb_percDesconto.setText(String.format("%.5f", vf_Porcentagem).replace(",", "."));
 
-                            //lb_valorTotalProdutos.setText("Total: R$" + String.format("%.2f", VL_valorTotal));
-                            double valorBruto = Double.parseDouble(lb_valorTotalProdutos.getText().toString().replace("Total: R$", "").replace(",", "."));
-                            double valorLiquido = valorBruto - Double.parseDouble(tb_vldesconto.getText().toString().replace(",", "."));
-
-                            double porcentagem = ((valorBruto - valorLiquido) / valorBruto) * 100;
-                            tb_percDesconto.setText(String.format("%.5f", porcentagem).replace(",", "."));
-
+                            suCalcularValorPedido();
                         }
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
 
-
-        /*tb_percDesconto.addTextChangedListener(new TextWatcher() {
+        tb_vlFrete.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,
                                           int after) {
                 // TODO Auto-generated method stub
-
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    if(tb_percDesconto.getText().toString().trim().equals("")){
-                        tb_vldesconto.setText("");
-                    }else {
-                        BancoController crud = new BancoController(getBaseContext());
+                    /*if (tb_vlFrete.getText().toString().trim().equals("")) {
+                        cl_Pedidos.setVlFrete("0.00");
+                    } else {
+                        /*cl_Pedidos.setVlFrete(String.valueOf(Double.parseDouble(tb_vlFrete.getText().toString().replace(".", "").replace(",", "."))));
+
+                        double vf_VlBruto = Double.parseDouble(cl_Pedidos.getVlTotalItens());
+                        double vf_VlLiquido = vf_VlBruto - Double.parseDouble(tb_vlDesconto.getText().toString().replace(",", "."));
+
+                        double vf_VltTotalPedido = vf_VlLiquido + Double.parseDouble(cl_Pedidos.getVlFrete());
 
 
-                        if (crud.verificaItemPedido(numpedido).equals("S")) {
-                            TextView lb_valorTotalProdutos = (TextView) findViewById(R.id.lb_valorTotalProdutos);
-                            //String.format("%.2f", vltotal);
-
-                            //lb_valorTotalProdutos.setText("Total: R$" + String.format("%.2f", VL_valorTotal));
-                            double valorBruto = Double.parseDouble(lb_valorTotalProdutos.getText().toString().replace("Total: R$", "").replace(",", "."));
-                            double valorPercDesconto = Double.parseDouble(tb_percDesconto.getText().toString().replace(",", "."));
-
-                            double porcentagem = valorPercDesconto / 100;
-                            double resultado = VL_valorTotal * porcentagem;
-                            double resultadoTotal = VL_valorTotal - resultado;
-                            resultado = Double.valueOf(String.format(Locale.US, "%.2f", resultadoTotal));
-                            String valor = String.format("%.2f", resultadoTotal);
-
-                            tb_vldesconto.setText(String.format("%.2f", resultado));
-
-                        }
-                    }
-                }catch (Exception e){
+                    }*/
+                    suCalcularValorPedido();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        });*/
-
-        if(fgenviado.equals("S") || fgcancelado.equals("S")){
-            FU_BloqueiaCampos(false);
-
-            imagemProdutos = (ImageView) findViewById(R.id.imageViewProduto);
-
-            lb_descricaoProdutoPedidos = (TextView) findViewById(R.id.lb_descricaoProdutoPedidos);
-            lb_descricaoProdutoPedidosTeste = (TextView) findViewById(R.id.lb_descricaoProdutoPedidosTeste);
-
-            tb_percDesconto = (EditText) findViewById(R.id.tb_percdescontoPedido);
-            tb_vldesconto = (EditText) findViewById(R.id.tb_vldescontoPedido);
-            tb_condPgto = (EditText) findViewById(R.id.tb_condPgto);
-            tb_obsPedido = (EditText) findViewById(R.id.tb_obsPedido);
-
-            imagemProdutos.setEnabled(false);
-
-            lb_descricaoProdutoPedidos.setEnabled(false);
-            lb_descricaoProdutoPedidosTeste.setEnabled(false);
-
-            tb_percDesconto.setEnabled(false);
-            tb_vldesconto.setEnabled(false);
-            tb_condPgto.setEnabled(false);
-            tb_obsPedido.setEnabled(false);
-        }
+        });
     }
 
     @Override
@@ -338,1499 +251,753 @@ public class ManutencaoPedidos extends AppCompatActivity {
         return true;
     }
 
-    public boolean FU_ConsistePedido(){
-        TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-        if(tb_rzsocial.getText().equals("Toque para selecionar um cliente...")) {
-            MensagemUtil.addMsg(ManutencaoPedidos.this, "Favor selecionar um cliente para abertura do pedido!");
-            return false;
-        }
-
-        EditText tb_vldesconto = (EditText) findViewById(R.id.tb_vldescontoPedido);
-        if (!tb_percDesconto.getText().toString().trim().equals("") && Double.parseDouble(tb_percDesconto.getText().toString()) > 99) {
-            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não é permitido um desconto superior a 99%!");
-            return false;
-        }
-
-        BancoController crud = new BancoController(getBaseContext());
-        String VA_possuiItemPedido = crud.verificaItemPedido(numpedido);
-
-        if(VA_possuiItemPedido.equals("N")){
-            if(!tb_vldesconto.getText().toString().trim().equals("") && Double.parseDouble(tb_vldesconto.getText().toString()) > 0){
-                MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi adicionado nenhum produto no pedido. Não é permitido informar nenhum desconto para este pedido!");
-                return  false;
-            }
-        }else {
-            if (!tb_percDesconto.getText().toString().trim().equals("") && Double.parseDouble(tb_vldesconto.getText().toString()) > 0) {
-                Cursor cursor = crud.carregaItemPedido(numpedido);
-                double VA_VlMaxDescPermitido = 0;
-                double VA_VlDescontoItens = 0;
-                try {
-                    VA_VlMaxDescPermitido += Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLMAXDESCPERMITIDO)));
-                    VA_VlDescontoItens += Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)));
-                    while (cursor.moveToNext()) {
-                        VA_VlMaxDescPermitido += Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLMAXDESCPERMITIDO)));
-                        VA_VlDescontoItens += Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                double VA_vlDesconto = Double.parseDouble(tb_percDesconto.getText().toString());
-                double porcentagem = VA_vlDesconto / 100;
-                double resultado = VL_valorTotal * porcentagem;
-                if ((resultado + VA_VlDescontoItens) > VA_VlMaxDescPermitido) {
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Desconto informado é maior que o permitido!");
-                    return false;
-                }
-            }
-            if (!tb_vldesconto.getText().toString().trim().equals("") && Double.parseDouble(tb_vldesconto.getText().toString()) > 0) {
-                Cursor cursor = crud.carregaItemPedido(numpedido);
-                double VA_VlMaxDescPermitido = 0;
-                double VA_VlDescontoItens = 0;
-                try {
-                    VA_VlMaxDescPermitido += Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLMAXDESCPERMITIDO)));
-                    VA_VlDescontoItens += Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)));
-                    while (cursor.moveToNext()) {
-                        VA_VlMaxDescPermitido += Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLMAXDESCPERMITIDO)));
-                        VA_VlDescontoItens += Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                tb_vldesconto = (EditText) findViewById(R.id.tb_vldescontoPedido);
-                double resultado = Double.parseDouble(tb_vldesconto.getText().toString());
-
-                if ((resultado + VA_VlDescontoItens) > VA_VlMaxDescPermitido) {
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Desconto informado é maior que o permitido!");
-                    return false;
-                }
-            }
-
-        }
-
-
-
-        return true;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
 
-        switch (item.getItemId()) {
-
-            // Id correspondente ao botão Up/Home da actionbar
-            case R.id.action_salvarpedido:
-                if (fgenviado.equals("S")) {
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido já foi enviado para o sistema online.");
-                } else if(fgcancelado.equals("S")) {
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não pode ser salvo, pois o pedido foi cancelado!");
-                }else {
-                    if (FU_ConsistePedido()) {
-                        TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-                        EditText tb_vldesconto = (EditText) findViewById(R.id.tb_percdescontoPedido);
-
-                        BancoController crud = new BancoController(getBaseContext());
-                        try {
-                            TextView tb_cdcliente = (TextView) findViewById(R.id.lb_rzsocialClientePedidos);
-                            tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-                            TextView tb_dtemissao = (TextView) findViewById(R.id.tb_dtemissaoResultado);
-                            EditText tb_condpgto = (EditText) findViewById(R.id.tb_condPgto);
-                            tb_percDesconto = (EditText) findViewById(R.id.tb_percdescontoPedido);
-                            tb_vldesconto = (EditText) findViewById(R.id.tb_vldescontoPedido);
-                            EditText tb_obs = (EditText) findViewById(R.id.tb_obsPedido);
-                            if (operacao.equals("I")) {
-                                numpedido = crud.carregaNumPedido();
-                            }
-                            if (fgcancelado.equals("N") && fgenviado.equals("N")) {
-
-                                if (crud.verificaItemPedido(numpedido).equals("S")) {
-
-                                    crud.alteraPedido(numpedido, tb_cdcliente.getText().toString(), tb_rzsocial.getText().toString().toUpperCase(), tb_condpgto.getText().toString().toUpperCase(), lb_valorTotal.getText().toString().substring(0, 27), tb_percDesconto.getText().toString(), tb_vldesconto.getText().toString(), tb_obs.getText().toString().toUpperCase(), "ABERTO");
-                                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido salvo com sucesso!");
-
-                                } else {
-                                    crud.alteraPedido(numpedido, tb_cdcliente.getText().toString(), tb_rzsocial.getText().toString().toUpperCase(), tb_condpgto.getText().toString().toUpperCase(), "", tb_percDesconto.getText().toString(), tb_vldesconto.getText().toString(), tb_obs.getText().toString().toUpperCase(), "ABERTO");
-                                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido salvo com sucesso!");
-                                }
-                            } else {
-                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não pode ser alterado, pois o pedido foi cancelado!");
-                            }
-                            Intent intent = new Intent(ManutencaoPedidos.this, Pedidos.class);
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel salvar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                        }
-                    }
-
-                }
-                return true;
-            case R.id.action_enviaronline:
-
-                if (fgenviado.equals("S")) {
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido já foi enviado para o sistema online.");
-                } else if(fgcancelado.equals("S")) {
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não pode ser enviado, pois o pedido foi cancelado!");
-                }else {
-                    if(FU_ConsistePedido()) {
-                        TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-                        EditText tb_vldesconto = (EditText) findViewById(R.id.tb_percdescontoPedido);
-
-                        BancoController crud = new BancoController(getBaseContext());
-                        try {
-                            TextView tb_cdcliente = (TextView) findViewById(R.id.lb_rzsocialClientePedidos);
-                            tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-                            TextView tb_dtemissao = (TextView) findViewById(R.id.tb_dtemissaoResultado);
-                            EditText tb_condpgto = (EditText) findViewById(R.id.tb_condPgto);
-                            tb_percDesconto = (EditText) findViewById(R.id.tb_percdescontoPedido);
-                            tb_vldesconto = (EditText)findViewById(R.id.tb_vldescontoPedido);
-                            EditText tb_obs = (EditText) findViewById(R.id.tb_obsPedido);
-                            if (operacao.equals("I")) {
-                                numpedido = crud.carregaNumPedido();
-                            }
-                            crud.alteraPedido(numpedido, tb_cdcliente.getText().toString(), tb_rzsocial.getText().toString().toUpperCase(), tb_condpgto.getText().toString().toUpperCase(), lb_valorTotal.getText().toString().substring(0, 27), tb_percDesconto.getText().toString(), tb_vldesconto.getText().toString(), tb_obs.getText().toString().toUpperCase(), "ABERTO");
-
-                            if (FU_ConsisteEnviarOnline()) {
-                                if (verificaConexao()) {
-                                    new LoadingAsyncOpcoes().execute();
-
-                                } else {
-                                    MensagemUtil.addMsg(ManutencaoPedidos.this, "É necessário ter conexão com a internet para o envio do pedido!");
-                                }
-                            }
-
-                        } catch (Exception e) {
-                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel enviar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                        }
-                    }
-
-                }
-
-                return true;
-            case R.id.action_cancelarpedido:
-
-                TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-
-                if(tb_rzsocial.getText().toString().equals("Toque para selecionar um cliente...")) {
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não foi aberto. Não será possivel realizar o cancelamento sem que o pedido seja aberto!");
-                    return false;
-                }else {
-
-                    if (fgenviado.equals("S")) {
-                        MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não pode ser cancelado, pois já foi enviado para o sistema online.");
-                    } else {
-                        builder = new AlertDialog.Builder(this);
-
-                        //define o titulo
-                        builder.setTitle("Cancelar Pedido");
-                        //define a mensagem
-                        builder.setMessage("Deseja mesmo cancelar o pedido " + numpedido + "?");
-
-                        //define um botão como positivo
-                        builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface arg0, int arg1) {
-                                //Toast.makeText(ManutencaoProdutoPedido.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
-                                BancoController crud = new BancoController(getBaseContext());
-                                try {
-                                    crud.alteraSituacaoPedido(numpedido, "CANCELADO");
-                                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido cancelado com sucesso!");
-                                    Intent intent = new Intent(ManutencaoPedidos.this, Pedidos.class);
-                                    startActivity(intent);
-                                } catch (Exception e) {
-                                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel cancelar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                                }
-
-
-                            }
-                        });
-                        //define um botão como negativo.
-                        builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface arg0, int arg1) {
-                                //Toast.makeText(ManutencaoProdutoPedido.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-
-                            }
-                        });
-                        //cria o AlertDialog
-                        alerta = builder.create();
-                        //Exibe
-                        alerta.show();
-                    }
-                }
-                return true;
-            case R.id.action_excluirpedido:
-                tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-
-                if(tb_rzsocial.getText().toString().equals("Toque para selecionar um cliente...")) {
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não foi aberto. Não será possivel realizar a exclusão sem que o pedido seja aberto!");
-                    return false;
-                }else {
-                    builder = new AlertDialog.Builder(this);
-
-                    //define o titulo
-                    builder.setTitle("Excluir Pedido");
-                    //define a mensagem
-                    builder.setMessage("Deseja mesmo excluir o pedido " + numpedido + "?");
-
-                    //define um botão como positivo
-                    builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            //Toast.makeText(ManutencaoProdutoPedido.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
-                            BancoController crud = new BancoController(getBaseContext());
-                            try {
-                                crud.deletaPedido(Integer.parseInt(numpedido));
-                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido excluido com sucesso!");
-                                Intent intent = new Intent(ManutencaoPedidos.this, Pedidos.class);
-                                startActivity(intent);
-                            } catch (Exception e) {
-                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel excluir o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
-                            }
-
-
-                        }
-                    });
-                    //define um botão como negativo.
-                    builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            //Toast.makeText(ManutencaoProdutoPedido.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-
-                        }
-                    });
-                    //cria o AlertDialog
-                    alerta = builder.create();
-                    //Exibe
-                    alerta.show();
-                }
-
-                return true;
+        if(id == android.R.id.home){
+            finish();
+            return true;
+        }else if (id == R.id.action_salvarpedido) {
+            suSalvarPedido();
+            return true;
+        }else if(id == R.id.action_enviaronline){
+            suEnviarOnline();
+            return true;
+        }else if(id == R.id.action_cancelarpedido){
+            suCancelarPedido();
+            return true;
+        }else if(id == R.id.action_duplicarpedido) {
+            suDuplicarPedido();
+            return true;
+        }else if(id == R.id.action_gerarpdf){
+            suCriarPDF();
+            return true;
+        }else if(id == R.id.action_excluirpedido){
+            suExcluirPedido();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public boolean FU_ConsisteEnviarOnline(){
-        tb_condPgto = (EditText)findViewById(R.id.tb_condPgto);
-        TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-
-        String VA_possuiItemPedido = "N";
-        BancoController crud = new BancoController(getBaseContext());
-        VA_possuiItemPedido = crud.verificaItemPedido(numpedido);
-
-        if(tb_rzsocial.getText().toString().equals("Toque para selecionar um cliente...")) {
-            MensagemUtil.addMsg(ManutencaoPedidos.this, "Favor selecionar um cliente no pedido!");
-            return false;
-        }
-        if(!VA_possuiItemPedido.equals("S")) {
-            MensagemUtil.addMsg(ManutencaoPedidos.this, "Deve ser informado ao menos um produto no pedido.");
-            return  false;
-        }
-        if(tb_condPgto.getText().toString().trim().equals("")){
-            MensagemUtil.addMsg(ManutencaoPedidos.this, "Deve ser informada a forma de pagamento do pedido.");
-            return false;
-        }
-        return true;
     }
 
     @Override
     protected void onActivityResult(int codigo, int resultado, Intent intent) {
         BancoController crud = new BancoController(getBaseContext());
         if(codigo == 1) {
-            if(resultado == 0){
+            if(resultado == 0) {
 
-            }else {
-                Cursor cursor = crud.carregaClienteById(resultado);
-                TextView tb_cdcliente = (TextView) findViewById(R.id.lb_rzsocialClientePedidos);
-                tb_cdcliente.setText(String.valueOf(resultado));
-                TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
+            }else if(resultado == 2){
                 try {
-                    if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)).equals("null")) {
-                        tb_rzsocial.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)).toUpperCase());
-                        nmcliente = tb_rzsocial.getText().toString();
-                        TextView lb_dtemissao = (TextView) findViewById(R.id.tb_dtemissaoResultado);
-                        String cdcliente = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE));
-                        tb_cdcliente.setText(cdcliente);
-                        if (lb_dtemissao.getText().toString().trim().equals("")) {
-                            lb_dtemissao.setText(getDateTime().substring(0, 16));
+                    suCarregaItemPedido();
+                    suCalcularValorPedido();
+                }catch (Exception e) {
+                    MensagemUtil.addMsg(ManutencaoPedidos.this, e.getMessage().toString());
+                }
+            }else {
+                CL_Clientes cl_Cliente = new CL_Clientes();
+                cl_Cliente.setId(String.valueOf(resultado));
 
-                            imagemProdutos = (ImageView) findViewById(R.id.imageViewProduto);
+                CTL_Clientes ctl_Clientes = new CTL_Clientes(getApplicationContext(), cl_Cliente);
 
-                            lb_descricaoProdutoPedidos = (TextView) findViewById(R.id.lb_descricaoProdutoPedidos);
-                            lb_descricaoProdutoPedidosTeste = (TextView) findViewById(R.id.lb_descricaoProdutoPedidosTeste);
+                if(ctl_Clientes.fuCarregarClienteId()) {
+                    try {
+                        cl_Pedidos.setNomeRzSocial(cl_Cliente.getNomeRzSocial().toUpperCase());
+                        cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
 
-                            tb_percDesconto = (EditText) findViewById(R.id.tb_percdescontoPedido);
-                            tb_vldesconto = (EditText) findViewById(R.id.tb_vldescontoPedido);
-                            tb_condPgto = (EditText) findViewById(R.id.tb_condPgto);
-                            tb_obsPedido = (EditText) findViewById(R.id.tb_obsPedido);
+                        lb_SelecionarClienteResultado.setText(cl_Pedidos.getNomeRzSocial());
 
-                            imagemProdutos.setEnabled(true);
+                        if (cl_Pedidos.getDtEmissao().trim().equals("")) {
 
-                            lb_descricaoProdutoPedidos.setEnabled(true);
-                            lb_descricaoProdutoPedidosTeste.setEnabled(true);
+                            cl_Pedidos.setDtEmissao(funcoes.getDateTime().substring(0, 16));
+                            lb_dtEmissaoResultado.setText(cl_Pedidos.getDtEmissao());
 
-                            tb_percDesconto.setEnabled(true);
-                            tb_vldesconto.setEnabled(true);
-                            tb_condPgto.setEnabled(true);
-                            tb_obsPedido.setEnabled(true);
+                            suBloqueiaCampos(true);
 
-                            String cdVendedor = crud.selecionaVendedor();
-                            crud.abrirPedido(cdcliente, nmcliente, lb_dtemissao.getText().toString(), cdVendedor, "ABERTO");
+                            cl_Pedidos.setCdVendedor(ctl_Usuario.fuSelecionarVendedor());
+                            cl_Pedidos.setFgSituacao("A");
 
+                            ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
 
+                            if(ctl_Pedidos.fuAbrirPedido())
+                            {
+                                cl_Pedidos.setNumPedido(ctl_Pedidos.fuCarregaNumPedido());
+                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido aberto com sucesso");
+                            }else{
+                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível abrir o pedido");
+                            }
                         }
+                    } catch (Exception e) {
+                        cl_Pedidos.setCdCliente("");
+                        cl_Pedidos.setNomeRzSocial("");
+                        cl_Pedidos.setDtEmissao("");
                     }
-                } catch (Exception e) {
-                    tb_rzsocial.setText("");
                 }
             }
         }else{
             try {
-                FU_CarregaItemPedido();
-                FU_CalcularValorPedido();
+                suCarregaItemPedido();
+                suCalcularValorPedido();
             }catch (Exception e) {
                 MensagemUtil.addMsg(ManutencaoPedidos.this, e.getMessage().toString());
             }
         }
     }
 
-    private String getDateTime() {
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle bundle){
-        super.onSaveInstanceState(bundle);
-
-        bundle.putSerializable(EstadoPedido.KEY, new EstadoPedido(nmcliente));
-    }
-
-    protected void FU_VisibilidadeProdutos(Boolean visibilidade){
-        TextView lb_fundoOcultarProdutos = (TextView)findViewById(R.id.lb_fundoOcultarProdutos);
-        TextView lb_ocultarProdutos = (TextView)findViewById(R.id.lb_ocultarProdutos);
-        TextView lb_valorTotalProdutos = (TextView)findViewById(R.id.lb_valorTotalProdutos);
-        TextView lb_qtdeTotalProdutos = (TextView)findViewById(R.id.lb_qtdeTotalProdutos);
-
-        TextView tb_dtemissao = (TextView)findViewById(R.id.tb_dtemissao);
+    @SuppressLint("RestrictedApi")
+    protected void suInstanciarCampos() {
 
 
-        if(visibilidade == true){
-            lb_fundoOcultarProdutos.setVisibility(View.VISIBLE);
-            lb_ocultarProdutos.setVisibility(View.VISIBLE);
-            lb_valorTotalProdutos.setVisibility(View.VISIBLE);
-            lb_qtdeTotalProdutos.setVisibility(View.VISIBLE);
+        cl_Pedidos = new CL_Pedidos();
+        cl_Usuario = new CL_Usuario();
+        ctl_Usuario = new CTL_Usuario(getApplicationContext(), cl_Usuario);
 
-            RelativeLayout.LayoutParams p_endereco = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            p_endereco.addRule(RelativeLayout.BELOW, R.id.lb_fundoOcultarProdutos);
-            p_endereco.setMargins(0, 25, 0, 0);
-            tb_dtemissao.setLayoutParams(p_endereco);
-        }else{
-            lb_fundoOcultarProdutos.setVisibility(View.INVISIBLE);
-            lb_ocultarProdutos.setVisibility(View.INVISIBLE);
-            lb_valorTotalProdutos.setVisibility(View.INVISIBLE);
-            lb_qtdeTotalProdutos.setVisibility(View.INVISIBLE);
+        vc_Operacao = this.getIntent().getStringExtra("operacao");
 
-            RelativeLayout.LayoutParams p_endereco = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            p_endereco.addRule(RelativeLayout.BELOW, R.id.lb_descricaoProdutoPedidos);
-            p_endereco.setMargins(0, 25, 0, 0);
-            tb_dtemissao.setLayoutParams(p_endereco);
+        if (vc_Operacao.equals("A")) {
+            cl_Pedidos.setNumPedido(this.getIntent().getStringExtra("codigo"));
+        } else {
+            cl_Pedidos.setNumPedido("0");
+            cl_Pedidos.setFgSituacao("A");
+        }
+
+        lb_SelecionarClienteResultado = (TextView) findViewById(R.id.lb_SelecionarClienteResultado);
+        lb_SelecionarProdutoResultado = (TextView) findViewById(R.id.lb_SelecionarProdutoResultado);
+        lb_ocultarProdutos = (TextView) findViewById(R.id.lb_ocultarProdutos);
+        lb_valorTotalProdutos = (TextView) findViewById(R.id.lb_valorTotalProdutos);
+        lb_qtdeTotalProdutos = (TextView) findViewById(R.id.lb_qtdeTotalProdutos);
+        lb_dtEmissao = (TextView) findViewById(R.id.lb_dtEmissao);
+        lb_dtEmissaoResultado = (TextView) findViewById(R.id.lb_dtEmissaoResultado);
+        lb_vlDesconto = (TextView) findViewById(R.id.lb_vlDesconto);
+        lb_percDesconto = (TextView) findViewById(R.id.lb_percDesconto);
+        lb_condPgto = (TextView) findViewById(R.id.lb_condPgto);
+        lb_obsPedido = (TextView) findViewById(R.id.lb_obsPedido);
+        lb_valorTotal = (TextView) findViewById(R.id.lb_valorTotal);
+        lb_vlTotalResultado = (TextView) findViewById(R.id.lb_vlTotalResultado);
+
+        fab_SelecionarEmitente = (FloatingActionButton) findViewById(R.id.fab_AddClienteVenda);
+        fab_SelecionarEmitente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ManutencaoPedidos.this, SelecaoCliente.class);
+                startActivityForResult(intent, 1);
+            }
+        });
+
+        fab_AdicionarProduto = (FloatingActionButton) findViewById(R.id.fab_AddProdutoVenda);
+        fab_AdicionarProduto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(ManutencaoPedidos.this, AdicionarProdutosCustomizada.class);
+                intent.putExtra("numpedido", cl_Pedidos.getNumPedido());
+                intent.putExtra("selecaoProdutos", "S");
+                startActivityForResult(intent, 1);
+
+            }
+        });
+
+        lv_ItensPedido = (ListView) findViewById(R.id.listViewItemPedidos);
+
+        lb_ocultarProdutos.setOnClickListener(new View.OnClickListener() {
+                                                  @Override
+                                                  public void onClick(View v) {
+                  if (lb_ocultarProdutos.getText().toString().equals("Mostrar Produtos")) {
+                      lv_ItensPedido.setVisibility(View.VISIBLE);
+                      lb_ocultarProdutos.setText("Ocultar Produtos");
+                      calculeHeightListView();
+                  } else {
+                      lv_ItensPedido.setVisibility(View.GONE);
+                      lb_ocultarProdutos.setText("Mostrar Produtos");
+                      calculeHeigthListViewReverse();
+                  }
+              }
+          }
+        );
+
+        tb_vlDesconto = (EditText) findViewById(R.id.tb_vlDesconto);
+
+        Locale mLocale = new Locale("pt", "BR");
+        tb_vlDesconto.addTextChangedListener(new MoneyTextWatcher(tb_vlDesconto, mLocale));
+
+        tb_percDesconto = (EditText) findViewById(R.id.tb_percDesconto);
+        tb_vlFrete = (EditText)findViewById(R.id.tb_vlFrete);
+        tb_vlFrete.addTextChangedListener(new MoneyTextWatcher(tb_vlFrete, mLocale));
+
+        tb_condPgto = (EditText) findViewById(R.id.tb_condPgto);
+        tb_obsPedido = (EditText) findViewById(R.id.tb_obsPedido);
+
+        if(vc_Operacao.equals("I")){
+            suBloqueiaCampos(false);
+            fab_SelecionarEmitente.setVisibility(View.VISIBLE);
         }
     }
 
-    protected void FU_CalcularValorPedido(){
+    protected boolean fuInstanciarPedido() {
 
-        tb_percDesconto = (EditText)findViewById(R.id.tb_percdescontoPedido);
-        lb_valorTotal = (TextView)findViewById(R.id.lb_valorTotal);
-        double VA_vlDesconto = 0;
-        if(tb_percDesconto.getText().toString().trim().equals("") || tb_percDesconto.getText().toString().equals("0")){
-            String valor = String.format("%.2f", VL_valorTotal);
-                lb_valorTotal.setText("Total Liquido do Pedido: R$" + valor);
-            //lb_valorTotal.setText("Total Liquido do Pedido: R$" + String.valueOf(VL_valorTotal));
+        try {
+            cl_Pedidos.setQtdeItens(lb_qtdeTotalProdutos.getText().toString().replace("Qtde: ", ""));
+            cl_Pedidos.setCondPgto(tb_condPgto.getText().toString().toUpperCase());
+            //String.format("%.5f", vf_Porcentagem)
+            double vf_VlDesconto = 0.0;
+            if(!tb_vlDesconto.getText().toString().trim().equals("")){
+                vf_VlDesconto = Double.parseDouble(tb_vlDesconto.getText().toString().replace(".", "").replace(",", "."));
+            }
+            cl_Pedidos.setVlDesconto(String.format("%.2f", vf_VlDesconto).replace(".", "").replace(",", "."));
+            cl_Pedidos.setPercDesconto(tb_percDesconto.getText().toString());
+            double vf_VlFrete = 0.0;
+            if(!tb_vlFrete.getText().toString().trim().equals("")){
+                vf_VlFrete = Double.parseDouble(tb_vlFrete.getText().toString().replace(".", "").replace(",", "."));
+            }
+            cl_Pedidos.setVlFrete(String.format("%.2f", vf_VlFrete).replace(".", "").replace(",", "."));
+            cl_Pedidos.setVlTotal(lb_vlTotalResultado.getText().toString().replace("R$", "").replace(".", "").replace(",", "."));
+            cl_Pedidos.setObsPedido(tb_obsPedido.getText().toString().toUpperCase());
+
+            ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    public void suBloqueiaCampos(boolean habilitar){
+
+
+        lb_SelecionarClienteResultado.setEnabled(habilitar);
+        lb_SelecionarProdutoResultado.setEnabled(habilitar);
+        //lb_ocultarProdutos.setEnabled(habilitar);
+        lb_valorTotalProdutos.setEnabled(habilitar);
+        lb_qtdeTotalProdutos.setEnabled(habilitar);
+        lb_dtEmissao.setEnabled(habilitar);
+        lb_dtEmissaoResultado.setEnabled(habilitar);
+        lb_vlDesconto.setEnabled(habilitar);
+        lb_percDesconto.setEnabled(habilitar);
+        lb_vlDesconto.setEnabled(habilitar);
+        lb_percDesconto.setEnabled(habilitar);
+        lb_condPgto.setEnabled(habilitar);
+        lb_obsPedido.setEnabled(habilitar);
+        lb_valorTotal.setEnabled(habilitar);
+        lb_vlTotalResultado.setEnabled(habilitar);
+
+        if(habilitar) {
+            fab_SelecionarEmitente.setVisibility(View.VISIBLE);
+            fab_AdicionarProduto.setVisibility(View.VISIBLE);
         }else{
-            VA_vlDesconto = Double.parseDouble(tb_percDesconto.getText().toString());
-            double porcentagem = VA_vlDesconto / 100;
-            double resultado = VL_valorTotal * porcentagem;
-            double resultadoTotal = VL_valorTotal - resultado;
+            fab_SelecionarEmitente.setVisibility(View.INVISIBLE);
+            fab_AdicionarProduto.setVisibility(View.INVISIBLE);
+        }
+
+        lv_ItensPedido.setEnabled(habilitar);
+
+        tb_vlDesconto.setEnabled(habilitar);
+        tb_percDesconto.setEnabled(habilitar);
+        tb_vlFrete.setEnabled(habilitar);
+        tb_condPgto.setEnabled(habilitar);
+        tb_obsPedido.setEnabled(habilitar);
+
+    }
+
+    public boolean fuConsistePedido() {
+        if (cl_Pedidos.getCdCliente().trim().equals("")) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Favor selecionar um cliente para abertura do pedido!");
+            return false;
+        }
+
+        if (!cl_Pedidos.getPercDesconto().trim().equals("") && Double.parseDouble(cl_Pedidos.getPercDesconto()) > 99) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não é permitido um desconto superior a 99%!");
+            return false;
+        }
+
+        if (!cl_Pedidos.getQtdeItens().trim().equals("")) {
+            if (!cl_Pedidos.getVlDesconto().trim().equals("") && Double.parseDouble(cl_Pedidos.getVlDesconto()) > 0) {
+
+
+                CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
+                cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
+
+                CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
+
+
+                try {
+                    double vf_VlMaxDescPermitido = 0;
+                    double vf_VlDescontoItens = 0;
+
+                    if (ctl_ItemPedido.fuCarregaTodosItensPedido()) {
+
+                        Cursor rs_ItemPedido = ctl_ItemPedido.rs_ItemPedido;
+                        while (!rs_ItemPedido.isAfterLast()) {
+                            vf_VlMaxDescPermitido += Double.parseDouble(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLMAXDESCPERMITIDO)));
+                            vf_VlDescontoItens += Double.parseDouble(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)));
+
+                            rs_ItemPedido.moveToNext();
+                        }
+                    }
+
+
+                    double VA_vlDesconto = Double.parseDouble(tb_percDesconto.getText().toString());
+                    double porcentagem = VA_vlDesconto / 100;
+                    double resultado = Double.parseDouble(cl_Pedidos.getVlTotal()) * porcentagem;
+                    if ((resultado + vf_VlDescontoItens) > vf_VlMaxDescPermitido) {
+                        MensagemUtil.addMsg(ManutencaoPedidos.this, "Desconto informado é maior que o permitido!");
+                        return false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        } else {
+            if (!cl_Pedidos.getVlDesconto().equals("") && Double.parseDouble(cl_Pedidos.getVlDesconto()) > 0) {
+                MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi adicionado nenhum produto no pedido. Não é permitido informar nenhum desconto para este pedido!");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void suSalvarPedido() {
+        if (cl_Pedidos.getFgSituacao().equals("E")) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido já foi enviado para o sistema online.");
+        } else if (cl_Pedidos.getFgSituacao().equals("C")) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não pode ser salvo, pois o pedido foi cancelado!");
+        } else {
+            if (fuInstanciarPedido()) {
+                if (fuConsistePedido()) {
+                    try {
+
+                        if (vc_Operacao.equals("I")) {
+                            cl_Pedidos.setNumPedido(ctl_Pedidos.fuCarregaNumPedido());
+                        }
+                        if (ctl_Pedidos.fuAlterarPedido()) {
+                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido salvo com sucesso!");
+                            Intent intent = new Intent();
+                            setResult(1, intent);
+                            finish();
+                        } else {
+                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi ´possível salvar o pedido");
+                        }
+
+                    } catch (Exception e) {
+                        MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel salvar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
+                    }
+                }
+            }
+        }
+    }
+
+    public void suEnviarOnline() {
+
+        try {
+            suSalvarPedido();
+
+            if (fuConsisteEnviarOnline()) {
+                if (verificaConexao()) {
+                    LoadingAsyncEnviarPedido async_EnviarPedido = new LoadingAsyncEnviarPedido();
+                    async_EnviarPedido.execute();
+
+                } else {
+                    MensagemUtil.addMsg(ManutencaoPedidos.this, "É necessário ter conexão com a internet para o envio do pedido!");
+                }
+            }
+
+        } catch (Exception e) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel enviar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
+        }
+    }
+
+    protected void suCancelarPedido(){
+        if(cl_Pedidos.getCdCliente().trim().equals("")) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não foi aberto. Não será possivel realizar o cancelamento sem que o pedido seja aberto!");
+        }else {
+            if (cl_Pedidos.getFgSituacao().equals("E")) {
+                MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não pode ser cancelado, pois já foi enviado para o sistema online.");
+            } else {
+                builder = new AlertDialog.Builder(this);
+
+                //define o titulo
+                builder.setTitle("Cancelar Pedido");
+                //define a mensagem
+                builder.setMessage("Deseja mesmo cancelar o pedido " + cl_Pedidos.getNumPedido() + "?");
+
+                //define um botão como positivo
+                builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+
+                        cl_Pedidos.setFgSituacao("C");
+                        ctl_Pedidos =  new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
+
+                        try {
+                            if(ctl_Pedidos.fuAlterarSituacaoPedido()){
+                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido cancelado com sucesso!");
+                                Intent intent = new Intent();
+                                setResult(1, intent);
+                                finish();
+                            }else{
+                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel cancelar o pedido devido à seguinte situação: " + ctl_Pedidos.vc_Mensagem + ".");
+                            }
+
+                        } catch (Exception e) {
+                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel cancelar o pedido devido à seguinte situação: " + ctl_Pedidos.vc_Mensagem + ".");
+                        }
+
+                    }
+                });
+                //define um botão como negativo.
+                builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        //Toast.makeText(ManutencaoProdutoPedido.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+                //cria o AlertDialog
+                alerta = builder.create();
+                //Exibe
+                alerta.show();
+            }
+        }
+    }
+
+    protected void suDuplicarPedido(){
+        AlertDialog al_DuplicarPedido;
+        AlertDialog.Builder bu_DuplicarPedido;
+
+        bu_DuplicarPedido = new AlertDialog.Builder(ManutencaoPedidos.this);
+
+        //define o titulo
+        bu_DuplicarPedido.setTitle("Duplicar pedido " + cl_Pedidos.getNumPedido());
+        //define a mensagem
+        bu_DuplicarPedido.setMessage("Deseja mesmo duplicar o pedido " + cl_Pedidos.getNumPedido() + "?");
+
+        //define um botão como positivo
+        bu_DuplicarPedido.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface arg0, int arg1) {
+
+                ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
+
+                if(ctl_Pedidos.fuCarregarPedido()){
+                    try {
+                        String vf_NumPedidoOriginal = cl_Pedidos.getNumPedido();
+                        if(ctl_Pedidos.fuDuplicarPedido()){
+
+                            CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
+                            cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
+
+                            CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
+
+                            if(ctl_ItemPedido.fuDuplicarItensPedidoDuplicado(vf_NumPedidoOriginal)) {
+                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido duplicado com sucesso!");
+                                finish();
+                            }else{
+                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível duplicar os itens do pedido!");
+                            }
+                        }else{
+                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível duplicar o pedido!");
+                        }
+                    }catch (Exception e){
+                        MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel duplicar o pedido devido à seguinte situação: " + e.getMessage().toString() + ".");
+                    }
+
+                }
+            }
+        });
+        //define um botão como negativo.
+        bu_DuplicarPedido.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface arg0, int arg1) {
+
+            }
+        });
+        //cria o AlertDialog
+        al_DuplicarPedido = bu_DuplicarPedido.create();
+        //Exibe
+        al_DuplicarPedido.show();
+    }
+
+    protected void suExcluirPedido(){
+        if(cl_Pedidos.getCdCliente().trim().equals("")) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido não foi aberto. Não será possivel realizar a exclusão sem que o pedido seja aberto!");
+        }else {
+            builder = new AlertDialog.Builder(this);
+
+            //define o titulo
+            builder.setTitle("Excluir Pedido");
+            //define a mensagem
+            builder.setMessage("Deseja mesmo excluir o pedido " + cl_Pedidos.getNumPedido() + "?");
+
+            //define um botão como positivo
+            builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface arg0, int arg1) {
+
+                    ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
+
+                    try {
+                        if(ctl_Pedidos.fuDeletarPedido()){
+                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido excluido com sucesso!");
+                            finish();
+                        }else{
+                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel excluir o pedido devido à seguinte situação: " + ctl_Pedidos.vc_Mensagem + ".");
+                        }
+
+                    } catch (Exception e) {
+                        MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel excluir o pedido devido à seguinte situação: " + ctl_Pedidos.vc_Mensagem + ".");
+                    }
+
+
+                }
+            });
+            //define um botão como negativo.
+            builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface arg0, int arg1) {
+                    //Toast.makeText(ManutencaoProdutoPedido.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
+
+                }
+            });
+            //cria o AlertDialog
+            alerta = builder.create();
+            //Exibe
+            alerta.show();
+        }
+    }
+
+    public boolean fuConsisteEnviarOnline(){
+
+        if(cl_Pedidos.getCdCliente().trim().equals("")) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Favor selecionar um cliente no pedido!");
+            return false;
+        }
+        if(cl_Pedidos.getQtdeItens().trim().equals("")) {
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Deve ser informado ao menos um produto no pedido.");
+            return  false;
+        }
+        if(cl_Pedidos.getCondPgto().trim().equals("")){
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Deve ser informada a forma de pagamento do pedido.");
+            return false;
+        }
+        return true;
+    }
+
+    protected void suCalcularValorPedido(){
+
+        double vf_vlDesconto = 0;
+        if(tb_percDesconto.getText().toString().trim().equals("") || tb_percDesconto.getText().toString().equals("0")){
+            if(tb_vlFrete.getText().toString().trim().equals("")){
+                cl_Pedidos.setVlFrete("0.00");
+            }else{
+                cl_Pedidos.setVlFrete(String.valueOf(Double.parseDouble(tb_vlFrete.getText().toString().replace(".", "").replace(",", "."))));
+            }
+            double vf_VlTotalFrete = Double.parseDouble(cl_Pedidos.getVlTotalItens()) + Double.parseDouble(cl_Pedidos.getVlFrete());
+            String vf_Valor = String.format("%.2f", vf_VlTotalFrete);
+            cl_Pedidos.setVlTotal(vf_Valor.replace(",", "."));
+            lb_vlTotalResultado.setText("R$" + vf_Valor);
+        }else{
+            vf_vlDesconto = Double.parseDouble(tb_vlDesconto.getText().toString().replace(".", "").replace(",", "."));
+            if(tb_vlFrete.getText().toString().trim().equals("")){
+                cl_Pedidos.setVlFrete("0.00");
+            }else{
+                cl_Pedidos.setVlFrete(String.valueOf(Double.parseDouble(tb_vlFrete.getText().toString().replace(".", "").replace(",", "."))));
+            }
+            double resultadoTotal = (Double.parseDouble(cl_Pedidos.getVlTotalItens()) - vf_vlDesconto) + Double.parseDouble(cl_Pedidos.getVlFrete());
             resultadoTotal = Double.valueOf(String.format(Locale.US, "%.2f", resultadoTotal));
             String valor = String.format("%.2f", resultadoTotal);
-            lb_valorTotal.setText("Total Liquido do Pedido: R$" + valor);
+            cl_Pedidos.setVlTotal(valor.replace(",", "."));
+            lb_vlTotalResultado.setText("R$" + valor);
         }
 
 
     }
 
-    protected void FU_CarregaPedido(){
-        BancoController crud = new BancoController(getBaseContext());
-        Cursor cursor = crud.carregaDadosPedido(numpedido);
+    protected void suCarregarPedido(){
 
-        TextView tb_cdcliente = (TextView) findViewById(R.id.lb_rzsocialClientePedidos);
-        TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-        TextView lb_dtemissao = (TextView) findViewById(R.id.tb_dtemissaoResultado);
+        ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
 
-        imagemProdutos = (ImageView)findViewById(R.id.imageViewProduto);
-
-        lb_descricaoProdutoPedidos = (TextView)findViewById(R.id.lb_descricaoProdutoPedidos);
-        lb_descricaoProdutoPedidosTeste = (TextView)findViewById(R.id.lb_descricaoProdutoPedidosTeste);
-        lb_valorTotal = (TextView)findViewById(R.id.lb_valorTotal);
-
-        tb_percDesconto = (EditText)findViewById(R.id.tb_percdescontoPedido);
-        tb_vldesconto = (EditText)findViewById(R.id.tb_vldescontoPedido);
-        tb_condPgto = (EditText)findViewById(R.id.tb_condPgto);
-        tb_obsPedido = (EditText)findViewById(R.id.tb_obsPedido);
-
-        imagemProdutos.setEnabled(true);
-
-        lb_descricaoProdutoPedidos.setEnabled(true);
-        lb_descricaoProdutoPedidosTeste.setEnabled(true);
-
-        tb_percDesconto.setEnabled(true);
-        tb_vldesconto.setEnabled(true);
-        tb_condPgto.setEnabled(true);
-        tb_obsPedido.setEnabled(true);
-
-        try {
-            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).equals("null")) {
-                tb_cdcliente.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)));
+        if(ctl_Pedidos.fuCarregarPedido()){
+            try {
+                lb_SelecionarClienteResultado.setText(cl_Pedidos.getNomeRzSocial().toUpperCase());
+            }catch (Exception e){
+                lb_SelecionarClienteResultado.setText("");
             }
-        }catch (Exception e){
-            tb_cdcliente.setText("");
-        }
 
-        try {
-            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)).equals("null")) {
-                tb_rzsocial.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)));
+            try {
+                tb_condPgto.setText(cl_Pedidos.getCondPgto().toUpperCase());
+            }catch (Exception e){
+                tb_condPgto.setText("");
             }
-        }catch (Exception e){
-            tb_rzsocial.setText("");
-        }
 
-        try {
-            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CONDPGTO)).equals("null")) {
-                tb_condPgto.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CONDPGTO)));
+            try {
+                tb_percDesconto.setText(cl_Pedidos.getPercDesconto());
+            }catch (Exception e){
+                tb_percDesconto.setText("");
             }
-        }catch (Exception e){
-            tb_condPgto.setText("");
-        }
 
-        try {
-            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).equals("null")) {
-                tb_percDesconto.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)));
+            try {
+                tb_vlDesconto.setText(cl_Pedidos.getVlDesconto());
+            }catch (Exception e){
+                tb_vlDesconto.setText("");
             }
-        }catch (Exception e){
-            tb_percDesconto.setText("");
-        }
 
-        try {
-            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).equals("null")) {
-                tb_vldesconto.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)));
+            try {
+                tb_vlFrete.setText(cl_Pedidos.getVlFrete());
+            }catch (Exception e){
+                tb_vlFrete.setText("");
             }
-        }catch (Exception e){
-            tb_vldesconto.setText("");
-        }
 
-        try {
-            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.OBS)).equals("null")) {
-                tb_obsPedido.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.OBS)));
+            try {
+                tb_obsPedido.setText(cl_Pedidos.getObsPedido().toUpperCase());
+            }catch (Exception e){
+                tb_obsPedido.setText("");
             }
-        }catch (Exception e){
-            tb_obsPedido.setText("");
-        }
 
-        try {
-            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)).equals("null")) {
-                lb_dtemissao.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)));
+            try {
+                lb_dtEmissaoResultado.setText(cl_Pedidos.getDtEmissao());
+            }catch (Exception e){
+                lb_dtEmissaoResultado.setText("");
             }
-        }catch (Exception e){
-            lb_dtemissao.setText("");
-        }
 
-        try {
-            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).equals("null")) {
-                lb_valorTotal.setText("Total Liquido do Pedido: R$" + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLTOTAL)));
-                //lb_dtemissao.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)));
+            try {
+                lb_vlTotalResultado.setText("R$" + cl_Pedidos.getVlTotal().replace(".", ","));
+            }catch (Exception e){
+                lb_vlTotalResultado.setText("R$0,00");
             }
-        }catch (Exception e){
-            lb_valorTotal.setText("Total Liquido do Pedido: R$0,00");
+
+            if(cl_Pedidos.getFgSituacao().equals("ABERTO")){
+                suBloqueiaCampos(true);
+            }else if(cl_Pedidos.getFgSituacao().equals("CANCELADO")){
+                suBloqueiaCampos(false);
+            }else if(cl_Pedidos.getFgSituacao().equals("ENVIADO")){
+                suBloqueiaCampos(false);
+            }
         }
-
-        if(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGSITUACAO)).equals("CANCELADO")) {
-            FU_BloqueiaCampos(false);
-            fgcancelado = "S";
-            fgenviado = "N";
-        }else if(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGSITUACAO)).equals("ENVIADO")) {
-            fgenviado = "S";
-            fgcancelado = "N";
-        }else{
-            fgcancelado = "N";
-            fgenviado = "N";
-        }
-
-
-
     }
 
-    protected void FU_CarregaItemPedido(){
-        BancoController crud = new BancoController(getBaseContext());
-        String VA_possuiItemPedido = "N";
-        VA_possuiItemPedido = crud.verificaItemPedido(numpedido);
-        VL_valorTotal = 0;
-        if(VA_possuiItemPedido.equals("S")) {
-            final Cursor cursorItemPedido = crud.carregaItemPedido(numpedido);
+    protected void suCarregaItemPedido(){
 
-            VL_valorTotal = 0;
-            double VA_quantidadeTotal = 0;
-            String VA_ValorProduto = "";
-            String VA_ValorAtacado = "";
-            VA_ContProdutos = 0;
+        CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
+        cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
+
+        CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
+        View vw_ListaProdutos = findViewById(R.id.la_ListaProdutos);
+
+        if(ctl_ItemPedido.fuCarregaTodosItensPedido()){
+
+            //la_ListaProdutos
+            lv_ItensPedido.setAdapter(null);
+
+            vw_ListaProdutos.setVisibility(View.VISIBLE);
+
+            final Cursor rs_ItemPedido = ctl_ItemPedido.rs_ItemPedido;
+
             List<String> descricaoPedidos = new ArrayList<>();
             List<String> itensRestantesPedidos = new ArrayList<>();
             List<String> valorProdutos = new ArrayList<>();
             List<String> valorAtacado = new ArrayList<>();
-            if (cursorItemPedido != null) {
-                descricaoPedidos.add(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
-                itensRestantesPedidos.add(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
-                valorProdutos.add(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)));
-                VA_quantidadeTotal = VA_quantidadeTotal + Double.parseDouble(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
-                VL_valorTotal = VL_valorTotal + Double.parseDouble(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).replace(",", "."));
-                VA_ContProdutos = VA_ContProdutos + 1;
-                while (cursorItemPedido.moveToNext()) {
-                    descricaoPedidos.add(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
-                    itensRestantesPedidos.add(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
-                    valorProdutos.add(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)));
-                    VA_quantidadeTotal = VA_quantidadeTotal + Double.parseDouble(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
-                    VL_valorTotal = VL_valorTotal + Double.parseDouble(cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).replace(",", "."));
-                    VA_ContProdutos = VA_ContProdutos + 1;
 
-                }
+            double vf_VlTotalItens = 0.0;
+            int vf_QtdeItens = 0;
 
+            while (!rs_ItemPedido.isAfterLast()){
+
+                descricaoPedidos.add(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+                itensRestantesPedidos.add(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
+                valorProdutos.add(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)));
+                vf_QtdeItens += Double.parseDouble(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
+                vf_VlTotalItens += Double.parseDouble(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).replace(",", "."));
+
+                rs_ItemPedido.moveToNext();
             }
 
-            FU_VisibilidadeProdutos(true);
-                /*descricaoPedidos.add("CATAFLAM PARA HEMATOMAS");
-                itensRestantesPedidos.add("10");
-                VA_ContProdutos = VA_ContProdutos + 1;
+            lb_valorTotalProdutos.setText("Total: R$" +  String.format("%.2f", vf_VlTotalItens));
+            lb_qtdeTotalProdutos.setText("Qtde: " + String.valueOf(vf_QtdeItens));
 
-                descricaoPedidos.add("PRODUTO PARA TESTE DE LISTVIEW NO ANDROID");
-                itensRestantesPedidos.add("5");
-                VA_ContProdutos = VA_ContProdutos + 1;
+            cl_Pedidos.setQtdeItens(String.valueOf(vf_QtdeItens));
+            cl_Pedidos.setVlTotalItens(String.valueOf(vf_VlTotalItens));
 
+            ListaProdutosPedido adapter = new ListaProdutosPedido(this, descricaoPedidos, itensRestantesPedidos, valorProdutos);
+            lv_ItensPedido.setAdapter(adapter);
 
-                descricaoPedidos.add("PRODUTO PARA TESTE DE LISTVIEW NO ANDROID PARA VER SE ELE COLOCA MAIS LINHAS");
-                itensRestantesPedidos.add("5");
-                VA_ContProdutos = VA_ContProdutos + 1;*/
-
-            TextView lb_valorTotalProdutos = (TextView) findViewById(R.id.lb_valorTotalProdutos);
-            TextView lb_qtdeTotalProdutos = (TextView) findViewById(R.id.lb_qtdeTotalProdutos);
-            //String.format("%.2f", vltotal);
-
-            lb_valorTotalProdutos.setText("Total: R$" +  String.format("%.2f", VL_valorTotal));
-            lb_qtdeTotalProdutos.setText("Qtde: " + String.valueOf(VA_quantidadeTotal) + " item(ns)");
-
-            List<Integer> icones = new ArrayList<>();
-
-
-            for (int i = 0; i < VA_ContProdutos; i++) {
-                icones.add(R.drawable.sem_foto);
-            }
-
-            View.OnClickListener myhandler = new View.OnClickListener() {
-                public void onClick(View v) {
-                    // MY QUESTION STARTS HERE!!!
-                    // IF b1 do this
-                    // IF b2 do this
-                    // MY QUESTION ENDS HERE!!!
-                }
-            };
-
-            ListView lista = (ListView) findViewById(R.id.listViewItemPedidos);
-
-            ListaProdutosPedido adapter = new ListaProdutosPedido(this, icones, descricaoPedidos, itensRestantesPedidos, valorProdutos);
-            lista.setAdapter(adapter);
-
-
-
-
-
-            lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            lv_ItensPedido.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     String codigo;
                     try {
-                        ListView listaProdutos = (ListView) findViewById(R.id.listViewItemPedidos);
-                        listaProdutos.setVisibility(View.   INVISIBLE);
-                        lb_ocultarProdutos.setText("Mostrar Produtos");
-
-                        TextView lb_dtemissao = (TextView) findViewById(R.id.tb_dtemissao);
-                        RelativeLayout.LayoutParams p_endereco = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                        p_endereco.addRule(RelativeLayout.BELOW, R.id.lb_fundoOcultarProdutos);
-                        p_endereco.setMargins(0, 25, 0, 0);
-                        lb_dtemissao.setLayoutParams(p_endereco);
-
-                        calculeHeigthListViewReverse();
-                        ListAdapter adapter2 = listaProdutos.getAdapter();
+                        ListAdapter adapter2 = lv_ItensPedido.getAdapter();
                         int lenght = adapter2.getCount();
                         if(position == 0){
-                            cursorItemPedido.moveToPosition(position);
+                            rs_ItemPedido.moveToPosition(position);
                         }else if(position < lenght - 1) {
-                            cursorItemPedido.moveToPosition(position);
+                            rs_ItemPedido.moveToPosition(position);
                         }else{
-                            cursorItemPedido.moveToPosition(position + 1);
+                            rs_ItemPedido.moveToPosition(position + 1);
                         }
 
-                        codigo = cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.ID));
+                        codigo = rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.ID));
                         Intent intent = new Intent(ManutencaoPedidos.this, ManutencaoProdutoPedido.class);
                         intent.putExtra("codigo", codigo);
-                        intent.putExtra("numpedido", numpedido);
+                        intent.putExtra("numpedido", cl_Pedidos.getNumPedido());
                         intent.putExtra("alteracao", "S");
                         //startActivity(intent);
                         startActivityForResult(intent, 2);
                     } catch (Exception e) {
-                        ListView listaProdutos = (ListView) findViewById(R.id.listViewItemPedidos);
-                        listaProdutos.setVisibility(View.   INVISIBLE);
-                        lb_ocultarProdutos.setText("Mostrar Produtos");
-
-                        TextView lb_dtemissao = (TextView) findViewById(R.id.tb_dtemissao);
-                        RelativeLayout.LayoutParams p_endereco = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                        p_endereco.addRule(RelativeLayout.BELOW, R.id.lb_fundoOcultarProdutos);
-                        p_endereco.setMargins(0, 25, 0, 0);
-                        lb_dtemissao.setLayoutParams(p_endereco);
-
-                        calculeHeigthListViewReverse();
-
-                        cursorItemPedido.moveToPosition(position);
-                        codigo = cursorItemPedido.getString(cursorItemPedido.getColumnIndexOrThrow(CriaBanco.ID));
+                        rs_ItemPedido.moveToPosition(position);
+                        codigo = rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.ID));
                         Intent intent = new Intent(ManutencaoPedidos.this, ManutencaoProdutoPedido.class);
                         intent.putExtra("codigo", codigo);
-                        intent.putExtra("numpedido", numpedido);
+                        intent.putExtra("numpedido", cl_Pedidos.getNumPedido());
                         intent.putExtra("alteracao", "S");
                         //startActivity(intent);
                         startActivityForResult(intent, 2);
                     }
                 }
             });
-        }else{
-            TextView lb_valorTotalProdutos = (TextView) findViewById(R.id.lb_valorTotalProdutos);
-            TextView lb_qtdeTotalProdutos = (TextView) findViewById(R.id.lb_qtdeTotalProdutos);
 
+            calculeHeightListView();
+
+        }else{
+            vw_ListaProdutos.setVisibility(View.GONE);
 
             lb_valorTotalProdutos.setText("Total: R$0,00");
-            lb_qtdeTotalProdutos.setText("Qtde: 0 item(ns)");
+            lb_qtdeTotalProdutos.setText("Qtde: 0");
 
-            FU_VisibilidadeProdutos(false);
         }
     }
 
     private void calculeHeightListView() {
-        ListView lista = (ListView) findViewById(R.id.listViewItemPedidos);
+
         int totalHeight = 0;
-        ListAdapter adapter2 = lista.getAdapter();
+        ListAdapter adapter2 = lv_ItensPedido.getAdapter();
         int lenght = adapter2.getCount();
         for (int i = 0; i < lenght; i++) {
-            View listItem = adapter2.getView(i, null, lista);
+            View listItem = adapter2.getView(i, null, lv_ItensPedido);
             listItem.measure(0, 0);
             totalHeight += listItem.getMeasuredHeight();
         }
-        ViewGroup.LayoutParams params = lista.getLayoutParams();
+        ViewGroup.LayoutParams params = lv_ItensPedido.getLayoutParams();
 
         params.height = totalHeight
-                + (lista.getDividerHeight() * (adapter2.getCount() - 1)) + (120);
-        lista.setLayoutParams(params);
-        lista.requestLayout();
+                + (lv_ItensPedido.getDividerHeight() * (adapter2.getCount() - 1));
+        lv_ItensPedido.setLayoutParams(params);
+        lv_ItensPedido.requestLayout();
     }
 
     private void calculeHeigthListViewReverse(){
-        ListView lista = (ListView) findViewById(R.id.listViewItemPedidos);
         int totalHeight = 0;
-        ListAdapter adapter2 = lista.getAdapter();
+        ListAdapter adapter2 = lv_ItensPedido.getAdapter();
         int lenght = adapter2.getCount();
         for (int i = 0; i < lenght; i++) {
-            View listItem = adapter2.getView(i, null, lista);
+            View listItem = adapter2.getView(i, null, lv_ItensPedido);
             listItem.measure(0, 0);
             totalHeight += listItem.getMeasuredHeight();
         }
-        ViewGroup.LayoutParams params = lista.getLayoutParams();
-
-        params.height = lista.getDividerHeight() * (adapter2.getCount() - 1);
-        lista.setLayoutParams(params);
-        lista.requestLayout();
-    }
-
-    public void FU_BloqueiaCampos(boolean bloqueia){
-        TextView tb_cdcliente = (TextView) findViewById(R.id.lb_rzsocialClientePedidos);
-        TextView tb_rzsocial = (TextView) findViewById(R.id.lb_rzsocialClientePedidosTeste);
-        TextView lb_dtemissao = (TextView) findViewById(R.id.tb_dtemissaoResultado);
-
-        imagemProdutos = (ImageView)findViewById(R.id.imageViewProduto);
-
-        lb_descricaoProdutoPedidos = (TextView)findViewById(R.id.lb_descricaoProdutoPedidos);
-        lb_descricaoProdutoPedidosTeste = (TextView)findViewById(R.id.lb_descricaoProdutoPedidosTeste);
-        lb_valorTotal = (TextView)findViewById(R.id.lb_valorTotal);
-
-        tb_percDesconto = (EditText)findViewById(R.id.tb_percdescontoPedido);
-        tb_vldesconto = (EditText)findViewById(R.id.tb_vldescontoPedido);
-        tb_condPgto = (EditText)findViewById(R.id.tb_condPgto);
-        tb_obsPedido = (EditText)findViewById(R.id.tb_obsPedido);
-
-        imagemProdutos.setEnabled(bloqueia);
-
-        lb_descricaoProdutoPedidos.setEnabled(bloqueia);
-        lb_descricaoProdutoPedidosTeste.setEnabled(bloqueia);
-
-        tb_percDesconto.setEnabled(bloqueia);
-        tb_vldesconto.setEnabled(bloqueia);
-        tb_condPgto.setEnabled(bloqueia);
-        tb_obsPedido.setEnabled(bloqueia);
-        tb_cdcliente.setEnabled(bloqueia);
-        tb_rzsocial.setEnabled(bloqueia);
-
-        ListView lista = (ListView) findViewById(R.id.listViewItemPedidos);
-        lista.setEnabled(bloqueia);
-
-    }
-
-    public boolean FU_EnviarPedido() {
-
-        BancoController crud = new BancoController(getBaseContext());
-        Cursor cursor = crud.carregaDadosPedido(numpedido);
-
-        String vltotal = "", dtemissao = "", cdvendedor = "", cdemitente = "", rzsocial = "", percdesconto = "", vldesconto = "", condpgto = "", obs = "";
-
-        String numpedidoSistema = "";
-
-        if (cursor != null) {
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).trim().equals("")) {
-                    vltotal = lb_valorTotal.getText().toString().replace("Total Liquido do Pedido: R$", "");
-                    //vltotal = "100,00";
-                }
-            } catch (Exception e) {
-                vltotal = "0";
-            }
-
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)).trim().equals("")) {
-                    dtemissao = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)).replace(" ", "espaco");
-                }
-            } catch (Exception e) {
-                dtemissao = getDateTime();
-            }
-
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDVENDEDOR)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDVENDEDOR)).trim().equals("")) {
-                    cdvendedor = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDVENDEDOR));
-                }
-            } catch (Exception e) {
-                cdvendedor = "0";
-            }
-
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).trim().equals("")) {
-                    cdemitente = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDEMITENTE));
-                }
-            } catch (Exception e) {
-                cdemitente = "0";
-            }
-
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)).trim().equals("")) {
-                    rzsocial = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)).replace(" ", "espaco");
-                }
-            } catch (Exception e) {
-                rzsocial = "";
-            }
-
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).trim().equals("")) {
-                    percdesconto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO));
-                }else{
-                    percdesconto = "0";
-                }
-            } catch (Exception e) {
-                percdesconto = "0";
-            }
-
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).trim().equals("")) {
-                    vldesconto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO));
-                }else{
-                    vldesconto = "0";
-                }
-            } catch (Exception e) {
-                vldesconto = "0";
-            }
-
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CONDPGTO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CONDPGTO)).trim().equals("")) {
-                    condpgto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CONDPGTO)).replace(" ", "espaco");
-                }
-            } catch (Exception e) {
-                condpgto = "DINHEIRO";
-            }
-
-            try {
-                if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.OBS)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.OBS)).trim().equals("")) {
-                    obs = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.OBS)).replace(" ", "espaco");
-                }else{
-                    obs = "espaco";
-                }
-            } catch (Exception e) {
-                obs = "espaco";
-            }
-
-            obs += "  CONDIÇÃO DE PAGAMENTO INFORMADA: " + condpgto + "";
-            obs = obs.replace(" ", "espaco");
-
-            try {
-                Cursor cursor_cliente = crud.carregaClienteByCdClienteNovoCliente(cdemitente);
-                if(cursor_cliente.getString(cursor_cliente.getColumnIndexOrThrow(CriaBanco.FGSINCRONIZADO)).equals("N")){
-                    cdemitente = FU_SincronizarCliente(cdemitente);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            int TIMEOUT_MILLISEC = 10000;
-            try {
-                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                trustStore.load(null, null);
-
-                MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
-                sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-                HttpParams p = new BasicHttpParams();
-
-                HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
-                HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
-
-                SchemeRegistry registry = new SchemeRegistry();
-                registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-                registry.register(new Scheme("https", sf, 443));
-
-                ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
-
-
-                HttpConnectionParams.setConnectionTimeout(p,
-                        TIMEOUT_MILLISEC);
-                HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-
-                HttpClient httpclient = new DefaultHttpClient(ccm, p);
-                String url = "http://www.planosistemas.com.br/" +
-                        "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirpedido&vltotal=" + vltotal + "&dtemissao=" + dtemissao + ""
-                        + "&cdvendedor=" + cdvendedor + "&cdemitente=" + cdemitente + "&rzsocial=" + rzsocial.replace("\t", "") + "&percdesconto=" + percdesconto + "&vldesconto=" + vldesconto + ""
-                        + "&condpgto=" + condpgto + "&obs=" + obs.replace("\n", "pulalinha") + "&filial=" + crud.buscaFilialSelecionada() + "";
-                HttpPost httppost = new HttpPost(url);
-
-                // Instantiate a GET HTTP method
-                try {
-                    Log.i(getClass().getSimpleName(), "send  task - start");
-                    //
-                    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(
-                            2);
-                    nameValuePairs.add(new BasicNameValuePair("user", "1"));
-                    httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                    ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                    String responseBody = httpclient.execute(httppost, responseHandler);
-                    // Parse
-                    JSONObject json = new JSONObject(responseBody);
-                    JSONArray jArray = json.getJSONArray("posts");
-                    ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
-
-                    for (int i = 0; i < jArray.length(); i++) {
-                        HashMap<String, String> map = new HashMap<String, String>();
-                        JSONObject e = jArray.getJSONObject(i);
-                        String s = e.getString("post");
-                        JSONObject jObject = new JSONObject(s);
-
-                        /*map.put("idusers", jObject.getString("RzSocial"));
-                        map.put("UserName", jObject.getString("Endereco"));
-                        map.put("FullName", jObject.getString("Telefone"));*/
-
-                        /*map.put("idusers", jObject.getString("idusers"));
-                        map.put("UserName", jObject.getString("UserName"));
-                        map.put("FullName", jObject.getString("FullName"));*/
-
-                        //mylist.add(map);
-
-                        if (!jObject.getString("NumPedido").equals("null")) {
-                            String NumPedido = jObject.getString("NumPedido");
-                            if(FU_SincronizaItemPedido(NumPedido, dtemissao)){
-                                FU_AlteraSituacaoPedido(NumPedido);
-
-                            }else{
-                                return false;
-                            }
-                        }
-
-                    }
-
-                } catch (ClientProtocolException e) {
-                    // TODO Auto-generated catch block
-                    return false;
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    return false;
-                }
-            } catch (Throwable t) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean FU_SincronizaItemPedido(String NumPedido, String DtEmissao){
-        BancoController crud = new BancoController(getBaseContext());
-
-                /*String ultdtsincronizacao = crud.carregaDtSincronizacao();
-                ultdtsincronizacao += "";*/
-        Cursor cursor = crud.carregaItemPedido(numpedido);
-
-        String cdproduto = "", qtde = "", vlunitario = "",  vltotal = "", descricao = "", percdesconto = "", vldesconto = "";
-        int id = 0;
-
-        if(cursor!=null) {
-
-            while (!cursor.isAfterLast()) {
-                id += 1;
-                try {
-                    if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)).trim().equals("")) {
-                        cdproduto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)).replace(",", ".");
-                        //vltotal = "100,00";
-                    }
-                } catch (Exception e) {
-                    cdproduto = "0";
-                }
-
-                try {
-                    if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDE)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDE)).trim().equals("")) {
-                        qtde = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDE)).replace(",", ".");
-                        //vltotal = "100,00";
-                    }
-                } catch (Exception e) {
-                    qtde = "0";
-                }
-
-                try {
-                    if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLUNITARIO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLUNITARIO)).trim().equals("")) {
-                        vlunitario = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLUNITARIO)).replace(",", ".");
-                        //vltotal = "100,00";
-                    }
-                } catch (Exception e) {
-                    vlunitario = "0";
-                }
-
-                try {
-                    if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).trim().equals("")) {
-                        vltotal = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).replace(",", ".");
-                        //vltotal = "100,00";
-                    }
-                } catch (Exception e) {
-                    vltotal = "0";
-                }
-
-                try {
-                    if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)).trim().equals("")) {
-                        descricao = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)).replace(",", ".");
-                        //vltotal = "100,00";
-                    }
-                } catch (Exception e) {
-                    descricao = "";
-                }
-                try {
-                    if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).trim().equals("")) {
-                        percdesconto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).replace(",", ".");
-                        //vltotal = "100,00";
-                    }
-                } catch (Exception e) {
-                    percdesconto = "0";
-                }
-                try {
-                    if (!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).equals("null") && !cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).trim().equals("")) {
-                        vldesconto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).replace(",", ".");
-                        //vltotal = "100,00";
-                    }
-                } catch (Exception e) {
-                    vldesconto = "0";
-                }
-
-                if(percdesconto.trim().equals("")){
-                    percdesconto = "0";
-                }
-
-
-                int TIMEOUT_MILLISEC = 10000;
-                try {
-                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    trustStore.load(null, null);
-
-                    MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
-                    sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-                    HttpParams p = new BasicHttpParams();
-
-                    HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
-                    HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
-
-                    SchemeRegistry registry = new SchemeRegistry();
-                    registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-                    registry.register(new Scheme("https", sf, 443));
-
-                    ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
-
-
-                    HttpConnectionParams.setConnectionTimeout(p,
-                            TIMEOUT_MILLISEC);
-                    HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-
-                    HttpClient httpclient = new DefaultHttpClient(ccm, p);
-                    String url = "http://www.planosistemas.com.br/" +
-                            "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inseriritempedido&numpedido=" + NumPedido + "&cdproduto="
-                            + cdproduto.replace(" ", "espaco") + "&id=" + id + "&qtde=" + qtde + "&vlunitario=" + vlunitario + "&vltotal=" + vltotal + "&dtemissao=" + DtEmissao + "&descricao=" +
-                            descricao.replace(" ", "espaco") + "&vldesconto=" + vldesconto + "&percdesconto=" + percdesconto + "&filial=" + crud.buscaFilialSelecionada() + "";
-                    HttpPost httppost = new HttpPost(url);
-
-                    // Instantiate a GET HTTP method
-                    try {
-                        Log.i(getClass().getSimpleName(), "send  task - start");
-                        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2) ;
-                        nameValuePairs.add(new BasicNameValuePair("user", "1"));
-                        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                        String responseBody = httpclient.execute(httppost, responseHandler);
-
-                    } catch (ClientProtocolException e) {
-                        // TODO Auto-generated catch block
-                        return  false;
-                        //e.printStackTrace();
-                        //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        return false;
-                        //e.printStackTrace();
-                        //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-
-                    }
-                    // Log.i(getClass().getSimpleName(), "send  task - end");
-
-                } catch (Throwable t) {
-                    return false;
-                    //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-                    //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a conexão com o servidor. Favor verificar a conexão com a internet. Request failed: " + t.toString(), Toast.LENGTH_LONG).show();
-                }
-
-                cursor.moveToNext();
-
-            }
-        }
-        return true;
-
-    }
-
-    public boolean FU_AlteraSituacaoPedido(String NumPedido){
-        BancoController crud = new BancoController(getBaseContext());
-
-        String dataRegistro = getDateTime().substring(0, 16);
-        int TIMEOUT_MILLISEC = 10000;
-        try {
-            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            trustStore.load(null, null);
-
-            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
-            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-            HttpParams p = new BasicHttpParams();
-
-            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
-            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
-
-            SchemeRegistry registry = new SchemeRegistry();
-            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-            registry.register(new Scheme("https", sf, 443));
-
-            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
-
-
-            HttpConnectionParams.setConnectionTimeout(p,
-                    TIMEOUT_MILLISEC);
-            HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-
-            HttpClient httpclient = new DefaultHttpClient(ccm, p);
-            String url = "http://www.planosistemas.com.br/" +
-                    "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=alteraSituacaoPedidoNovo&numpedido=" + NumPedido + "&filial=" + crud.buscaFilialSelecionada() + "&dtregistro=" + dataRegistro.replace(" ", "espaco") + "&usuario=" + crud.selecionarNmUsuarioSistema().replace(" ", "espaco") + "";
-            HttpPost httppost = new HttpPost(url);
-
-            try {
-                Log.i(getClass().getSimpleName(), "send  task - start");
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2) ;
-                nameValuePairs.add(new BasicNameValuePair("user", "1"));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                String responseBody = httpclient.execute(httppost, responseHandler);
-
-            } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-                return  false;
-                //e.printStackTrace();
-                //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                return false;
-                //e.printStackTrace();
-                //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-
-            }
-            // Log.i(getClass().getSimpleName(), "send  task - end");
-
-        } catch (Throwable t) {
-            return false;
-            //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a conexão com o servidor. Favor verificar a conexão com a internet. Request failed: " + t.toString(), Toast.LENGTH_LONG).show();
-        }
-        return true;
-    }
-
-    public boolean FU_CancelaPedido(String NumPedido) {
-
-        BancoController crud = new BancoController(getBaseContext());
-
-        int TIMEOUT_MILLISEC = 10000;
-        try {
-            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            trustStore.load(null, null);
-
-            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
-            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-            HttpParams p = new BasicHttpParams();
-
-            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
-            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
-
-            SchemeRegistry registry = new SchemeRegistry();
-            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-            registry.register(new Scheme("https", sf, 443));
-
-            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
-
-
-            HttpConnectionParams.setConnectionTimeout(p,
-                    TIMEOUT_MILLISEC);
-            HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-
-            HttpClient httpclient = new DefaultHttpClient(ccm, p);
-            String url = "http://www.planosistemas.com.br/" +
-                    "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=cancelarPedido&numpedido=" + NumPedido + "";
-            HttpPost httppost = new HttpPost(url);
-
-            try {
-                Log.i(getClass().getSimpleName(), "send  task - start");
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2) ;
-                nameValuePairs.add(new BasicNameValuePair("user", "1"));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                String responseBody = httpclient.execute(httppost, responseHandler);
-
-            } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-                return  false;
-                //e.printStackTrace();
-                //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                return false;
-                //e.printStackTrace();
-                //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-
-            }
-            // Log.i(getClass().getSimpleName(), "send  task - end");
-
-        } catch (Throwable t) {
-            return false;
-            //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do item do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getApplicationContext(), "Não foi possivel realizar a conexão com o servidor. Favor verificar a conexão com a internet. Request failed: " + t.toString(), Toast.LENGTH_LONG).show();
-        }
-        return true;
-    }
-
-    public String FU_SincronizarCliente(String cdemitente){
-        String VA_CdCliente = "";
-
-        int TIMEOUT_MILLISEC = 10000;
-
-        BancoController crud = new BancoController(getBaseContext());
-
-                /*String ultdtsincronizacao = crud.carregaDtSincronizacao();
-                ultdtsincronizacao += "";*/
-        Cursor cursor = crud.carregaClienteByCdClienteNovoCliente(cdemitente);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-
-            while(!cursor.isAfterLast()) {
-
-                String idString = "";
-                String rzsocialString = "";
-                String nmfantasiaString = "";
-                String cepString = "";
-                String enderecoString = "";
-                String classificacaoString = "";
-                String numeroString = "";
-                String complementoString = "";
-                String bairroString = "";
-                String estadoString = "";
-                String cidadeString = "";
-                String cnpjString = "";
-                String telefoneString = "";
-                String telefoneAdicionalString = "";
-                String faxString = "";
-                String nmcontatoString = "";
-                String emailString = "";
-                String tipopessoaString = "";
-                String tipoclienteString = "";
-                String obsclienteString = "";
-                String inscestadual = "";
-                String vendedorString = "99";
-                String dtultalteracao = "";
-                String dtcadastro = "";
-                String resultado = "";
-
-                if(!cursor.getString(cursor.getColumnIndex(CriaBanco.ID)).equals("null") && !cursor.getString(cursor.getColumnIndex(CriaBanco.ID)).trim().equals("")) {
-                    idString = cursor.getString(cursor.getColumnIndex(CriaBanco.ID));
-                }
-                if(!cursor.getString(cursor.getColumnIndex("rzsocial")).equals("null") && !cursor.getString(cursor.getColumnIndex("rzsocial")).trim().equals("")) {
-                    rzsocialString = cursor.getString(cursor.getColumnIndex("rzsocial")).replace("'", "");
-                }else{
-                    rzsocialString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("nmfantasia")).equals("null") && !cursor.getString(cursor.getColumnIndex("nmfantasia")).trim().equals("")) {
-                    nmfantasiaString = cursor.getString(cursor.getColumnIndex("nmfantasia")).replace("'", "");
-                }else{
-                    nmfantasiaString = "espaco";
-                }
-                //nmfantasiaString = "Guilherme";
-                if(!cursor.getString(cursor.getColumnIndex("cep")).equals("null")  && !cursor.getString(cursor.getColumnIndex("cep")).trim().equals("")) {
-                    cepString = cursor.getString(cursor.getColumnIndex("cep")).replace(".", "").replace("-", "");
-                }else{
-                    cepString = "0";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("endereco")).equals("null")  && !cursor.getString(cursor.getColumnIndex("endereco")).trim().equals("")) {
-                    enderecoString = cursor.getString(cursor.getColumnIndex("endereco")).replace("'", "");
-                }else{
-                    enderecoString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("classificacao")).equals("null")  && !cursor.getString(cursor.getColumnIndex("classificacao")).trim().equals("")) {
-                    classificacaoString = cursor.getString(cursor.getColumnIndex("classificacao")).replace("'", "");
-                }else{
-                    classificacaoString= "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("numero")).equals("null")  && !cursor.getString(cursor.getColumnIndex("numero")).trim().equals("")) {
-                    numeroString = cursor.getString(cursor.getColumnIndex("numero"));
-                }else{
-                    numeroString = "0";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("complemento")).equals("null")  && !cursor.getString(cursor.getColumnIndex("complemento")).trim().equals("")) {
-                    complementoString = cursor.getString(cursor.getColumnIndex("complemento")).replace("'", "");
-                }else{
-                    complementoString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("bairro")).equals("null")  && !cursor.getString(cursor.getColumnIndex("bairro")).trim().equals("")) {
-                    bairroString = cursor.getString(cursor.getColumnIndex("bairro")).replace("'", "");
-                }else{
-                    bairroString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("uf")).equals("null")  && !cursor.getString(cursor.getColumnIndex("uf")).trim().equals("")) {
-                    estadoString = cursor.getString(cursor.getColumnIndex("uf"));
-                }else{
-                    estadoString = "PR";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("cidade")).equals("null")  && !cursor.getString(cursor.getColumnIndex("cidade")).trim().equals("")) {
-                    cidadeString = cursor.getString(cursor.getColumnIndex("cidade")).replace("'", "");
-                }else{
-                    cidadeString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("cgc")).equals("null")  && !cursor.getString(cursor.getColumnIndex("cgc")).trim().equals("")) {
-                    cnpjString = cursor.getString(cursor.getColumnIndex("cgc")).replace(".", "").replace("-", "").replace("/", "");
-                }else{
-                    cnpjString = "0";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("telefone")).equals("null")  && !cursor.getString(cursor.getColumnIndex("telefone")).trim().equals("")) {
-                    telefoneString = cursor.getString(cursor.getColumnIndex("telefone")).replace("(", "").replace("-", "").replace(")", "");
-                }else{
-                    telefoneString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("telefoneadicional")).equals("null")  && !cursor.getString(cursor.getColumnIndex("telefoneadicional")).trim().equals("")) {
-                    telefoneAdicionalString = cursor.getString(cursor.getColumnIndex("telefoneadicional")).replace("(", "").replace("-", "").replace(")", "");;
-                }else{
-                    telefoneAdicionalString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("fax")).equals("null")  && !cursor.getString(cursor.getColumnIndex("fax")).trim().equals("")) {
-                    faxString = cursor.getString(cursor.getColumnIndex("fax")).replace("(", "").replace("-", "").replace(")", "");;
-                }else{
-                    faxString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("nmcontatocliente")).equals("null")  && !cursor.getString(cursor.getColumnIndex("nmcontatocliente")).trim().equals("")) {
-                    nmcontatoString = cursor.getString(cursor.getColumnIndex("nmcontatocliente")).replace("'", "");
-                }else{
-                    nmcontatoString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("email")).equals("null")  && !cursor.getString(cursor.getColumnIndex("email")).trim().equals("")) {
-                    emailString = cursor.getString(cursor.getColumnIndex("email")).replace("'", "");
-                }else{
-                    emailString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("tipopessoa")).equals("null")  && !cursor.getString(cursor.getColumnIndex("tipopessoa")).trim().equals("")) {
-                    tipopessoaString = cursor.getString(cursor.getColumnIndex("tipopessoa"));
-                }else{
-                    tipopessoaString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("tipcliente")).equals("null")  && !cursor.getString(cursor.getColumnIndex("tipcliente")).trim().equals("")) {
-                    tipoclienteString = cursor.getString(cursor.getColumnIndex("tipcliente"));
-                }else{
-                    tipoclienteString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("obscliente")).equals("null")  && !cursor.getString(cursor.getColumnIndex("obscliente")).trim().equals("")) {
-                    obsclienteString = cursor.getString(cursor.getColumnIndex("obscliente")).replace("'", "");
-                }else{
-                    obsclienteString = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("inscestadual")).equals("null")  && !cursor.getString(cursor.getColumnIndex("inscestadual")).trim().equals("")) {
-                    inscestadual = cursor.getString(cursor.getColumnIndex("inscestadual")).replace("'", "");
-                }else{
-                    inscestadual = "espaco";
-                }
-                //tipoclienteString = "EXPRESSPLANO";
-                if(!cursor.getString(cursor.getColumnIndex("dtultalteracao")).equals("null")  && !cursor.getString(cursor.getColumnIndex("dtultalteracao")).trim().equals("")) {
-                    dtultalteracao = cursor.getString(cursor.getColumnIndex("dtultalteracao"));
-                }else{
-                    dtultalteracao = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("dtcadastro")).equals("null")  && !cursor.getString(cursor.getColumnIndex("dtcadastro")).trim().equals("")) {
-                    dtcadastro = cursor.getString(cursor.getColumnIndex("dtcadastro"));
-                }else{
-                    dtcadastro = "espaco";
-                }
-                if(!cursor.getString(cursor.getColumnIndex("vendedor")).equals("null")  && !cursor.getString(cursor.getColumnIndex("vendedor")).trim().equals("")) {
-                    vendedorString = cursor.getString(cursor.getColumnIndex("vendedor"));
-                }else{
-                    vendedorString = "espaco";
-                }
-
-
-                try {
-                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    trustStore.load(null, null);
-
-                    MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
-                    sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-                    HttpParams p = new BasicHttpParams();
-
-                    HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
-                    HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
-
-                    SchemeRegistry registry = new SchemeRegistry();
-                    registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-                    registry.register(new Scheme("https", sf, 443));
-
-                    ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
-
-
-                    HttpConnectionParams.setConnectionTimeout(p,
-                            TIMEOUT_MILLISEC);
-                    HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
-
-                    HttpClient httpclient = new DefaultHttpClient(ccm, p);
-
-                    String url = "http://www.planosistemas.com.br/" +
-                            "WebService2.php?user=" + crud.selecionarCdClienteBanco() + "&format=json&num=10&method=inserirClienteNovo&rzsocial=" +
-                            rzsocialString.replace(" ", "espaco") +
-                            "&nmfantasia=" + nmfantasiaString.replace(" ", "espaco") +
-                            "&cep=" + cepString +
-                            "&endereco=" + enderecoString.replace(" ", "espaco") +
-                            "&classificacao=" + classificacaoString.replace(" ", "espaco") +
-                            "&numero=" + numeroString +
-                            "&complemento=" + complementoString.replace(" ", "espaco") +
-                            "&bairro=" + bairroString.replace(" ", "espaco") +
-                            "&uf=" + estadoString +
-                            "&cidade=" + cidadeString.replace(" ", "espaco") +
-                            "&tipopessoa=" + tipopessoaString +
-                            "&cgc=" + cnpjString +
-                            "&telefone=" + telefoneString +
-                            "&telefoneadicional=" + telefoneAdicionalString +
-                            "&fax=" + faxString +
-                            "&contato=" + nmcontatoString.replace(" ", "espaco") +
-                            "&email=" + emailString +
-                            "&vendedor=" + vendedorString +
-                            "&tipocliente=" + tipoclienteString.replace(" ", "espaco") +
-                            "&dtcadastro=" + dtcadastro.replace(" ", "espaco") +
-                            "" +
-                            "&obscliente=" + obsclienteString.replace(" ", "espaco") + "" +
-                            "&inscestadual=" + inscestadual.replace("", "espaco");
-                    HttpPost httppost = new HttpPost(url);
-
-                    // Instantiate a GET HTTP method
-                    try {
-                        Log.i(getClass().getSimpleName(), "send  task - start");
-                        //
-                        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(
-                                2);
-                        nameValuePairs.add(new BasicNameValuePair("user", "1"));
-                        httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                        String responseBody = httpclient.execute(httppost, responseHandler);
-                        // Parse
-                        JSONObject json = new JSONObject(responseBody);
-                        JSONArray jArray = json.getJSONArray("posts");
-                        ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
-
-                        for (int i = 0; i < jArray.length(); i++) {
-                            HashMap<String, String> map = new HashMap<String, String>();
-                            JSONObject e = jArray.getJSONObject(i);
-                            String s = e.getString("post");
-                            JSONObject jObject = new JSONObject(s);
-
-                            /*map.put("idusers", jObject.getString("RzSocial"));
-                            map.put("UserName", jObject.getString("Endereco"));
-                            map.put("FullName", jObject.getString("Telefone"));*/
-
-                            /*map.put("idusers", jObject.getString("idusers"));
-                            map.put("UserName", jObject.getString("UserName"));
-                            map.put("FullName", jObject.getString("FullName"));*/
-
-                            //mylist.add(map);
-
-                            if (!jObject.getString("CdCliente").equals("null")) {
-
-                                crud.alteraClientePedido(jObject.getString("CdCliente"), Integer.parseInt(idString));
-                                cdemitente =  jObject.getString("CdCliente");
-
-                            }
-                        }
-
-
-                    } catch (ClientProtocolException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    // Log.i(getClass().getSimpleName(), "send  task - end");
-
-                } catch (Throwable t) {
-                    Toast.makeText(getApplicationContext(), "Request failed: " + t.toString(), Toast.LENGTH_LONG).show();
-                }
-
-                cursor.moveToNext();
-            }
-        }
-
-        return cdemitente;
+        ViewGroup.LayoutParams params = lv_ItensPedido.getLayoutParams();
+
+        params.height = lv_ItensPedido.getDividerHeight() * (adapter2.getCount() - 1);
+        lv_ItensPedido.setLayoutParams(params);
+        lv_ItensPedido.requestLayout();
     }
 
     public  boolean verificaConexao() {
@@ -1846,7 +1013,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
         return conectado;
     }
 
-    private class LoadingAsyncOpcoes extends AsyncTask<Void, Void, Void> {
+    private class LoadingAsyncEnviarPedido extends AsyncTask<Void, Void, Void> {
         ProgressDialog progressDialog = new ProgressDialog(ManutencaoPedidos.this);
         BancoController crud = new BancoController(getBaseContext());
         String validou = "N";
@@ -1860,13 +1027,11 @@ public class ManutencaoPedidos extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            if(FU_EnviarPedido() == true) {
-
+            if(fuEnviarPedido()) {
                 validou = "S";
-
+            }else{
+                validou = "N";
             }
-
-
             return null;
         }
 
@@ -1876,15 +1041,279 @@ public class ManutencaoPedidos extends AppCompatActivity {
             progressDialog.dismiss();
 
             if(validou.equals("S")){
-                crud = new BancoController(getBaseContext());
-                crud.alteraSituacaoPedido(numpedido, "ENVIADO");
-                MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido enviado com sucesso!");
-                Intent intent = new Intent(ManutencaoPedidos.this, Pedidos.class);
-                startActivity(intent);
+                cl_Pedidos.setFgSituacao("E");
+                if(ctl_Pedidos.fuAlterarSituacaoPedido()){
+                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido enviado com sucesso!");
+                    finish();
+                }else{
+                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel realizar a sincronização do pedido. Favor verificar a conexão com a internet.");
+                }
             }else {
                 MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel realizar a sincronização do pedido. Favor verificar a conexão com a internet.");
             }
         }
+    }
+
+    public boolean fuEnviarPedido() {
+
+        SYNC_Pedidos sync_Pedidos = new SYNC_Pedidos(getApplicationContext());
+        if(sync_Pedidos.FU_EnviarPedido(cl_Pedidos)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
+            Font.BOLD);
+    private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+            Font.NORMAL, BaseColor.RED);
+    private static Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+            Font.NORMAL);
+    private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+            Font.BOLD);
+
+    private static Font negritoMenor = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+            Font.BOLD);
+    private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+            Font.BOLD);
+
+    private void suCriarPDF() {
+
+        Document document = new Document();
+
+        try {
+
+
+
+            String filename = "pedido_" + cl_Pedidos.getNumPedido() + ".pdf";
+
+            document = new Document(PageSize.A4);
+
+            String path = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
+
+            File dir = new File(path, filename);
+            if (!dir.exists()) {
+                dir.getParentFile().mkdirs();
+            }
+
+            FileOutputStream fOut = new FileOutputStream(dir);
+            fOut.flush();
+
+            PdfWriter.getInstance(document, fOut);
+            document.open();
+
+            try {
+                Drawable d = getResources().getDrawable(R.drawable.logo_expres_mobile);
+                BitmapDrawable bitDw = ((BitmapDrawable) d);
+                Bitmap bmp = bitDw.getBitmap();
+                Bitmap resized = Bitmap.createScaledBitmap(bmp, (int)(bmp.getWidth()*0.25), (int)(bmp.getHeight()*0.25), true);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                resized.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                //bmp.setWidth(200);
+                //bmp.setHeight(50);
+                Image image = Image.getInstance(stream.toByteArray());
+
+                document.add(image);
+
+            }
+            catch(IOException ex)
+            {
+
+            }
+
+            Paragraph preface = new Paragraph();
+            // We add one empty line
+            addEmptyLine(preface, 1);
+            // Lets write a big header
+            Paragraph pa_Titulo = new Paragraph();
+            pa_Titulo.setAlignment(Element.ALIGN_CENTER);
+            pa_Titulo.setFont(catFont);
+            pa_Titulo.add("PEDIDO Nº" + cl_Pedidos.getNumPedido());
+            preface.add(pa_Titulo);
+            //preface.add(new Paragraph("PEDIDO Nº" + cl_Pedidos.getNumPedido(), catFont));
+
+            addEmptyLine(preface, 2);
+            // Will create: Report generated by: _name, _date
+            preface.setFont(normalFont);
+            preface.add("Data de emissão: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getDtEmissao());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Cliente: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getNomeRzSocial());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Quantidade de produtos: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getQtdeItens());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Valor dos produtos: ");
+            preface.setFont(subFont);
+            preface.add("R$" + String.format("%.2f", Double.parseDouble(cl_Pedidos.getVlTotalItens())));
+            addEmptyLine(preface, 1);
+
+            CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
+            cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
+
+            CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
+
+            if(ctl_ItemPedido.fuCarregaTodosItensPedido()) {
+
+                addEmptyLine(preface, 1);
+                preface.setFont(subFont);
+                preface.add("PRODUTOS DO PEDIDO:");
+                addEmptyLine(preface, 2);
+
+                createTable(preface, ctl_ItemPedido.rs_ItemPedido);
+
+                addEmptyLine(preface, 2);
+            }
+
+
+            preface.setFont(normalFont);
+            preface.add("Valor do desconto: ");
+            preface.setFont(subFont);
+            preface.add("R$" + cl_Pedidos.getVlDesconto());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Valor do frete: ");
+            preface.setFont(subFont);
+            //double resultadoTotal = (Double.parseDouble(cl_Pedidos.getVlTotalItens()) - vf_vlDesconto) + Double.parseDouble(cl_Pedidos.getVlFrete());
+            //            resultadoTotal = Double.valueOf(String.format(Locale.US, "%.2f", resultadoTotal));
+            //            String valor = String.format("%.2f", resultadoTotal);
+            preface.add("R$" + String.format("%.2f", Double.parseDouble(cl_Pedidos.getVlFrete())));
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Condição do pagamento: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getCondPgto());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Observação do pedido: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getObsPedido());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Valor total do pedido: ");
+            preface.setFont(subFont);
+            preface.add("R$" + cl_Pedidos.getVlTotal().replace(".", ","));
+
+            //createTable(preface);
+
+
+
+           /* preface.add(new Paragraph("Report generated by: " + System.getProperty("user.name") + ", " + new Date(), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    smallBold));
+            preface.add(new Paragraph("This document describes something which is very important ",
+                    smallBold));
+
+            addEmptyLine(preface, 8);
+
+            preface.add(new Paragraph("This document is a preliminary version and not subject to your license agreement or any other agreement with vogella.com ;-).",
+                    redFont));*/
+
+
+            document.add(preface);
+
+
+
+
+        } catch (DocumentException e) {
+            e.printStackTrace();
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível gerar o PDF");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível gerar o PDF");
+        } catch (IOException e) {
+            e.printStackTrace();
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível gerar o PDF");
+        } finally {
+            document.close();
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "PDF do pedido gerado com sucesso na pasta " + Environment.getExternalStorageDirectory() + "/PedidosPDF/");
+        }
+    }
+
+    private static void addEmptyLine(Paragraph paragraph, int number) {
+        for (int i = 0; i < number; i++) {
+            paragraph.add(new Paragraph(" "));
+        }
+    }
+
+    private static void createTable(Paragraph paragraph, Cursor rs_ItemPedido)
+            throws BadElementException {
+        PdfPTable table = new PdfPTable(3);
+
+        // t.setBorderColor(BaseColor.GRAY);
+        // t.setPadding(4);
+        // t.setSpacing(4);
+        // t.setBorderWidth(1);
+
+        while (!rs_ItemPedido.isAfterLast()) {
+
+            Phrase ph_Descricao = new Phrase();
+            ph_Descricao.setFont(negritoMenor);
+            ph_Descricao.add(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+
+
+            PdfPCell c1 = new PdfPCell(ph_Descricao);
+            c1.setHorizontalAlignment(Element.ALIGN_LEFT);
+            ///c1.setPaddingTop(5);
+            c1.setPadding(10);
+            table.addCell(c1);
+
+            Phrase ph_QtdeProdutos = new Phrase();
+            ph_QtdeProdutos.setFont(negritoMenor);
+            ph_QtdeProdutos.add("Quantidade: " + rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
+
+            PdfPCell c2 = new PdfPCell(ph_QtdeProdutos);
+            c2.setHorizontalAlignment(Element.ALIGN_LEFT);
+            ///c1.setPaddingTop(5);
+            c2.setPadding(10);
+            table.addCell(c2);
+
+            Phrase ph_VlTotal = new Phrase();
+            ph_VlTotal.setFont(negritoMenor);
+            ph_VlTotal.add("Valor total: " + "R$" + String.format("%.2f", Double.parseDouble(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).replace(",", "."))));
+
+            PdfPCell c3 = new PdfPCell(ph_VlTotal);
+            c3.setHorizontalAlignment(Element.ALIGN_LEFT);
+            ///c1.setPaddingTop(5);
+            c3.setPadding(10);
+            table.addCell(c3);
+
+            //table.addCell("Quantidade: " + rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
+            //table.addCell("Valor total: " + "R$" + String.format("%.2f", Double.parseDouble(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).replace(",", "."))));
+
+            rs_ItemPedido.moveToNext();
+        }
+
+
+        /*PdfPCell c1 = new PdfPCell(new Phrase("Table Header 1"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+
+        c1 = new PdfPCell(new Phrase("Table Header 2"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+
+        c1 = new PdfPCell(new Phrase("Table Header 3"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+        table.setHeaderRows(1);
+
+        table.addCell("1.0");
+        table.addCell("1.1");
+        table.addCell("1.2");
+        table.addCell("2.1");
+        table.addCell("2.2");
+        table.addCell("2.3");*/
+
+        paragraph.add(table);
+
     }
 
 }

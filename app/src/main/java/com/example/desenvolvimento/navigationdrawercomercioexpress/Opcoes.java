@@ -203,35 +203,34 @@ public class Opcoes extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
+        if (id == R.id.nav_clientes) {
             Intent secondActivity;
             secondActivity = new Intent(Opcoes.this, HomeActivity.class);
             startActivity(secondActivity);
-
-        } else if (id == R.id.nav_gallery) {
+            // Handle the camera action
+        } else if (id == R.id.nav_pedidos) {
             Intent secondActivity;
             secondActivity = new Intent(Opcoes.this, Pedidos.class);
             startActivity(secondActivity);
 
-        }
-        else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_produtos) {
             Intent secondActivity;
             secondActivity = new Intent(Opcoes.this, Produtos.class);
             secondActivity.putExtra("selecaoProdutos", "N");
             startActivity(secondActivity);
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_opcoes) {
             Intent secondActivity;
             secondActivity = new Intent(Opcoes.this, Opcoes.class);
             startActivity(secondActivity);
 
-        }/* else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_visaogeral) {
             Intent secondActivity;
-            secondActivity = new Intent(Opcoes.this, Sincronizar.class);
+            secondActivity = new Intent(Opcoes.this, VisaoGeralNova.class);
             startActivity(secondActivity);
 
-        }*/
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

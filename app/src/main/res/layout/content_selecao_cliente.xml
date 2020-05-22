@@ -18,7 +18,8 @@
         android:background="@drawable/edittext_foco"
         android:textColor="@color/black"
         android:textCursorDrawable="@drawable/cursor"
-        android:padding="10dip">
+        android:padding="10dip"
+        android:visibility="gone">
 
     </EditText>
 
@@ -31,6 +32,7 @@
         android:layout_alignBottom="@+id/tb_buscarclienteSelecaoClientes"
         android:layout_alignRight="@+id/tb_buscarclienteSelecaoClientes"
         android:src="@android:drawable/ic_search_category_default"
+        android:visibility="gone"
         />
 
     <ListView
@@ -41,7 +43,7 @@
         android:layout_alignParentStart="true"
         android:fastScrollAlwaysVisible="true"
         android:fastScrollEnabled="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
         />
 
     <GridLayout

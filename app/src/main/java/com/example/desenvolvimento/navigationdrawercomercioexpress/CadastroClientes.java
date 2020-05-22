@@ -10,6 +10,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -29,6 +31,9 @@ import java.util.Date;
 import br.com.jansenfelipe.androidmask.MaskEditTextChangedListener;
 
 public class CadastroClientes extends AppCompatActivity {
+
+    MenuItem me_Salvar;
+    MenuItem me_Excluir;
 
     String codigo;
 
@@ -86,6 +91,10 @@ public class CadastroClientes extends AppCompatActivity {
     private AlertDialog alerta;
     AlertDialog.Builder builder;
 
+    String vc_TipoOperacao = "";
+
+    FloatingActionButton fab_SalvarCliente;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,14 +104,13 @@ public class CadastroClientes extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-       /*Spinner spinnerEstado = (Spinner) findViewById(R.id.tb_estado);
-        try {
-            ArrayList<String> estados = crud.selecionarEstado();
-            ArrayAdapter<String> arrayEstado = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, estados);
-            spinnerEstado.setAdapter(arrayEstado);
-        }catch (Exception e){
-            e.printStackTrace();
-        }*/
+        fab_SalvarCliente = (FloatingActionButton) findViewById(R.id.fab_SalvarCliente);
+        fab_SalvarCliente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                suSalvarCliente();
+            }
+        });
 
         tipopessoa = (Spinner)findViewById(R.id.cb_tipopessoa);
         rzsocial = (EditText)findViewById(R.id.tb_rzsocial);
@@ -132,18 +140,10 @@ public class CadastroClientes extends AppCompatActivity {
         // Apply the adapter to the spinner
         estado.setAdapter(adapter);
 
-         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapterTipoPessoa = ArrayAdapter.createFromResource(this, R.array.tipopessoa_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
         adapterTipoPessoa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         tipopessoa.setAdapter(adapterTipoPessoa);
 
-        /*ArrayAdapter<CharSequence> adapterTipoCliente = ArrayAdapter.createFromResource(this, R.array.tipocliente_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapterTipoCliente.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        tipocliente.setAdapter(adapterTipoCliente);*/
         try {
             crud = new BancoController(getBaseContext());
             Cursor listaTipoCliente = crud.selecionarTipoClienteCursor();
@@ -159,12 +159,6 @@ public class CadastroClientes extends AppCompatActivity {
         }catch (Exception e2){
             e2.printStackTrace();
         }
-
-       /* ArrayList<String> suaListaDeConsulta = crud.selecionarTipoCliente();
-        ArrayAdapter<String> array;
-
-        array = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, suaListaDeConsulta);
-        tipocliente.setAdapter(array);*/
 
         maskCPF = new MaskEditTextChangedListener("###.###.###-##", cnpj);
         maskCNPJ = new MaskEditTextChangedListener("##.###.###/####-##", cnpj);
@@ -199,59 +193,13 @@ public class CadastroClientes extends AppCompatActivity {
 
         });
 
-        /*spinnerEstado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                Spinner spinnerEstado = (Spinner) findViewById(R.id.tb_estado);
-                if(!spinnerEstado.getSelectedItem().toString().trim().equals("null") || !spinnerEstado.getSelectedItem().toString().trim().equals("")) {
-                    Spinner spinnerCidade = (Spinner) findViewById(R.id.tb_cidade);
-                    try {
-                        ArrayList<String> cidades = crud.selecionarCidade(spinnerEstado.getSelectedItem().toString());
-                        ArrayAdapter<String> arrayCidade = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_item, cidades);
-                        spinnerCidade.setAdapter(arrayCidade);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
-
-        });*/
-
-
-        Button botao = (Button)findViewById(R.id.button);
-        Button botaoAlterar = (Button)findViewById(R.id.sc_alterar);
-        Button botaoCancelar = (Button)findViewById(R.id.sc_cancelar);
-        Button botaoExcluir = (Button)findViewById(R.id.sc_excluir);
-
         codigo = this.getIntent().getStringExtra("codigo");
 
         if(codigo.equals("0")) {
-            botaoAlterar.setVisibility(View.INVISIBLE);
-            botaoExcluir.setVisibility(View.INVISIBLE);
-            TextView lb_sccancelar = (TextView)findViewById(R.id.lb_sccancelar);
-            RelativeLayout.LayoutParams p_botaocancelar = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            p_botaocancelar.addRule(RelativeLayout.BELOW, R.id.lb_sccadastrar);
-            p_botaocancelar.setMargins(0, 90, 0, 0);
-            lb_sccancelar.setLayoutParams(p_botaocancelar);
-
-            RelativeLayout.LayoutParams p_botaoalterar = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            p_botaoalterar.addRule(RelativeLayout.BELOW, R.id.tb_fax);
-            botaoAlterar.setLayoutParams(p_botaoalterar);
-
-            RelativeLayout.LayoutParams p_botaoexcluir = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            p_botaoexcluir.addRule(RelativeLayout.BELOW, R.id.tb_fax);
-            botaoExcluir.setLayoutParams(p_botaoexcluir);
-
-
+            vc_TipoOperacao = "I";
         }else{
+            vc_TipoOperacao = "A";
+
             crud = new BancoController(getBaseContext());
             cursor = crud.carregaClienteById(Integer.parseInt(codigo));
 
@@ -427,295 +375,249 @@ public class CadastroClientes extends AppCompatActivity {
                     VA_CountRows += 1;
                     listaTipoCliente.moveToNext();
                 }
-                /*ArrayAdapter<CharSequence> adaptadorTipoCliente = ArrayAdapter.createFromResource(this, R.array.tipocliente_array, android.R.layout.simple_spinner_item);
-                adaptadorTipoCliente.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                tipocliente.setAdapter(adaptadorTipoCliente);
-                if (!compareValueTipoCliente.equals(null)) {
-                    int spinnerPosition = adaptadorTipoCliente.getPosition(compareValueTipoCliente);
-                    tipocliente.setSelection(spinnerPosition);
-                }*/
 
             }catch (Exception e){
                 e.printStackTrace();;
             }
 
             if(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGSINCRONIZADO)).equals("N")) {
-                TextView lb_scalterar = (TextView)findViewById(R.id.lb_scalterar);
-                TextView lb_sccancelar = (TextView)findViewById(R.id.lb_sccancelar);
-                TextView lb_scexcluir = (TextView)findViewById(R.id.lb_scexcluir);
-                botao.setVisibility(View.INVISIBLE);
-                //botaoExcluir.setVisibility(View.INVISIBLE);
+
                 cnpj.setEnabled(false);
-                RelativeLayout.LayoutParams p_botaoalterar = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                p_botaoalterar.addRule(RelativeLayout.BELOW, R.id.lb_tipcliente);
-                lb_scalterar.setLayoutParams(p_botaoalterar);
-
-                RelativeLayout.LayoutParams p_botaoexcluir = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                p_botaoexcluir.addRule(RelativeLayout.BELOW, R.id.lb_scalterar);
-                p_botaoexcluir.setMargins(0, 90, 0, 0);
-                lb_scexcluir.setLayoutParams(p_botaoexcluir);
-
-
-                RelativeLayout.LayoutParams p_botaocancelar = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                p_botaocancelar.addRule(RelativeLayout.BELOW, R.id.lb_scexcluir);
-                p_botaocancelar.setMargins(0, 90, 0, 0);
-                lb_sccancelar.setLayoutParams(p_botaocancelar);
 
             }else{
-                RelativeLayout.LayoutParams p_botaocadastrar = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                p_botaocadastrar.addRule(RelativeLayout.BELOW, R.id.tb_fax);
-                botao.setLayoutParams(p_botaocadastrar);
+                vc_TipoOperacao = "E";
 
-                RelativeLayout.LayoutParams p_botaoalterar = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                p_botaoalterar.addRule(RelativeLayout.BELOW, R.id.tb_fax);
-                botaoAlterar.setLayoutParams(p_botaoalterar);
-
-                RelativeLayout.LayoutParams p_botaoexcluir = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                p_botaoexcluir.addRule(RelativeLayout.BELOW, R.id.tb_fax);
-                botaoExcluir.setLayoutParams(p_botaoexcluir);
-
-
-                botao.setVisibility(View.INVISIBLE);
-                botaoCancelar.setVisibility(View.INVISIBLE);
-                botaoAlterar.setVisibility(View.INVISIBLE);
-                botaoExcluir.setVisibility(View.INVISIBLE);
-
-                tipopessoa.setEnabled(false);
-                rzsocial.setEnabled(false);
-                nmfantasia.setEnabled(false);
-                cep.setEnabled(false);
-                endereco.setEnabled(false);
-                classificacao.setEnabled(false);
-                numero.setEnabled(false);
-                complemento.setEnabled(false);
-                bairro.setEnabled(false);
-                estado.setEnabled(false);
-                cidade.setEnabled(false);
-                cnpj.setEnabled(false);
-                telefone.setEnabled(false);
-                telefoneadicional.setEnabled(false);
-                fax.setEnabled(false);
-                contato.setEnabled(false);
-                email.setEnabled(false);
-                tipocliente.setEnabled(false);
-                obscliente.setEnabled(false);
-                inscestadual.setEnabled(false);
+                suBloquearCampos(false);
 
                 TextView lb_clienteSincronizado = (TextView)findViewById(R.id.lb_clientesincronizado);
                 lb_clienteSincronizado.setVisibility(View.VISIBLE);
             }
 
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_cadastrarcliente, menu);
+
+        me_Salvar = menu.findItem(R.id.menu_salvar);
+        me_Excluir = menu.findItem(R.id.menu_excluir);
+
+        if(vc_TipoOperacao.equals("E")){
+
+            me_Salvar.setVisible(false);
+            me_Excluir.setVisible(false);
+
+        }
 
 
+        return true;
+    }
 
-        botao.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Button botao = (Button) findViewById(R.id.button);
-                BancoController crud = new BancoController(getBaseContext());
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
 
-                /*EditText rzsocial = (EditText) findViewById(R.id.tb_rzsocial);
-                EditText nmfantasia = (EditText) findViewById(R.id.tb_nmfantasia);
-                EditText cnpj = (EditText) findViewById(R.id.tb_cnpj);
+        int id = item.getItemId();
 
-                EditText email = (EditText) findViewById(R.id.tb_email);
-                EditText telefone = (EditText) findViewById(R.id.tb_telefone);
-                EditText celular = (EditText) findViewById(R.id.tb_telefoneadicional);
+        if(id == android.R.id.home){
 
-                EditText endereco = (EditText) findViewById(R.id.tb_endereco);
-                EditText complemento = (EditText) findViewById(R.id.tb_complemento);
-                EditText cep = (EditText) findViewById(R.id.tb_cep);
-                EditText bairro = (EditText) findViewById(R.id.tb_bairro);
-                EditText cidade = (EditText) findViewById(R.id.tb_cidade);
-                Spinner estado = (Spinner) findViewById(R.id.tb_estado);
-                Spinner tipopessoa = (Spinner)findViewById(R.id.cb_tipopessoa);*/
+            //fuVoltar();
+            finish();
 
-                rzsocialString = rzsocial.getText().toString().toUpperCase();
-                nmfantasiaString = nmfantasia.getText().toString().toUpperCase();
-                cepString = cep.getText().toString();
-                enderecoString = endereco.getText().toString().toUpperCase();
-                classificacaoString = classificacao.getText().toString().toUpperCase();
-                numeroString = numero.getText().toString();
-                complementoString = complemento.getText().toString().toUpperCase();
-                bairroString = bairro.getText().toString().toUpperCase();
-                estadoString = estado.getSelectedItem().toString();
-                cidadeString = cidade.getText().toString().toUpperCase();
-                cnpjString = cnpj.getText().toString().replace(".", "").replace("-", "").replace("/", "");
-                inscestadualString = inscestadual.getText().toString();
-                telefoneString = telefone.getText().toString();
-                telefoneAdicionalString = telefoneadicional.getText().toString();
-                faxString = fax.getText().toString();
-                nmcontatoString = contato.getText().toString().toUpperCase();
-                emailString = email.getText().toString().toUpperCase();
-                tipopessoaString = tipopessoa.getSelectedItem().toString().substring(0, 1);
-                tipoclienteString = tipocliente.getSelectedItem().toString();
-                obsclienteString = obscliente.getText().toString().toUpperCase();
-                dtultalteracao = getDateTime();
-                String dtcadastro = getDateTime();
-                resultado = "";
-                String vendedor = crud.selecionaVendedor();
+            return true;
+        }
 
-                if(botao.getText().toString().equals("Cadastrar")) {
-                    if (FU_Consiste("incluir")){
+        if(id == R.id.menu_salvar) {
 
-                            try {
-                                resultado = crud.inserirCliente(cnpjString, rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, vendedor, tipopessoaString, dtultalteracao, dtcadastro, "N", obsclienteString, classificacaoString, "", "");
-                                Toast.makeText(getApplicationContext(), "Cliente cadastrado com sucesso!", Toast.LENGTH_LONG).show();
-                                Intent secondActivity;
-                                secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
-                                startActivity(secondActivity);
-                            }catch (Exception e){
-                                //Toast.makeText(getApplicationContext(), "Não foi possivel realizar o cadastro do cliente.", Toast.LENGTH_LONG).show();
-                                MensagemUtil.addMsg(CadastroClientes.this, "Não foi possivel realizar o cadastro do cliente.");
+            suSalvarCliente();
 
-                            }
-                    }
-                }else{
+            return true;
+        }
+
+        if(id == R.id.menu_excluir){
+
+            suDeletarCliente();
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    protected void suSalvarCliente(){
+        if(vc_TipoOperacao.equals("I")){
+            BancoController crud = new BancoController(getBaseContext());
+
+            rzsocialString = rzsocial.getText().toString().toUpperCase();
+            nmfantasiaString = nmfantasia.getText().toString().toUpperCase();
+            cepString = cep.getText().toString();
+            enderecoString = endereco.getText().toString().toUpperCase();
+            classificacaoString = classificacao.getText().toString().toUpperCase();
+            numeroString = numero.getText().toString();
+            complementoString = complemento.getText().toString().toUpperCase();
+            bairroString = bairro.getText().toString().toUpperCase();
+            estadoString = estado.getSelectedItem().toString();
+            cidadeString = cidade.getText().toString().toUpperCase();
+            cnpjString = cnpj.getText().toString().replace(".", "").replace("-", "").replace("/", "");
+            inscestadualString = inscestadual.getText().toString();
+            telefoneString = telefone.getText().toString();
+            telefoneAdicionalString = telefoneadicional.getText().toString();
+            faxString = fax.getText().toString();
+            nmcontatoString = contato.getText().toString().toUpperCase();
+            emailString = email.getText().toString().toUpperCase();
+            tipopessoaString = tipopessoa.getSelectedItem().toString().substring(0, 1);
+            tipoclienteString = tipocliente.getSelectedItem().toString();
+            obsclienteString = obscliente.getText().toString().toUpperCase();
+            dtultalteracao = getDateTime();
+            String dtcadastro = getDateTime();
+            resultado = "";
+            String vendedor = crud.selecionaVendedor();
+
+            if(vc_TipoOperacao.equals("I")) {
+                if (FU_Consiste("incluir")){
+
                     try {
-                        resultado = crud.alterarCliente(Integer.parseInt(codigo), rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, tipopessoaString, dtultalteracao, obsclienteString, classificacaoString);
-                        Toast.makeText(getApplicationContext(), "Cliente alterado com sucesso!", Toast.LENGTH_LONG).show();
+                        resultado = crud.inserirCliente(cnpjString, rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, vendedor, tipopessoaString, dtultalteracao, dtcadastro, "N", obsclienteString, classificacaoString, "", "");
+                        Toast.makeText(getApplicationContext(), "Cliente cadastrado com sucesso!", Toast.LENGTH_LONG).show();
                         Intent secondActivity;
                         secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
                         startActivity(secondActivity);
-                        //resultado = crud.alteraRegistro(Integer.parseInt(codigo), rzsocial.getText().toString(),nmfantasia.getText().toString(), cnpj.getText().toString(), email.getText().toString(), telefone.getText().toString(), celular.getText().toString(), endereco.getText().toString(), complemento.getText().toString(), cep.getText().toString(), bairro.getText().toString(), cidade.getText().toString(), estado.getSelectedItem().toString(), tipopessoaString);
                     }catch (Exception e){
-                        Toast.makeText(getApplicationContext(), "Não foi possivel realizar a alteração do cadastro do cliente.", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Não foi possivel realizar o cadastro do cliente.", Toast.LENGTH_LONG).show();
+                        MensagemUtil.addMsg(CadastroClientes.this, "Não foi possivel realizar o cadastro do cliente.");
 
                     }
                 }
+            }else{
+                try {
+                    resultado = crud.alterarCliente(Integer.parseInt(codigo), rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, tipopessoaString, dtultalteracao, obsclienteString, classificacaoString);
+                    Toast.makeText(getApplicationContext(), "Cliente alterado com sucesso!", Toast.LENGTH_LONG).show();
+                    Intent secondActivity;
+                    secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
+                    startActivity(secondActivity);
+                    //resultado = crud.alteraRegistro(Integer.parseInt(codigo), rzsocial.getText().toString(),nmfantasia.getText().toString(), cnpj.getText().toString(), email.getText().toString(), telefone.getText().toString(), celular.getText().toString(), endereco.getText().toString(), complemento.getText().toString(), cep.getText().toString(), bairro.getText().toString(), cidade.getText().toString(), estado.getSelectedItem().toString(), tipopessoaString);
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(), "Não foi possivel realizar a alteração do cadastro do cliente.", Toast.LENGTH_LONG).show();
 
-            }
-        });
-
-        botaoAlterar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Button botao = (Button) findViewById(R.id.sc_alterar);
-                BancoController crud = new BancoController(getBaseContext());
-
-                /*EditText rzsocial = (EditText) findViewById(R.id.tb_rzsocial);
-                EditText nmfantasia = (EditText) findViewById(R.id.tb_nmfantasia);
-                EditText cnpj = (EditText) findViewById(R.id.tb_cnpj);
-
-                EditText email = (EditText) findViewById(R.id.tb_email);
-                EditText telefone = (EditText) findViewById(R.id.tb_telefone);
-                EditText celular = (EditText) findViewById(R.id.tb_telefoneadicional);
-
-                EditText endereco = (EditText) findViewById(R.id.tb_endereco);
-                EditText complemento = (EditText) findViewById(R.id.tb_complemento);
-                EditText cep = (EditText) findViewById(R.id.tb_cep);
-                EditText bairro = (EditText) findViewById(R.id.tb_bairro);
-                EditText cidade = (EditText) findViewById(R.id.tb_cidade);
-                Spinner estado = (Spinner) findViewById(R.id.tb_estado);
-                Spinner tipopessoa = (Spinner)findViewById(R.id.cb_tipopessoa);*/
-
-                rzsocialString = rzsocial.getText().toString().toUpperCase();
-                nmfantasiaString = nmfantasia.getText().toString().toUpperCase();
-                cepString = cep.getText().toString();
-                enderecoString = endereco.getText().toString().toUpperCase();
-                classificacaoString = classificacao.getText().toString().toUpperCase();
-                numeroString = numero.getText().toString();
-                complementoString = complemento.getText().toString().toUpperCase();
-                bairroString = bairro.getText().toString().toUpperCase();
-                estadoString = estado.getSelectedItem().toString();
-                cidadeString = cidade.getText().toString().toUpperCase();
-                cnpjString = cnpj.getText().toString().replace(".", "").replace("-", "").replace("/", "");
-                inscestadualString = inscestadual.getText().toString();
-                telefoneString = telefone.getText().toString();
-                telefoneAdicionalString = telefoneadicional.getText().toString();
-                faxString = fax.getText().toString();
-                nmcontatoString = contato.getText().toString().toUpperCase();
-                emailString = email.getText().toString().toUpperCase();
-                tipopessoaString = tipopessoa.getSelectedItem().toString().substring(0, 1);
-                tipoclienteString = tipocliente.getSelectedItem().toString();
-                obsclienteString = obscliente.getText().toString().toUpperCase();
-                dtultalteracao = getDateTime();
-                resultado = "";
-
-                if (FU_Consiste("alterar")){
-                    try {
-                        resultado = crud.alterarCliente(Integer.parseInt(codigo), rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, tipopessoaString, dtultalteracao, obsclienteString, classificacaoString);
-                        Toast.makeText(getApplicationContext(), "Cliente alterado com sucesso!", Toast.LENGTH_LONG).show();
-                        Intent secondActivity;
-                        secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
-                        startActivity(secondActivity);
-                        //resultado = crud.alteraRegistro(Integer.parseInt(codigo), rzsocial.getText().toString(),nmfantasia.getText().toString(), cnpj.getText().toString(), email.getText().toString(), telefone.getText().toString(), celular.getText().toString(), endereco.getText().toString(), complemento.getText().toString(), cep.getText().toString(), bairro.getText().toString(), cidade.getText().toString(), estado.getSelectedItem().toString(), tipopessoaString);
-                    }catch (Exception e){
-                        Toast.makeText(getApplicationContext(), "Não foi possivel realizar a alteração do cadastro do cliente.", Toast.LENGTH_LONG).show();
-
-                    }
                 }
-
             }
-        });
+        }else{
+            BancoController crud = new BancoController(getBaseContext());
+
+            rzsocialString = rzsocial.getText().toString().toUpperCase();
+            nmfantasiaString = nmfantasia.getText().toString().toUpperCase();
+            cepString = cep.getText().toString();
+            enderecoString = endereco.getText().toString().toUpperCase();
+            classificacaoString = classificacao.getText().toString().toUpperCase();
+            numeroString = numero.getText().toString();
+            complementoString = complemento.getText().toString().toUpperCase();
+            bairroString = bairro.getText().toString().toUpperCase();
+            estadoString = estado.getSelectedItem().toString();
+            cidadeString = cidade.getText().toString().toUpperCase();
+            cnpjString = cnpj.getText().toString().replace(".", "").replace("-", "").replace("/", "");
+            inscestadualString = inscestadual.getText().toString();
+            telefoneString = telefone.getText().toString();
+            telefoneAdicionalString = telefoneadicional.getText().toString();
+            faxString = fax.getText().toString();
+            nmcontatoString = contato.getText().toString().toUpperCase();
+            emailString = email.getText().toString().toUpperCase();
+            tipopessoaString = tipopessoa.getSelectedItem().toString().substring(0, 1);
+            tipoclienteString = tipocliente.getSelectedItem().toString();
+            obsclienteString = obscliente.getText().toString().toUpperCase();
+            dtultalteracao = getDateTime();
+            resultado = "";
+
+            if (FU_Consiste("alterar")){
+                try {
+                    resultado = crud.alterarCliente(Integer.parseInt(codigo), rzsocialString, nmfantasiaString, cepString, enderecoString, numeroString, complementoString, bairroString, estadoString, cidadeString, cnpjString, inscestadualString, telefoneString, telefoneAdicionalString, faxString, nmcontatoString, emailString, tipoclienteString, tipopessoaString, dtultalteracao, obsclienteString, classificacaoString);
+                    Toast.makeText(getApplicationContext(), "Cliente alterado com sucesso!", Toast.LENGTH_LONG).show();
+                    Intent secondActivity;
+                    secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
+                    startActivity(secondActivity);
+                    //resultado = crud.alteraRegistro(Integer.parseInt(codigo), rzsocial.getText().toString(),nmfantasia.getText().toString(), cnpj.getText().toString(), email.getText().toString(), telefone.getText().toString(), celular.getText().toString(), endereco.getText().toString(), complemento.getText().toString(), cep.getText().toString(), bairro.getText().toString(), cidade.getText().toString(), estado.getSelectedItem().toString(), tipopessoaString);
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(), "Não foi possivel realizar a alteração do cadastro do cliente.", Toast.LENGTH_LONG).show();
+
+                }
+            }
+        }
+    }
+
+    protected void suDeletarCliente(){
 
         builder = new AlertDialog.Builder(this);
 
-        botaoExcluir.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText tb_rzsocial = (EditText) findViewById(R.id.tb_rzsocial);
+        EditText tb_rzsocial = (EditText) findViewById(R.id.tb_rzsocial);
 
-                crud = new BancoController(getBaseContext());
-                //cursor = crud.carregaDadosById(Integer.parseInt(codigo));
+        crud = new BancoController(getBaseContext());
+        //cursor = crud.carregaDadosById(Integer.parseInt(codigo));
 
-                if (crud.verificaPedidoIdCliente(Integer.parseInt(codigo)).equals("S")) {
-                    MensagemUtil.addMsg(CadastroClientes.this, "Cliente se encontra associado a um pedido, não será possivel excluir o cliente!");
-                } else {
+        if (crud.verificaPedidoIdCliente(Integer.parseInt(codigo)).equals("S")) {
+            MensagemUtil.addMsg(CadastroClientes.this, "Cliente se encontra associado a um pedido, não será possivel excluir o cliente!");
+        } else {
 
 
-                    //define o titulo
+            //define o titulo
 
-                    builder.setTitle("Excluir Cliente");
-                    //define a mensagem
-                    builder.setMessage("Deseja mesmo excluir o cliente " + tb_rzsocial.getText().toString() + "?")
-                    ;
+            builder.setTitle("Excluir Cliente");
+            //define a mensagem
+            builder.setMessage("Deseja mesmo excluir o cliente " + tb_rzsocial.getText().toString() + "?")
+            ;
 
-                    //define um botão como positivo
-                    builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            //Toast.makeText(ManutencaoProdutoPedido.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
-                            try {
-                                BancoController crud = new BancoController(getBaseContext());
-                                crud.deletaCliente(Integer.parseInt(codigo));
-                                MensagemUtil.addMsg(CadastroClientes.this, "Cliente excluido com sucesso!");
-                                Intent secondActivity;
-                                secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
-                                startActivity(secondActivity);
-                            } catch (Exception e) {
-                                MensagemUtil.addMsg(CadastroClientes.this, "Não foi possivel excluir o cliente do pedido devido à seguinte situação:" + e.getMessage().toString());
-                            }
-                        }
-                    });
-                    //define um botão como negativo.
-                    builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            //Toast.makeText(ManutencaoProdutoPedido.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    //cria o AlertDialog
-                    alerta = builder.create();
-                    //Exibe
-                    alerta.show();
+            //define um botão como positivo
+            builder.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface arg0, int arg1) {
+                    //Toast.makeText(ManutencaoProdutoPedido.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
+                    try {
+                        BancoController crud = new BancoController(getBaseContext());
+                        crud.deletaCliente(Integer.parseInt(codigo));
+                        MensagemUtil.addMsg(CadastroClientes.this, "Cliente excluido com sucesso!");
+                        Intent secondActivity;
+                        secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
+                        startActivity(secondActivity);
+                    } catch (Exception e) {
+                        MensagemUtil.addMsg(CadastroClientes.this, "Não foi possivel excluir o cliente do pedido devido à seguinte situação:" + e.getMessage().toString());
+                    }
                 }
-            }
-        });
+            });
+            //define um botão como negativo.
+            builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface arg0, int arg1) {
+                    //Toast.makeText(ManutencaoProdutoPedido.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
+                }
+            });
+            //cria o AlertDialog
+            alerta = builder.create();
+            //Exibe
+            alerta.show();
+        }
+    }
 
-        botaoCancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent secondActivity;
-                secondActivity = new Intent(CadastroClientes.this, HomeActivity.class);
-                startActivity(secondActivity);
-            }
-        });
+    public void suBloquearCampos(boolean bloquear){
+
+        tipopessoa.setEnabled(bloquear);
+        rzsocial.setEnabled(bloquear);
+        nmfantasia.setEnabled(bloquear);
+        cep.setEnabled(bloquear);
+        endereco.setEnabled(bloquear);
+        classificacao.setEnabled(bloquear);
+        numero.setEnabled(bloquear);
+        complemento.setEnabled(bloquear);
+        bairro.setEnabled(bloquear);
+        estado.setEnabled(bloquear);
+        cidade.setEnabled(bloquear);
+        cnpj.setEnabled(bloquear);
+        telefone.setEnabled(bloquear);
+        telefoneadicional.setEnabled(bloquear);
+        fax.setEnabled(bloquear);
+        contato.setEnabled(bloquear);
+        email.setEnabled(bloquear);
+        tipocliente.setEnabled(bloquear);
+        obscliente.setEnabled(bloquear);
+        inscestadual.setEnabled(bloquear);
+
+        fab_SalvarCliente.setVisibility(View.GONE);
+
     }
 
     public boolean FU_Consiste(String comando){

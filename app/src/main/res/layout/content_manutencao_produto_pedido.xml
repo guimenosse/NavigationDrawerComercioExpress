@@ -113,7 +113,6 @@
             android:singleLine="true"
             android:padding="10dip"
             android:textColor="@color/black"
-            android:selectAllOnFocus="true"
             android:textCursorDrawable="@drawable/cursor"
             />
 
@@ -140,40 +139,8 @@
             android:singleLine="true"
             android:padding="10dip"
             android:textColor="@color/black"
-            android:selectAllOnFocus="true"
             android:textCursorDrawable="@drawable/cursor"
             />
-
-
-        <Button android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_excluir"
-        android:id="@+id/sc_excluirProduto"
-        android:layout_below="@+id/tb_descontoProdutoManutencao"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="15dp"
-        android:layout_alignRight="@+id/tb_valorUnitarioManutencao"
-        android:layout_alignEnd="@+id/tb_valorUnitarioManutencao"
-        android:layout_gravity="center"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:background="@drawable/estilo_botao_excluir"/>
-
-        <Button android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_cancelar"
-            android:id="@+id/sc_cancelar"
-            android:layout_below="@+id/sc_excluirProduto"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="15dp"
-            android:layout_alignRight="@+id/tb_valorUnitarioManutencao"
-            android:layout_alignEnd="@+id/tb_valorUnitarioManutencao"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:background="@drawable/estilo_botao"/>
 
     </RelativeLayout>
 </ScrollView>

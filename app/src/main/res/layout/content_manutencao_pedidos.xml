@@ -1,339 +1,372 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_manutencao_pedidos"
     tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos"
     android:focusable="true"
+    android:orientation="vertical"
+    android:fillViewport="true"
     android:focusableInTouchMode="true"
+    android:background="@color/corBranca"
      >
 
-    <RelativeLayout android:layout_width="fill_parent"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/la_Cliente"
+            android:layout_width="match_parent"
+            android:layout_height="90sp"
+            android:background="@drawable/layoutsecaocliente"
+            android:layout_marginTop="0sp"
+            android:orientation="horizontal">
 
+            <ImageView
+                android:id="@+id/img_SelecionarCliente"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:textAlignment="center"
+                android:layout_marginLeft="20sp"
+                android:padding="5sp"
+                android:src="@drawable/ic_cliente_branco"
+                android:gravity="center_vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/lb_SelecionarClienteResultado"
+                android:layout_width="match_parent"
+                android:layout_height="90sp"
+                android:layout_centerVertical="true"
+                android:text="@string/campo_lb_selecionarcliente"
+                android:textColor="@color/corBranca"
+                android:layout_marginLeft="70sp"
+                android:textSize="16sp"
+                android:gravity="center_vertical"
+                android:layout_marginRight="60sp"
+                app:layout_constraintStart_toEndOf="@+id/img_SelecionarCliente"
+                app:layout_constraintTop_toTopOf="@+id/img_SelecionarCliente"
+                />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_AddClienteVenda"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabCustomSize="55sp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="-10dp"
+                android:layout_marginRight="5dp"
+                android:backgroundTint="@color/azulEscuroNovaIdentidade"
+                app:borderWidth="0dp"
+                android:contentDescription="Teste"
+                app:fab_colorNormal="@color/corCinza"
+                app:srcCompat="@drawable/ic_venda_cliente"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/lb_SelecionarClienteResultado"
+                app:layout_constraintStart_toEndOf="@+id/lb_SelecionarClienteResultado"
+                app:layout_constraintTop_toTopOf="@+id/lb_SelecionarClienteResultado"
+                />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/la_Produto"
+            android:layout_width="match_parent"
+            android:layout_height="90sp"
+            android:background="@drawable/layoutsecaoproduto"
+            android:layout_marginTop="0sp"
+            android:layout_below="@+id/la_Cliente"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/img_SelecionarProduto"
+                android:layout_width="wrap_content"
+                android:layout_height="90sp"
+                android:textAlignment="center"
+                android:layout_marginLeft="20sp"
+                android:padding="5sp"
+                android:src="@drawable/ic_produto_branco"
+                android:gravity="center_vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/lb_SelecionarProdutoResultado"
+                android:layout_width="match_parent"
+                android:layout_height="90sp"
+                android:layout_centerVertical="true"
+                android:text="@string/campo_lb_selecionarproduto"
+                android:textColor="@color/corBranca"
+                android:layout_marginLeft="70sp"
+                android:textSize="16sp"
+                android:gravity="center_vertical"
+                android:layout_marginRight="60sp"
+                app:layout_constraintStart_toEndOf="@+id/img_SelecionarProduto"
+                app:layout_constraintTop_toTopOf="@+id/img_SelecionarProduto"
+                />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_AddProdutoVenda"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabCustomSize="55sp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="-10dp"
+                android:layout_marginRight="5dp"
+                android:backgroundTint="@color/corVerdeMuitoTransparente"
+                app:borderWidth="0dp"
+                android:contentDescription="Teste"
+                app:fab_colorNormal="@color/corCinza"
+                app:srcCompat="@drawable/ic_adicionar_produto"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/lb_SelecionarProdutoResultado"
+                app:layout_constraintStart_toEndOf="@+id/lb_SelecionarProdutoResultado"
+                app:layout_constraintTop_toTopOf="@+id/lb_SelecionarProdutoResultado"
+                />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <RelativeLayout
+            android:id="@+id/la_ListaProdutos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/la_Produto"
+            android:visibility="gone"
+            android:background="@drawable/layoutsecaolistaproduto">
 
 
             <TextView
+                android:id="@+id/lb_ocultarProdutos"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:gravity="center"
+                android:layout_height="50sp"
+                android:layout_marginLeft="15sp"
+                android:gravity="center_vertical"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text=""
-                android:textColor="@color/white"
-                android:id="@+id/lb_rzsocialClientePedidos"
-                android:background="@color/white"
-                android:layout_alignParentTop="true"
+                android:text="@string/campo_mostrarprodutos"
+                android:enabled="true"
+                android:textColor="@color/corBranca"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"/>
 
-        <ImageView
-            android:id="@+id/imageView1"
-            android:padding="-5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/lb_rzsocialClientePedidos"
-            android:layout_alignBottom="@+id/lb_rzsocialClientePedidos"
-            android:layout_alignLeft="@+id/lb_rzsocialClientePedidos"
-            android:src="@drawable/ic_action"
-            android:background="@color/cor_botao"
-            />
+            <TextView
+                android:id="@+id/lb_valorTotalProdutos"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="190dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Total: R$"
+                android:enabled="false"
+                android:textColor="@color/corBranca"
+                android:layout_alignTop="@+id/lb_ocultarProdutos"
+                android:layout_alignBottom="@+id/lb_ocultarProdutos"
+                android:layout_alignRight="@+id/lb_ocultarProdutos"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"/>
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Toque para selecionar um cliente..."
-            android:textColor="@color/black"
-            android:id="@+id/lb_rzsocialClientePedidosTeste"
-            android:layout_alignTop="@+id/lb_rzsocialClientePedidos"
-            android:layout_alignBottom="@+id/lb_rzsocialClientePedidos"
-            android:layout_alignLeft="@+id/lb_rzsocialClientePedidos"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text=""
-            android:layout_marginTop="10dp"
-            android:textColor="@color/black"
-            android:enabled="false"
-            android:id="@+id/lb_descricaoProdutoPedidos"
-            android:background="@color/white"
-            android:layout_below="@+id/lb_rzsocialClientePedidos"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <ImageView
-            android:id="@+id/imageViewProduto"
-            android:padding="-5dp"
-            android:enabled="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/lb_descricaoProdutoPedidos"
-            android:layout_alignBottom="@+id/lb_descricaoProdutoPedidos"
-            android:layout_alignLeft="@+id/lb_descricaoProdutoPedidos"
-            android:src="@drawable/ic_action_plus"
-            android:background="@color/verde_claro"
-            />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="60dp"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Adicionar Produto"
-            android:enabled="false"
-            android:textColor="@color/black"
-            android:id="@+id/lb_descricaoProdutoPedidosTeste"
-            android:layout_alignTop="@+id/lb_descricaoProdutoPedidos"
-            android:layout_alignBottom="@+id/lb_descricaoProdutoPedidos"
-            android:layout_alignLeft="@+id/lb_descricaoProdutoPedidos"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <Button android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Selecionar cliente"
-            android:id="@+id/sc_selecionarcliente"
-            android:layout_below="@+id/lb_rzsocialClientePedidos"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="5dp"
-            android:visibility="invisible"
-            android:layout_alignRight="@+id/tb_bairro"
-            android:layout_alignEnd="@+id/tb_bairro"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:background="@drawable/estilo_botao"/>
-
-        <Button android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Selecionar produto"
-            android:id="@+id/sc_selecionarprodutos"
-            android:layout_below="@+id/lb_descricaoProdutoPedidos"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="5dp"
-            android:visibility="invisible"
-            android:layout_alignRight="@+id/tb_bairro"
-            android:layout_alignEnd="@+id/tb_bairro"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:background="@drawable/estilo_botao"/>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text=""
-            android:layout_marginTop="10dp"
-            android:textColor="@color/black"
-            android:enabled="false"
-            android:id="@+id/lb_fundoOcultarProdutos"
-            android:background="@color/white"
-            android:layout_below="@+id/lb_descricaoProdutoPedidos"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Mostrar Produtos"
-            android:enabled="true"
-            android:textColor="@color/black"
-            android:id="@+id/lb_ocultarProdutos"
-            android:layout_alignTop="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignBottom="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignLeft="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="190dp"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Total: R$"
-            android:enabled="false"
-            android:textColor="@color/black"
-            android:id="@+id/lb_valorTotalProdutos"
-            android:layout_alignTop="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignBottom="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignRight="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="5dp"/>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="190dp"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Qtde: "
-            android:enabled="false"
-            android:textColor="@color/black"
-            android:id="@+id/lb_qtdeTotalProdutos"
-            android:layout_alignTop="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignBottom="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignRight="@+id/lb_fundoOcultarProdutos"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="25dp"/>
+            <TextView
+                android:id="@+id/lb_qtdeTotalProdutos"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="190dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Qtde: "
+                android:enabled="false"
+                android:textColor="@color/corBranca"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="10sp"
+                android:layout_marginTop="25dp"/>
 
 
             <ListView
+                android:id="@+id/listViewItemPedidos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/listViewItemPedidos"
-                android:layout_below="@+id/lb_fundoOcultarProdutos"
+                android:layout_below="@+id/lb_ocultarProdutos"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="5dp"
-                android:visibility="invisible"
-                android:background="@color/white" />
+                android:layout_marginTop="25sp"
+                android:layout_marginLeft="15sp"
+                android:layout_marginRight="15sp"
+                android:layout_marginBottom="15sp"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
 
         <TextView
+            android:id="@+id/lb_dtEmissao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Data de Emissão: "
-            android:textSize="14dp"
-            android:id="@+id/tb_dtemissao"
+            android:text="@string/campo_dtemissao"
+            android:textSize="16sp"
+            android:layout_marginLeft="15sp"
             android:textColor="@color/cor_teste"
-            android:layout_below="@+id/listViewItemPedidos"
+            android:layout_below="@+id/la_ListaProdutos"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="15dp" />
 
         <TextView
+            android:id="@+id/lb_dtEmissaoResultado"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text=""
-            android:id="@+id/tb_dtemissaoResultado"
-            android:textColor="@color/black"
-            android:layout_below="@+id/listViewItemPedidos"
-            android:layout_alignTop="@+id/tb_dtemissao"
-            android:layout_alignBottom="@+id/tb_dtemissao"
-            android:layout_marginTop="-5dp"
+            android:textColor="@color/cor_teste"
+            android:layout_marginTop="-2sp"
             android:enabled="false"
-            android:layout_marginLeft="120dp"/>
+            android:textSize="18sp"
+            android:layout_toEndOf="@+id/lb_dtEmissao"
+            android:layout_alignBottom="@+id/lb_dtEmissao"
+            android:layout_alignTop="@+id/lb_dtEmissao"
+            android:layout_marginLeft="5sp"/>
 
         <TextView
+            android:id="@+id/lb_vlDesconto"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Valor do Desconto: "
-            android:textSize="14dp"
-            android:id="@+id/lb_vldescontoPedido"
+            android:text="@string/campo_vldescontopedido"
+            android:textSize="16sp"
+            android:layout_marginLeft="15sp"
             android:textColor="@color/cor_teste"
-            android:layout_below="@+id/tb_dtemissao"
+            android:layout_below="@+id/lb_dtEmissao"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="15dp" />
 
-        <EditText android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/tb_vlDesconto"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tb_vldescontoPedido"
-            android:inputType="numberDecimal"
-            android:layout_below="@+id/lb_vldescontoPedido"
+            android:inputType="number"
+            android:layout_below="@+id/lb_vlDesconto"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp"
             android:singleLine="true"
             android:padding="10dip"
             android:textColor="@color/black"
-            android:enabled="false"
-            android:selectAllOnFocus="true"
             android:textCursorDrawable="@drawable/cursor"
             />
 
         <TextView
+            android:id="@+id/lb_percDesconto"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Desconto (%): "
             android:textSize="14dp"
-            android:id="@+id/lb_percdescontoPedido"
             android:textColor="@color/cor_teste"
-            android:layout_below="@+id/tb_vldescontoPedido"
+            android:layout_below="@+id/lb_vlDesconto"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:visibility="invisible"
+            android:visibility="gone"
             android:layout_marginTop="15dp" />
 
-        <EditText android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/tb_percDesconto"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tb_percdescontoPedido"
             android:inputType="numberDecimal"
-            android:layout_below="@+id/lb_percdescontoPedido"
+            android:layout_below="@+id/lb_percDesconto"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp"
             android:singleLine="true"
             android:padding="10dip"
             android:textColor="@color/black"
-            android:enabled="false"
-            android:visibility="invisible"
-            android:selectAllOnFocus="true"
+            android:visibility="gone"
             android:textCursorDrawable="@drawable/cursor"
             />
 
         <TextView
+            android:id="@+id/lb_vlFrete"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Condição de Pagamento: "
-            android:textSize="14dp"
-            android:id="@+id/lb_condPgto"
+            android:text="@string/campo_vlfrete"
+            android:textSize="16sp"
+            android:layout_marginLeft="15sp"
             android:textColor="@color/cor_teste"
-            android:layout_below="@+id/tb_vldescontoPedido"
+            android:layout_below="@+id/tb_vlDesconto"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="15dp" />
 
-        <EditText android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/tb_vlFrete"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:inputType="number"
+            android:layout_below="@+id/lb_vlFrete"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp"
+            android:singleLine="true"
+            android:padding="10dip"
+            android:textColor="@color/black"
+            android:textCursorDrawable="@drawable/cursor"
+            />
+
+        <TextView
+            android:id="@+id/lb_condPgto"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/campo_condpagamento"
+            android:textSize="16sp"
+            android:layout_marginLeft="15sp"
+            android:textColor="@color/cor_teste"
+            android:layout_below="@+id/tb_vlFrete"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="15dp" />
+
+        <EditText
             android:id="@+id/tb_condPgto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:inputType="textCapSentences"
             android:layout_below="@+id/lb_condPgto"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp"
             android:singleLine="true"
             android:padding="10dip"
             android:textColor="@color/black"
-            android:enabled="false"
             android:textCursorDrawable="@drawable/cursor"
             />
 
         <TextView
+            android:id="@+id/lb_obsPedido"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Observação do Pedido: "
-            android:textSize="14dp"
-            android:id="@+id/lb_obsPedido"
+            android:text="@string/campo_observacaopedido"
+            android:textSize="16sp"
+            android:layout_marginLeft="15sp"
             android:textColor="@color/cor_teste"
             android:layout_below="@+id/tb_condPgto"
             android:layout_alignParentLeft="true"
@@ -341,36 +374,55 @@
             android:layout_marginTop="15dp" />
 
 
-        <EditText android:layout_width="wrap_content"
-            android:layout_height="150dp"
+        <EditText
             android:id="@+id/tb_obsPedido"
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"
             android:gravity="top"
-            android:inputType="textMultiLine"
+            android:inputType="textCapSentences|textMultiLine"
             android:layout_below="@+id/lb_obsPedido"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp"
             android:padding="10dip"
             android:textColor="@color/black"
-            android:enabled="false"
             android:textCursorDrawable="@drawable/cursor"
 
             />
 
         <TextView
+            android:id="@+id/lb_valorTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Total Liquido do Pedido: R$ 0,00"
-            android:textSize="14dp"
-            android:id="@+id/lb_valorTotal"
+            android:text="@string/campo_vltotalpedido"
+            android:textSize="16sp"
+            android:layout_marginLeft="15sp"
             android:textColor="@color/cor_teste"
             android:layout_below="@+id/tb_obsPedido"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="15dp" />
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15sp"/>
 
+        <TextView
+            android:id="@+id/lb_vlTotalResultado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="R$0,00"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_toEndOf="@+id/lb_valorTotal"
+            android:layout_alignBottom="@+id/lb_valorTotal"
+            android:layout_alignTop="@+id/lb_valorTotal"
+            android:layout_marginTop="-7sp"
+            android:layout_marginLeft="10sp"
+            android:enabled="false"/>
 
     </RelativeLayout>
 
