@@ -48,6 +48,22 @@ public class MDL_Usuario {
         return nmusuarioSistema;
     }
 
+    public String fuSelecionarFilial(){
+        Cursor cursor;
+        String[] campos = {banco.ID, banco.FILIAL};
+        db = banco.getReadableDatabase();
+        cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
+        String vf_Filial = "";
+        if(cursor!=null){
+            cursor.moveToFirst();
+            vf_Filial = cursor.getString(cursor.getColumnIndex(CriaBanco.FILIAL));
+        }
+
+        cursor.close();
+        db.close();
+        return vf_Filial;
+    }
+
     public Cursor fuSelecionarVendedor(){
         Cursor cursor;
         String[] campos = {banco.ID, banco.CDVENDEDORDEFAULT};

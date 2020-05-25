@@ -311,7 +311,7 @@ public class MDL_Pedidos {
 
         boolean validou = false;
         try {
-            String[] campos = {banco.ID, banco.DTEMISSAO, banco.VLDESCONTO, banco.VLTOTAL};
+            String[] campos = {banco.ID, banco.FGSITUACAO, banco.DTEMISSAO, banco.VLDESCONTO, banco.VLTOTAL};
             db = banco.getReadableDatabase();
             String where = "substr(" + banco.DTEMISSAO + ", 1, 10)" + " = '" + data + "'";
             rs_Pedido = db.query(banco.TABELAMESTREPEDIDO, campos, where, null, null, null, null);
@@ -378,7 +378,7 @@ public class MDL_Pedidos {
             Cursor cursor;
             String[] campos = {banco.ID, banco.DTEMISSAO, banco.FGSITUACAO, banco.VLDESCONTO, banco.VLTOTAL};
             db = banco.getReadableDatabase();
-            String where = banco.DTEMISSAO + " BETWEEN '" + dataInicial + "' AND '" + dataFinal + "";
+            String where = banco.DTEMISSAO + " BETWEEN '" + dataInicial + "' AND '" + dataFinal + "'";
             rs_Pedido = db.query(banco.TABELAMESTREPEDIDO, campos, where, null, null, null, null);
 
             if (rs_Pedido != null) {

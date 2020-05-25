@@ -79,7 +79,7 @@
 
                 <TextView
                     android:id="@+id/lb_vlVendaBruta"
-                    android:layout_width="100dp"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@+id/img_movimentacaoDiaria"
                     android:layout_alignBottom="@+id/img_movimentacaoDiaria"
@@ -105,7 +105,7 @@
 
                 <TextView
                     android:id="@+id/lb_vlDescontosVenda"
-                    android:layout_width="100dp"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@+id/img_movimentacaoDiaria"
                     android:layout_alignBottom="@+id/img_movimentacaoDiaria"
@@ -131,7 +131,7 @@
 
                 <TextView
                     android:id="@+id/lb_vlVendaLiquida"
-                    android:layout_width="100dp"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@+id/img_movimentacaoDiaria"
                     android:layout_alignBottom="@+id/img_movimentacaoDiaria"
@@ -189,7 +189,7 @@
         <RelativeLayout
             android:id="@+id/layout_demonstrativoTiposVendaBackground"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="260dp"
             android:layout_below="@+id/layout_movimentacaoDiariaBackground"
             android:alpha="0.1"
             android:background="@drawable/layoutstyletiposvenda">
@@ -199,9 +199,9 @@
         <RelativeLayout
             android:id="@+id/layout_demonstrativoTiposVenda"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="260dp"
             android:layout_below="@+id/layout_demonstrativoTiposVendaBackground"
-            android:layout_marginTop="-220dp">
+            android:layout_marginTop="-260dp">
 
             <RelativeLayout
                 android:id="@+id/la_Datas"
@@ -249,7 +249,7 @@
                     android:id="@+id/lb_DatasSelecionadas"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="5dp"
                     android:gravity="center_horizontal"
                     android:text="Período: 01/01/2020 até 01/12/2020"
@@ -271,9 +271,9 @@
 
                 <TextView
                     android:id="@+id/lb_quantidadeTipoVendaAbertos"
-                    android:layout_width="225dp"
+                    android:layout_width="230dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="0dp"
+                    android:layout_marginLeft="-20dp"
                     android:layout_marginTop="0dp"
                     android:text="@string/label_quantidade_tipovenda_pedido"
                     android:textAlignment="viewEnd"
@@ -295,10 +295,10 @@
 
                 <TextView
                     android:id="@+id/lb_quantidadeTipoVendaCancelados"
-                    android:layout_width="225dp"
+                    android:layout_width="230dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/lb_quantidadeTipoVendaAbertos"
-                    android:layout_marginLeft="0dp"
+                    android:layout_marginLeft="-20dp"
                     android:layout_marginTop="5dp"
                     android:text="@string/label_quantidade_tipovenda_cancelados_pedidos"
                     android:textAlignment="viewEnd"
@@ -319,16 +319,42 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/lb_vlDescontoTipoVenda"
-                    android:layout_width="225dp"
+                    android:id="@+id/lb_quantidadeTipoVendaEnviados"
+                    android:layout_width="230dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/lb_quantidadeTipoVendaCancelados"
-                    android:layout_marginLeft="0dp"
+                    android:layout_marginLeft="-20dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/label_quantidade_tipovenda_enviados_pedidos"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_quantidadeTipoVendaEnviadosResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_quantidadeTipoVendaEnviados"
+                    android:layout_alignBottom="@+id/lb_quantidadeTipoVendaEnviados"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_quantidadeTipoVendaEnviados"
+                    android:text="2 pedidos"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_vlDescontoTipoVenda"
+                    android:layout_width="230dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lb_quantidadeTipoVendaEnviados"
+                    android:layout_marginLeft="-20dp"
                     android:layout_marginTop="5dp"
                     android:text="@string/label_valordescontos_tipovenda"
                     android:textAlignment="viewEnd"
                     android:textColor="@color/corCinzaEscuro"
-                    android:textSize="14dp" />
+                    android:textSize="14dp"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/lb_vlDescontoTipoVendaResultado"
@@ -341,14 +367,15 @@
                     android:text="R$ 230,00"
                     android:textColor="@color/corCinzaEscuro"
                     android:textSize="14dp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/lb_vlTotalTipoVenda"
-                    android:layout_width="225dp"
+                    android:layout_width="230dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/lb_vlDescontoTipoVenda"
-                    android:layout_marginLeft="0dp"
+                    android:layout_marginLeft="-20dp"
                     android:layout_marginTop="5dp"
                     android:text="Valor total dos pedidos em aberto:"
                     android:textAlignment="viewEnd"
@@ -363,6 +390,56 @@
                     android:layout_alignBottom="@+id/lb_vlTotalTipoVenda"
                     android:layout_marginLeft="10dp"
                     android:layout_toEndOf="@+id/lb_vlTotalTipoVenda"
+                    android:text="R$ 1500,00"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_vlTotalTipoVendaCancelados"
+                    android:layout_width="230dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lb_vlTotalTipoVenda"
+                    android:layout_marginLeft="-20dp"
+                    android:layout_marginTop="5dp"
+                    android:text="Valor total dos pedidos cancelados:"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_vlTotalTipoVendaCanceladosResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_vlTotalTipoVendaCancelados"
+                    android:layout_alignBottom="@+id/lb_vlTotalTipoVendaCancelados"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_vlTotalTipoVendaCancelados"
+                    android:text="R$ 1500,00"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lb_vlTotalTipoVendaEnviados"
+                    android:layout_width="230dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lb_vlTotalTipoVendaCancelados"
+                    android:layout_marginLeft="-20dp"
+                    android:layout_marginTop="5dp"
+                    android:text="Valor total dos pedidos enviados:"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corCinzaEscuro"
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/lb_vlTotalTipoVendaEnviadosResultado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/lb_vlTotalTipoVendaEnviados"
+                    android:layout_alignBottom="@+id/lb_vlTotalTipoVendaEnviados"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/lb_vlTotalTipoVendaEnviados"
                     android:text="R$ 1500,00"
                     android:textColor="@color/corCinzaEscuro"
                     android:textSize="14dp"

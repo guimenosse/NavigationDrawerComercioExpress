@@ -19,7 +19,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_pedidos"
+        app:headerLayout="@layout/nav_header_visao_geral_nova"
         app:menu="@menu/activity_pedidos_drawer"
         app:itemTextColor="@color/corCinzaEscuro"
         app:itemIconTint="@color/corCinzaEscuro"/>

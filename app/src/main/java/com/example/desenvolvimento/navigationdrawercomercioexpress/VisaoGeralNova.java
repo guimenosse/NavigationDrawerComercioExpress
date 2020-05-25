@@ -32,6 +32,7 @@ import classes.CL_Pedidos;
 import classes.CL_VisaoGeral;
 import controllers.CTL_Pedidos;
 import controllers.CTL_VisaoGeral;
+import models.MDL_Usuario;
 
 public class VisaoGeralNova extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -59,7 +60,9 @@ public class VisaoGeralNova extends AppCompatActivity
 
     //Instancia das labels que apresentarão os resultados do tipo de venda
     TextView lb_QuantidadeTipoVendaAbertos, lb_QuantidadeTipoVendaCancelados, lb_VlTotalTipoVenda;
-    TextView lb_QuantidadeTipoVendaAbertosResultado, lb_QuantidadeTipoVendaCanceladosResultado, lb_VlDescontoTipoVendaResultado, lb_VlTotalTipoVendaResultado;
+    TextView lb_QuantidadeTipoVendaAbertosResultado, lb_QuantidadeTipoVendaCanceladosResultado, lb_VlDescontoTipoVendaResultado,
+            lb_VlTotalTipoVendaResultado, lb_quantidadeTipoVendaEnviadosResultado,
+            lb_vlTotalTipoVendaCanceladosResultado, lb_vlTotalTipoVendaEnviadosResultado;
 
     //Instancia da label do estoque.
     TextView lb_ProdutosAtencao;
@@ -115,6 +118,29 @@ public class VisaoGeralNova extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        try {
+            View view = navigationView.getHeaderView(0);
+
+            TextView lb_NomeVendedor = (TextView) view.findViewById(R.id.lb_NomeVendedor);
+            TextView lb_EmailVendedor = (TextView) view.findViewById(R.id.lb_EmailVendedor);
+
+            MDL_Usuario mdl_Usuario = new MDL_Usuario(getApplicationContext());
+
+            String vf_NmUsuario = mdl_Usuario.fuSelecionarNmUsuarioSistema();
+            String vf_Filial = mdl_Usuario.fuSelecionarFilial();
+
+            try {
+                lb_NomeVendedor.setText(vf_NmUsuario);
+                lb_EmailVendedor.setText(vf_Filial);
+            } catch (Exception e) {
+                lb_NomeVendedor.setText("");
+                lb_EmailVendedor.setText("");
+            }
+        }catch (Exception e){
+            String teste = e.getMessage();
+            String teste2  = teste;
+        }
 
         fu_InstanciarCampos();
 
@@ -279,8 +305,13 @@ public class VisaoGeralNova extends AppCompatActivity
 
         lb_QuantidadeTipoVendaAbertosResultado = (TextView)findViewById(R.id.lb_quantidadeTipoVendaAbertosResultado);
         lb_QuantidadeTipoVendaCanceladosResultado = (TextView)findViewById(R.id.lb_quantidadeTipoVendaCanceladosResultado);
+        lb_quantidadeTipoVendaEnviadosResultado = (TextView)findViewById(R.id.lb_quantidadeTipoVendaEnviadosResultado);
         lb_VlDescontoTipoVendaResultado = (TextView)findViewById(R.id.lb_vlDescontoTipoVendaResultado);
         lb_VlTotalTipoVendaResultado = (TextView)findViewById(R.id.lb_vlTotalTipoVendaResultado);
+
+        lb_vlTotalTipoVendaCanceladosResultado = (TextView)findViewById(R.id.lb_vlTotalTipoVendaCanceladosResultado);
+        lb_vlTotalTipoVendaEnviadosResultado = (TextView)findViewById(R.id.lb_vlTotalTipoVendaEnviadosResultado);
+
         //----------------------------------------------------------------------------------------
 
         //Campos da seção de produtos-------------------------------------------------------------
@@ -418,6 +449,12 @@ public class VisaoGeralNova extends AppCompatActivity
         lb_DatasSelecionadas.setVisibility(View.VISIBLE);
         lb_DatasSelecionadas.setText("Período: " + cl_VisaoGeral.getDataInicial() +  " até " + cl_VisaoGeral.getDataFinal() + "");
 
+
+        Calendar c = vc_MyCalendar;
+        c.add(Calendar.DATE, 1);
+
+        cl_VisaoGeral.setDataFinal(sdf.format(c.getTime()));
+
         fu_CalcularResultadosTipoVenda();
     }
 
@@ -455,24 +492,41 @@ public class VisaoGeralNova extends AppCompatActivity
                 lb_QuantidadeTipoVendaAbertosResultado.setText(String.valueOf(cl_VisaoGeral.getCountTipoVenda()) + " pedido");
 
                 if (cl_VisaoGeral.getCountTipoVenda() != 1) {
-                    lb_QuantidadeTipoVendaAbertosResultado.setText(lb_QuantidadeTipoVendaAbertosResultado.getText() + " pedidos");
+                    lb_QuantidadeTipoVendaAbertosResultado.setText(lb_QuantidadeTipoVendaAbertosResultado.getText() + "s");
                 }
 
                 lb_QuantidadeTipoVendaCanceladosResultado.setText(cl_VisaoGeral.getCountCanceladosTipoVenda() + " pedido");
 
-                if (cl_VisaoGeral.getCountTipoVenda() != 1) {
-                    lb_QuantidadeTipoVendaCanceladosResultado.setText(lb_QuantidadeTipoVendaCanceladosResultado.getText() + " pedidos");
+                if (cl_VisaoGeral.getCountCanceladosTipoVenda() != 1) {
+                    lb_QuantidadeTipoVendaCanceladosResultado.setText(lb_QuantidadeTipoVendaCanceladosResultado.getText() + "s");
+                }
+
+                lb_quantidadeTipoVendaEnviadosResultado.setText(cl_VisaoGeral.getCountEnviadosTipoVenda() + " pedido");
+
+                if (cl_VisaoGeral.getCountEnviadosTipoVenda() != 1) {
+                    lb_quantidadeTipoVendaEnviadosResultado.setText(lb_quantidadeTipoVendaEnviadosResultado.getText() + "s");
                 }
 
                 lb_VlDescontoTipoVendaResultado.setText("R$ " + String.format("%.2f", cl_VisaoGeral.getVlDescontoTipoVenda()) + "");
                 String vf_VlTotalTipoVenda = String.format("%.2f", cl_VisaoGeral.getVlTotalTipoVenda());
                 lb_VlTotalTipoVendaResultado.setText("R$ " + vf_VlTotalTipoVenda + "");
 
+                //lb_vlTotalTipoVendaCanceladosResultado, lb_vlTotalTipoVendaEnviadosResultado
+                String vl_VlTotalCancelados = String.format("%.2f", cl_VisaoGeral.getVlTotalCancelados());
+                lb_vlTotalTipoVendaCanceladosResultado.setText("R$ " + vl_VlTotalCancelados + "");
+                String vf_VlTotalEnviados = String.format("%.2f", cl_VisaoGeral.getVlTotalEnviados());
+                lb_vlTotalTipoVendaEnviadosResultado.setText("R$ " + vf_VlTotalEnviados + "");
+
+
+
             } else {
                 lb_QuantidadeTipoVendaAbertosResultado.setText("0 pedidos");
                 lb_QuantidadeTipoVendaCanceladosResultado.setText("0 pedidos");
+                lb_quantidadeTipoVendaEnviadosResultado.setText("0 pedidos");
                 lb_VlDescontoTipoVendaResultado.setText("R$ 0,00");
                 lb_VlTotalTipoVendaResultado.setText("R$ 0,00");
+                lb_vlTotalTipoVendaCanceladosResultado.setText("R$ 0,00");
+                lb_vlTotalTipoVendaEnviadosResultado.setText("R$ 0,00");
                 MensagemUtil.addMsg(VisaoGeralNova.this, getString(R.string.mensagem_visaogeral_falhacarregamentopedidos) + vf_TipoVenda + "s");
             }
 

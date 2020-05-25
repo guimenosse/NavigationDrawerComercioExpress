@@ -112,7 +112,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
             HttpClient httpclient = new DefaultHttpClient(ccm, p);
             String url = "http://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + vc_CdClienteBanco
-                    + "&format=json&num=10&method=inserirpedido&vltotal=" + cl_Pedidos.getVlTotal().replace(".", ",")
+                    + "&format=json&num=10&method=inserirpedidofrete&vltotal=" + cl_Pedidos.getVlTotal().replace(".", ",")
                     + "&dtemissao=" + cl_Pedidos.getDtEmissao().replace(" ", "espaco") + ""
                     + "&cdvendedor=" + cl_Pedidos.getCdVendedor() + "&cdemitente=" + cl_Pedidos.getCdCliente()
                     + "&rzsocial=" + cl_Pedidos.getNomeRzSocial().replace(" ", "espaco")
@@ -361,7 +361,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                     HttpClient httpclient = new DefaultHttpClient(ccm, p);
                     String url = "http://www.planosistemas.com.br/" +
                             "WebService2.php?user=" + vc_CdClienteBanco
-                            + "&format=json&num=10&method=inserirpedido&vltotal=" + cl_Pedidos.getVlTotal()
+                            + "&format=json&num=10&method=inserirpedidofrete&vltotal=" + cl_Pedidos.getVlTotal()
                             + "&dtemissao=" + cl_Pedidos.getDtEmissao() + ""
                             + "&cdvendedor=" + cl_Pedidos.getCdVendedor() + "&cdemitente=" + cl_Pedidos.getCdCliente() + "&rzsocial=" + cl_Pedidos.getNomeRzSocial()
                             + "&percdesconto=" + cl_Pedidos.getPercDesconto() + "&vldesconto=" + cl_Pedidos.getVlDesconto() + ""

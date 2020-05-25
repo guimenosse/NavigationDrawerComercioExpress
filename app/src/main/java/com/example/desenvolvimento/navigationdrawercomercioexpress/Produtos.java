@@ -30,6 +30,8 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.MDL_Usuario;
+
 public class Produtos extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     int VA_ContProdutos;
@@ -61,6 +63,29 @@ public class Produtos extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        try {
+            View view = navigationView.getHeaderView(0);
+
+            TextView lb_NomeVendedor = (TextView) view.findViewById(R.id.lb_NomeVendedor);
+            TextView lb_EmailVendedor = (TextView) view.findViewById(R.id.lb_EmailVendedor);
+
+            MDL_Usuario mdl_Usuario = new MDL_Usuario(getApplicationContext());
+
+            String vf_NmUsuario = mdl_Usuario.fuSelecionarNmUsuarioSistema();
+            String vf_Filial = mdl_Usuario.fuSelecionarFilial();
+
+            try {
+                lb_NomeVendedor.setText(vf_NmUsuario);
+                lb_EmailVendedor.setText(vf_Filial);
+            } catch (Exception e) {
+                lb_NomeVendedor.setText("");
+                lb_EmailVendedor.setText("");
+            }
+        }catch (Exception e){
+            String teste = e.getMessage();
+            String teste2  = teste;
+        }
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

@@ -2,8 +2,8 @@ package classes;
 
 public class CL_VisaoGeral {
 
-    protected int countTipoVenda, countCanceladosTipoVenda;
-    protected double vlVendaBruto, vlVendaDesconto, vlVendaLiquido, vlLucroMedio, vlDescontoTipoVenda, vlTotalTipoVenda;
+    protected int countTipoVenda, countCanceladosTipoVenda, countEnviadosTipoVenda;
+    protected double vlVendaBruto, vlVendaDesconto, vlVendaLiquido, vlLucroMedio, vlDescontoTipoVenda, vlTotalTipoVenda, vlTotalCancelados, vlTotalEnviados;
 
     protected String dataInicial, dataFinal;
 
@@ -90,5 +90,29 @@ public class CL_VisaoGeral {
 
     public void setDataFinal(String dataFinal) {
         this.dataFinal = dataFinal;
+    }
+
+    public int getCountEnviadosTipoVenda() {
+        return countEnviadosTipoVenda;
+    }
+
+    public void setCountEnviadosTipoVenda(int countEnviadosTipoVenda) {
+        this.countEnviadosTipoVenda = countEnviadosTipoVenda;
+    }
+
+    public double getVlTotalCancelados() {
+        return vlTotalCancelados;
+    }
+
+    public void setVlTotalCancelados(double vlTotalCancelados) {
+        this.vlTotalCancelados = vlTotalCancelados;
+    }
+
+    public double getVlTotalEnviados() {
+        return vlTotalEnviados;
+    }
+
+    public void setVlTotalEnviados(double vlTotalEnviados) {
+        this.vlTotalEnviados = vlTotalEnviados;
     }
 }

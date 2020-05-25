@@ -72,6 +72,7 @@ import classes.CL_ItemPedido;
 import classes.CL_Pedidos;
 import controllers.CTL_ItemPedido;
 import controllers.CTL_Pedidos;
+import models.MDL_Usuario;
 import sync.SYNC_Pedidos;
 
 public class Pedidos extends AppCompatActivity
@@ -134,6 +135,29 @@ public class Pedidos extends AppCompatActivity
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
+        }
+
+        try {
+            View view = navigationView.getHeaderView(0);
+
+            TextView lb_NomeVendedor = (TextView) view.findViewById(R.id.lb_NomeVendedor);
+            TextView lb_EmailVendedor = (TextView) view.findViewById(R.id.lb_EmailVendedor);
+
+            MDL_Usuario mdl_Usuario = new MDL_Usuario(getApplicationContext());
+
+            String vf_NmUsuario = mdl_Usuario.fuSelecionarNmUsuarioSistema();
+            String vf_Filial = mdl_Usuario.fuSelecionarFilial();
+
+            try {
+                lb_NomeVendedor.setText(vf_NmUsuario);
+                lb_EmailVendedor.setText(vf_Filial);
+            } catch (Exception e) {
+                lb_NomeVendedor.setText("");
+                lb_EmailVendedor.setText("");
+            }
+        }catch (Exception e){
+            String teste = e.getMessage();
+            String teste2  = teste;
         }
 
         cl_Pedidos = new CL_Pedidos();
@@ -1818,7 +1842,6 @@ public class Pedidos extends AppCompatActivity
             /*Date dateCadguia = format.parse(dateStart);
             Calendar dataInicial = Calendar.getInstance();
             dataInicial.setTime(dateCadguia);
-
 
 
             long diferenca = System.currentTimeMillis() - dataInicial.getTimeInMillis();
