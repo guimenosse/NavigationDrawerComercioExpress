@@ -19,7 +19,7 @@ public class MDL_Pedidos {
 
     public String [] arr_CamposPedido = {banco.ID, banco.CONDPGTO, banco.VLTOTAL, banco.PERCDESCONTO, banco.VLDESCONTO,
             banco.VLFRETE, banco.CDEMITENTE, banco.RZSOCIAL, banco.OBS, banco.DTEMISSAO,
-            banco.FGSITUACAO, banco.CDVENDEDOR};
+            banco.FGSITUACAO, banco.CDVENDEDOR, banco.NUMPEDIDOSERVIDOR};
 
     public MDL_Pedidos(Context context)
     {
@@ -58,6 +58,7 @@ public class MDL_Pedidos {
             valores.put(CriaBanco.VLDESCONTO, "0.00");
             valores.put(CriaBanco.VLFRETE, "0.00");
             valores.put(CriaBanco.OBS, "");
+            valores.put(CriaBanco.NUMPEDIDOSERVIDOR, "");
 
             resultado = db.insertOrThrow(CriaBanco.TABELAMESTREPEDIDO, null, valores);
             db.close();
@@ -105,6 +106,27 @@ public class MDL_Pedidos {
             return true;
         }
 
+    }
+
+    public boolean fuAlterarNumPedidoServidor(String numPedido, String numPedidoServidor){
+        ContentValues valores;
+        String where;
+        long resultado;
+        db = banco.getWritableDatabase();
+
+        where = CriaBanco.ID + " = " + numPedido;
+
+        valores = new ContentValues();
+        valores.put(CriaBanco.NUMPEDIDOSERVIDOR, numPedidoServidor);
+
+        resultado = db.update(CriaBanco.TABELAMESTREPEDIDO, valores, where, null);
+        db.close();
+
+        if(resultado == -1){
+            return false;
+        }else{
+            return true;
+        }
     }
 
     public boolean fuDuplicarPedido(String cdCliente, String nomeRzSocial, String dtEmissao, String cdVendedor,
@@ -347,6 +369,28 @@ public class MDL_Pedidos {
         db.close();
 
         return cursor;
+
+    }
+
+    public boolean fu_BuscarPedidosData(String dataInicial, String dataFinal){
+
+        try {
+            Cursor cursor;
+            String[] campos = {banco.ID, banco.DTEMISSAO, banco.FGSITUACAO, banco.VLDESCONTO, banco.VLTOTAL};
+            db = banco.getReadableDatabase();
+            String where = banco.DTEMISSAO + " BETWEEN '" + dataInicial + "' AND '" + dataFinal + "";
+            rs_Pedido = db.query(banco.TABELAMESTREPEDIDO, campos, where, null, null, null, null);
+
+            if (rs_Pedido != null) {
+                rs_Pedido.moveToFirst();
+            }
+            db.close();
+
+            return true;
+        }catch (Exception e){
+            vc_Mensagem = e.getMessage();
+            return false;
+        }
 
     }
 

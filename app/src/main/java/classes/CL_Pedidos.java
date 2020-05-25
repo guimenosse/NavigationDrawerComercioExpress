@@ -19,6 +19,8 @@ public class CL_Pedidos {
 
     protected String vlFrete;
 
+    protected String numPedidoServidor;
+
     public CL_Pedidos(){
         this.numPedido = "";
         this.condPgto = "";
@@ -36,6 +38,8 @@ public class CL_Pedidos {
         this.vlTotalItens = "0.0";
 
         this.vlFrete = "0.00";
+
+        this.numPedidoServidor = "";
     }
 
     public String getNumPedido() {
@@ -148,5 +152,13 @@ public class CL_Pedidos {
 
     public void setVlFrete(String vlFrete) {
         this.vlFrete = vlFrete;
+    }
+
+    public String getNumPedidoServidor() {
+        return numPedidoServidor;
+    }
+
+    public void setNumPedidoServidor(String numPedidoServidor) {
+        this.numPedidoServidor = numPedidoServidor;
     }
 }

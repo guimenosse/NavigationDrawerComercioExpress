@@ -74,6 +74,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String DTEMISSAO = "dtemissao";
     public static final String CDVENDEDOR = "cdvendedor";
     public static final String FGSITUACAO = "fgsituacao";
+    public static final String NUMPEDIDOSERVIDOR = "numpedidoservidor";
 
     public static final String TABELAITEMPEDIDO = "itempedido";
     public static final String QTDE = "qtde";
@@ -205,6 +206,7 @@ public class CriaBanco extends SQLiteOpenHelper {
                 OBS + " text, " +
                 DTEMISSAO + " datetime, " +
                 FGSITUACAO + " text, " +
+                NUMPEDIDOSERVIDOR + " text, " +
                 CDVENDEDOR + " integer)";
 
         db.execSQL(sql);

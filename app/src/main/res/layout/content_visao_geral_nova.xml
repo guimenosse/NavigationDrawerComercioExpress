@@ -189,7 +189,7 @@
         <RelativeLayout
             android:id="@+id/layout_demonstrativoTiposVendaBackground"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="220dp"
             android:layout_below="@+id/layout_movimentacaoDiariaBackground"
             android:alpha="0.1"
             android:background="@drawable/layoutstyletiposvenda">
@@ -199,18 +199,79 @@
         <RelativeLayout
             android:id="@+id/layout_demonstrativoTiposVenda"
             android:layout_width="match_parent"
-            android:layout_height="130dp"
+            android:layout_height="220dp"
             android:layout_below="@+id/layout_demonstrativoTiposVendaBackground"
-            android:layout_marginTop="-110dp">
+            android:layout_marginTop="-220dp">
 
             <RelativeLayout
+                android:id="@+id/la_Datas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
 
                 <TextView
+                    android:id="@+id/lb_SelecionarDatas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center_horizontal"
+                    android:text="Selecionar por data"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/corPreta"
+                    android:textSize="14dp" />
+
+                <ImageView
+                    android:id="@+id/img_dtSelecionarDatasPicker"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignTop="@+id/lb_SelecionarDatas"
+                    android:layout_alignBottom="@+id/lb_SelecionarDatas"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="-10dp"
+                    android:layout_toEndOf="@+id/lb_SelecionarDatas"
+                    android:src="@drawable/ic_dtemissao_picker" />
+
+                <ImageView
+                    android:id="@+id/img_dtSelecionarDatasFechar"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_alignTop="@+id/img_dtSelecionarDatasPicker"
+                    android:layout_alignBottom="@+id/img_dtSelecionarDatasPicker"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_toEndOf="@+id/img_dtSelecionarDatasPicker"
+                    android:src="@drawable/ic_fechar" />
+
+                <TextView
+                    android:id="@+id/lb_DatasSelecionadas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_horizontal"
+                    android:text="Período: 01/01/2020 até 01/12/2020"
+                    android:textAlignment="center"
+                    android:textColor="@color/corPreta"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    android:layout_below="@+id/img_dtSelecionarDatasPicker" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_below="@+id/la_Datas"
+                android:layout_marginTop="15sp"
+                android:layout_marginLeft="-40sp">
+
+                <TextView
                     android:id="@+id/lb_quantidadeTipoVendaAbertos"
-                    android:layout_width="240dp"
+                    android:layout_width="225dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="0dp"
                     android:layout_marginTop="0dp"
@@ -234,7 +295,7 @@
 
                 <TextView
                     android:id="@+id/lb_quantidadeTipoVendaCancelados"
-                    android:layout_width="240dp"
+                    android:layout_width="225dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/lb_quantidadeTipoVendaAbertos"
                     android:layout_marginLeft="0dp"
@@ -259,7 +320,7 @@
 
                 <TextView
                     android:id="@+id/lb_vlDescontoTipoVenda"
-                    android:layout_width="240dp"
+                    android:layout_width="225dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/lb_quantidadeTipoVendaCancelados"
                     android:layout_marginLeft="0dp"
@@ -284,12 +345,12 @@
 
                 <TextView
                     android:id="@+id/lb_vlTotalTipoVenda"
-                    android:layout_width="240dp"
+                    android:layout_width="225dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/lb_vlDescontoTipoVenda"
                     android:layout_marginLeft="0dp"
                     android:layout_marginTop="5dp"
-                    android:text="Valor total dos pedidos em aberto: "
+                    android:text="Valor total dos pedidos em aberto:"
                     android:textAlignment="viewEnd"
                     android:textColor="@color/corCinzaEscuro"
                     android:textSize="14dp" />
@@ -310,58 +371,6 @@
             </RelativeLayout>
 
         </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/layout_estoqueProdutosBackground"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_below="@+id/layout_demonstrativoTiposVenda"
-            android:alpha="0.1"
-            android:layout_marginTop="-25dp"
-            android:background="@drawable/layoutstyleestoqueprodutos">
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/layout_estoqueProdutos"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_below="@+id/layout_estoqueProdutosBackground"
-            android:layout_marginTop="-100dp">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal">
-
-                <ImageView
-                    android:id="@+id/img_estoqueProdutos"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginTop="10dp"
-                    android:src="@drawable/imagem_icone_produtos" />
-
-                <TextView
-                    android:id="@+id/lb_produtosAtencao"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignTop="@+id/img_estoqueProdutos"
-                    android:layout_alignBottom="@+id/img_estoqueProdutos"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_toEndOf="@+id/img_estoqueProdutos"
-                    android:text="@string/label_semprodutosatencao"
-                    android:textColor="@color/corCinzaEscuro"
-                    android:textSize="15dp"
-                    android:textStyle="bold" />
-
-            </RelativeLayout>
-
-        </RelativeLayout>
-
-
 
     </RelativeLayout>
 

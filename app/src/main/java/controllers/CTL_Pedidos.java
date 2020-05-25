@@ -81,6 +81,14 @@ public class CTL_Pedidos {
         }
     }
 
+    public boolean fuAlterarNumPedidoServidor(){
+        if(mdl_Pedidos.fuAlterarNumPedidoServidor(cl_Pedidos.getNumPedido(), cl_Pedidos.getNumPedidoServidor())){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public boolean fuDeletarPedido(){
         if(mdl_Pedidos.fuDeletarPedido(cl_Pedidos.getNumPedido())){
             return true;
@@ -289,6 +297,14 @@ public class CTL_Pedidos {
                     cl_Pedidos.setObsPedido("");
                 }
 
+                try {
+                    if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDOSERVIDOR)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDOSERVIDOR)).trim().equals("")) {
+                        cl_Pedidos.setNumPedidoServidor(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDOSERVIDOR)));
+                    }
+                } catch (Exception e) {
+                    cl_Pedidos.setNumPedidoServidor("A");
+                }
+
                 rs_Pedido.moveToNext();
 
             }
@@ -330,6 +346,32 @@ public class CTL_Pedidos {
         }
 
         return vf_CdCliente;
+    }
+
+    public boolean fuBuscarPedidosData(String dataInicial, String dataFinal){
+
+        String vf_Dia = dataInicial.substring(0, 2);
+        String vf_Mes = dataInicial.substring(3, 5);
+        String vf_Ano = dataInicial.substring(6, 10);
+        String vf_DataInicial = vf_Ano + "-" + vf_Mes + "-" + vf_Dia;
+
+        vf_Dia = dataFinal.substring(0, 2);
+        vf_Mes = dataFinal.substring(3, 5);
+        vf_Ano = dataFinal.substring(6, 10);
+
+        String vf_DataFinal = vf_Ano + "-" + vf_Mes + "-" + vf_Dia;
+
+        if(mdl_Pedidos.fu_BuscarPedidosData(vf_DataInicial, vf_DataFinal)){
+            rs_Pedido = mdl_Pedidos.rs_Pedido;
+            if (rs_Pedido.getCount() > 0){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+
     }
 
 }

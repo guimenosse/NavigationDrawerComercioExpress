@@ -1,5 +1,6 @@
 package com.example.desenvolvimento.navigationdrawercomercioexpress;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -7,6 +8,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,6 +25,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -127,7 +130,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
     TextView lb_SelecionarClienteResultado, lb_SelecionarProdutoResultado, lb_ocultarProdutos, lb_valorTotalProdutos,
             lb_qtdeTotalProdutos, lb_dtEmissao, lb_dtEmissaoResultado, lb_vlDesconto, lb_percDesconto, lb_condPgto,
-            lb_obsPedido, lb_valorTotal, lb_vlTotalResultado;
+            lb_obsPedido, lb_valorTotal, lb_vlTotalResultado, lb_numPedidoServidor, lb_numPedidoServidorResultado;
 
     FloatingActionButton fab_SelecionarEmitente, fab_AdicionarProduto;
 
@@ -141,6 +144,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
     AlertDialog.Builder builder;
 
     FloatingActionButton fab_SalvarPedidos;
+    SYNC_Pedidos sync_Pedidos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +159,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
         fab_SalvarPedidos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                suSalvarPedido();
+                suSalvarPedido("N");
             }
         });
 
@@ -260,7 +264,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
             finish();
             return true;
         }else if (id == R.id.action_salvarpedido) {
-            suSalvarPedido();
+            suSalvarPedido("N");
             return true;
         }else if(id == R.id.action_enviaronline){
             suEnviarOnline();
@@ -272,7 +276,9 @@ public class ManutencaoPedidos extends AppCompatActivity {
             suDuplicarPedido();
             return true;
         }else if(id == R.id.action_gerarpdf){
-            suCriarPDF();
+
+            fuVerificaPermissaoStorage();
+
             return true;
         }else if(id == R.id.action_excluirpedido){
             suExcluirPedido();
@@ -375,6 +381,8 @@ public class ManutencaoPedidos extends AppCompatActivity {
         lb_obsPedido = (TextView) findViewById(R.id.lb_obsPedido);
         lb_valorTotal = (TextView) findViewById(R.id.lb_valorTotal);
         lb_vlTotalResultado = (TextView) findViewById(R.id.lb_vlTotalResultado);
+        lb_numPedidoServidor = (TextView)findViewById(R.id.lb_numPedidoServidor);
+        lb_numPedidoServidorResultado = (TextView)findViewById(R.id.lb_numPedidoServidorResultado);
 
         fab_SelecionarEmitente = (FloatingActionButton) findViewById(R.id.fab_AddClienteVenda);
         fab_SelecionarEmitente.setOnClickListener(new View.OnClickListener() {
@@ -432,6 +440,8 @@ public class ManutencaoPedidos extends AppCompatActivity {
             suBloqueiaCampos(false);
             fab_SelecionarEmitente.setVisibility(View.VISIBLE);
         }
+
+        sync_Pedidos = new SYNC_Pedidos(getApplicationContext());
     }
 
     protected boolean fuInstanciarPedido() {
@@ -561,7 +571,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
         return true;
     }
 
-    public void suSalvarPedido() {
+    public void suSalvarPedido(String fgEnviarOnline) {
         if (cl_Pedidos.getFgSituacao().equals("E")) {
             MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido já foi enviado para o sistema online.");
         } else if (cl_Pedidos.getFgSituacao().equals("C")) {
@@ -575,10 +585,14 @@ public class ManutencaoPedidos extends AppCompatActivity {
                             cl_Pedidos.setNumPedido(ctl_Pedidos.fuCarregaNumPedido());
                         }
                         if (ctl_Pedidos.fuAlterarPedido()) {
-                            MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido salvo com sucesso!");
-                            Intent intent = new Intent();
-                            setResult(1, intent);
-                            finish();
+                            if(fgEnviarOnline.equals("E")){
+
+                            }else{
+                                MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido salvo com sucesso!");
+                                Intent intent = new Intent();
+                                setResult(1, intent);
+                                finish();
+                            }
                         } else {
                             MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi ´possível salvar o pedido");
                         }
@@ -594,7 +608,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
     public void suEnviarOnline() {
 
         try {
-            suSalvarPedido();
+            suSalvarPedido("E");
 
             if (fuConsisteEnviarOnline()) {
                 if (verificaConexao()) {
@@ -864,11 +878,22 @@ public class ManutencaoPedidos extends AppCompatActivity {
                 lb_vlTotalResultado.setText("R$0,00");
             }
 
-            if(cl_Pedidos.getFgSituacao().equals("ABERTO")){
+            if(cl_Pedidos.getFgSituacao().equals("A")){
                 suBloqueiaCampos(true);
-            }else if(cl_Pedidos.getFgSituacao().equals("CANCELADO")){
+            }else if(cl_Pedidos.getFgSituacao().equals("C")){
                 suBloqueiaCampos(false);
-            }else if(cl_Pedidos.getFgSituacao().equals("ENVIADO")){
+            }else if(cl_Pedidos.getFgSituacao().equals("E")){
+
+                try {
+                    lb_numPedidoServidor.setVisibility(View.VISIBLE);
+                    lb_numPedidoServidorResultado.setVisibility(View.VISIBLE);
+                    lb_numPedidoServidorResultado.setText(cl_Pedidos.getNumPedidoServidor());
+                }catch (Exception e){
+                    lb_numPedidoServidor.setVisibility(View.GONE);
+                    lb_numPedidoServidorResultado.setVisibility(View.GONE);
+                    lb_numPedidoServidorResultado.setText("");
+                }
+
                 suBloqueiaCampos(false);
             }
         }
@@ -1014,14 +1039,13 @@ public class ManutencaoPedidos extends AppCompatActivity {
     }
 
     private class LoadingAsyncEnviarPedido extends AsyncTask<Void, Void, Void> {
-        ProgressDialog progressDialog = new ProgressDialog(ManutencaoPedidos.this);
-        BancoController crud = new BancoController(getBaseContext());
+
+        ProgressDialog pd_Pedidos;
         String validou = "N";
 
         @Override
         protected void onPreExecute() {
-            progressDialog.setMessage("Enviando o pedido online...");
-            progressDialog.show();
+            pd_Pedidos = ProgressDialog.show(ManutencaoPedidos.this, "Enviando o pedido","Enviando o pedido online para o servidor...");
         }
 
         @Override
@@ -1038,25 +1062,29 @@ public class ManutencaoPedidos extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
 
-            progressDialog.dismiss();
+            try {
+                pd_Pedidos.dismiss();
 
-            if(validou.equals("S")){
-                cl_Pedidos.setFgSituacao("E");
-                if(ctl_Pedidos.fuAlterarSituacaoPedido()){
-                    MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido enviado com sucesso!");
-                    finish();
-                }else{
+                if (validou.equals("S")) {
+                    cl_Pedidos.setFgSituacao("E");
+                    if (ctl_Pedidos.fuAlterarSituacaoPedido()) {
+                        MensagemUtil.addMsg(ManutencaoPedidos.this, "Pedido enviado com sucesso!");
+                        finish();
+                    } else {
+                        MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel realizar a sincronização do pedido. Favor verificar a conexão com a internet.");
+                    }
+                } else {
                     MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel realizar a sincronização do pedido. Favor verificar a conexão com a internet.");
                 }
-            }else {
-                MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possivel realizar a sincronização do pedido. Favor verificar a conexão com a internet.");
+            }catch (Exception e){
+                String teste = e.getMessage();
+                String teste2 = teste;
             }
         }
     }
 
     public boolean fuEnviarPedido() {
 
-        SYNC_Pedidos sync_Pedidos = new SYNC_Pedidos(getApplicationContext());
         if(sync_Pedidos.FU_EnviarPedido(cl_Pedidos)){
             return true;
         }else{
@@ -1314,6 +1342,86 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
         paragraph.add(table);
 
+    }
+
+
+    //Função para verificar se a permissão de armazenamento no celular já foi setada
+    protected void fuVerificaPermissaoStorage(){
+
+        if (ContextCompat.checkSelfPermission(ManutencaoPedidos.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(ManutencaoPedidos.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                //suCriarPDF();
+                builder = new AlertDialog.Builder(this);
+
+                //define o titulo
+                builder.setTitle("Permissão");
+                //define a mensagem
+                builder.setMessage("Para que o Comércio Express Mobile possa gerar o PDF do pedido, a permissão para salvar o documento em seus arquivos precisa ser concedida. Por favor conceda a permissão para que seja possivel realizar a geração do PDF do pedido clicando em 'PERMITIR' na mensagem a seguir.");
+
+                builder.setNeutralButton("ESTÁ BEM", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        //fuVerificaPermissaoStorage();
+                        ActivityCompat.requestPermissions(ManutencaoPedidos.this,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                1);
+                    }
+                });
+
+                //cria o AlertDialog
+                alerta = builder.create();
+                //Exibe
+                alerta.show();
+
+
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }else{
+            suCriarPDF();
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                    suCriarPDF();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+
+                    //Funcoes.addMsg(this, "Poxa você não deu permissao, vai ficar sem algumas funcionalidades");
+                }
+                return;
+            }
+        }
     }
 
 }

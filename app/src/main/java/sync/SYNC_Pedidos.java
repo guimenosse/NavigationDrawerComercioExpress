@@ -86,6 +86,9 @@ public class SYNC_Pedidos extends AppCompatActivity {
     public boolean FU_EnviarPedido(CL_Pedidos cl_Pedido){
 
         try {
+
+            cl_Pedidos = cl_Pedido;
+
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             trustStore.load(null, null);
 
@@ -109,12 +112,13 @@ public class SYNC_Pedidos extends AppCompatActivity {
             HttpClient httpclient = new DefaultHttpClient(ccm, p);
             String url = "http://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + vc_CdClienteBanco
-                    + "&format=json&num=10&method=inserirpedido&vltotal=" + cl_Pedidos.getVlTotal()
-                    + "&dtemissao=" + cl_Pedidos.getDtEmissao() + ""
-                    + "&cdvendedor=" + cl_Pedidos.getCdVendedor() + "&cdemitente=" + cl_Pedidos.getCdCliente() + "&rzsocial=" + cl_Pedidos.getNomeRzSocial()
-                    + "&percdesconto=" + cl_Pedidos.getPercDesconto() + "&vldesconto=" + cl_Pedidos.getVlDesconto() + ""
-                    + "&vlfrete=" + cl_Pedidos.getVlFrete()
-                    + "&condpgto=" + cl_Pedidos.getCondPgto() + "&obs=" + cl_Pedidos.getObsPedido().replace("\n", "pulalinha")
+                    + "&format=json&num=10&method=inserirpedido&vltotal=" + cl_Pedidos.getVlTotal().replace(".", ",")
+                    + "&dtemissao=" + cl_Pedidos.getDtEmissao().replace(" ", "espaco") + ""
+                    + "&cdvendedor=" + cl_Pedidos.getCdVendedor() + "&cdemitente=" + cl_Pedidos.getCdCliente()
+                    + "&rzsocial=" + cl_Pedidos.getNomeRzSocial().replace(" ", "espaco")
+                    + "&percdesconto=" + cl_Pedidos.getPercDesconto().replace(".", ",") + "&vldesconto=" + cl_Pedidos.getVlDesconto().replace(".", ",") + ""
+                    + "&vlfrete=" + cl_Pedidos.getVlFrete().replace(".", ",")
+                    + "&condpgto=" + cl_Pedidos.getCondPgto() + "&obs=" + cl_Pedidos.getObsPedido().replace(" ", "espaco").replace("\n", "pulalinha")
                     + "&filial=" + cl_Filial.getCdFilial() + "";
             HttpPost httppost = new HttpPost(url);
 
@@ -141,8 +145,16 @@ public class SYNC_Pedidos extends AppCompatActivity {
 
                     if (!jObject.getString("NumPedido").equals("null")) {
                         String vf_NumPedidoServidor = jObject.getString("NumPedido");
-                        if (FU_SincronizaItemPedido(vf_NumPedidoServidor)) {
-                            FU_AlteraSituacaoPedido(vf_NumPedidoServidor);
+                        int indexPonto = vf_NumPedidoServidor.indexOf(".");
+                        String vf_NumPedidoServidorInt = vf_NumPedidoServidor.substring(0, indexPonto).replace(".", "");
+
+                        cl_Pedidos.setNumPedidoServidor(vf_NumPedidoServidorInt);
+                        ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
+
+                        ctl_Pedidos.fuAlterarNumPedidoServidor();
+
+                        if (FU_SincronizaItemPedido(vf_NumPedidoServidorInt)) {
+                            FU_AlteraSituacaoPedido(vf_NumPedidoServidorInt);
                         } else {
                             return false;
                         }
@@ -172,8 +184,8 @@ public class SYNC_Pedidos extends AppCompatActivity {
                 cl_Pedidos = new CL_Pedidos();
 
                 try {
-                    if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDO)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDO)).trim().equals("")) {
-                        cl_Pedidos.setNumPedido(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDO)).replace(" ", "espaco"));
+                    if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.ID)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.ID)).trim().equals("")) {
+                        cl_Pedidos.setNumPedido(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.ID)).replace(" ", "espaco"));
                     }
                 } catch (Exception e) {
                     cl_Pedidos.setNumPedido("0");
@@ -188,7 +200,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                         CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
                         cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
 
-                        CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
+                        CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(vc_Context, cl_ItemPedido);
 
                         double vf_VlTotalDouble = 0;
                         if(ctl_ItemPedido.fuCarregaTodosItensPedido()){
@@ -390,8 +402,21 @@ public class SYNC_Pedidos extends AppCompatActivity {
                             //mylist.add(map);
                             if (!jObject.getString("NumPedido").equals("null")) {
                                 String vf_NumPedidoServidor = jObject.getString("NumPedido");
-                                if (FU_SincronizaItemPedido(vf_NumPedidoServidor)) {
-                                    FU_AlteraSituacaoPedido(vf_NumPedidoServidor);
+                                int indexPonto = vf_NumPedidoServidor.indexOf(".");
+                                String vf_NumPedidoServidorInt = vf_NumPedidoServidor.substring(0, indexPonto).replace(".", "");
+
+                                cl_Pedidos.setNumPedidoServidor(vf_NumPedidoServidorInt);
+                                ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
+
+                                ctl_Pedidos.fuAlterarNumPedidoServidor();
+
+                                if (FU_SincronizaItemPedido(vf_NumPedidoServidorInt)) {
+                                    FU_AlteraSituacaoPedido(vf_NumPedidoServidorInt);
+
+                                    cl_Pedidos.setFgSituacao("E");
+                                    CTL_Pedidos vf_Ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
+                                    vf_Ctl_Pedidos.fuAlterarSituacaoPedido();
+
 
                                 } else {
                                     return false;
@@ -428,6 +453,8 @@ public class SYNC_Pedidos extends AppCompatActivity {
                     /*e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Não foi possivel realizar a sincronização do pedido. Favor verificar a conexão com a internet.", Toast.LENGTH_LONG).show();*/
                 }
+
+                rs_Pedido.moveToNext();
             }
         }
         return true;
@@ -439,7 +466,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
         CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
         cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
 
-        CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
+        CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(vc_Context, cl_ItemPedido);
 
 
         if(ctl_ItemPedido.fuCarregaTodosItensPedido()) {
@@ -569,12 +596,12 @@ public class SYNC_Pedidos extends AppCompatActivity {
                             "WebService2.php?user=" + vc_CdClienteBanco
                             + "&format=json&num=10&method=inseriritempedido&numpedido=" + numPedidoServidor + "&cdproduto="
                             + cl_ItemPedido.getCdProduto().replace(" ", "espaco") + "&id=" + cl_ItemPedido.getId()
-                            + "&qtde=" + cl_ItemPedido.getQtde() + "&vlunitario=" + cl_ItemPedido.getVlUnitario()
-                            + "&vltotal=" + cl_ItemPedido.getVlTotal()
-                            + "&dtemissao=" + cl_Pedidos.getDtEmissao()
+                            + "&qtde=" + cl_ItemPedido.getQtde().replace(".", ",") + "&vlunitario=" + cl_ItemPedido.getVlUnitario()
+                            + "&vltotal=" + cl_ItemPedido.getVlTotal().replace(".", ",")
+                            + "&dtemissao=" + cl_Pedidos.getDtEmissao().replace(" ", "espaco")
                             + "&descricao=" + cl_ItemPedido.getDescricao().replace(" ", "espaco")
-                            + "&vldesconto=" + cl_ItemPedido.getVlDesconto()
-                            + "&percdesconto=" + cl_ItemPedido.getPercDesconto()
+                            + "&vldesconto=" + cl_ItemPedido.getVlDesconto().replace(".", ",")
+                            + "&percdesconto=" + cl_ItemPedido.getPercDesconto().replace(".", ",")
                             + "&filial=" + cl_Filial.getCdFilial() + "";
 
                     HttpPost httppost = new HttpPost(url);

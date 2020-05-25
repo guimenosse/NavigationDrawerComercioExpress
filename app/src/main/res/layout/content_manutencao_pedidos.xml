@@ -406,7 +406,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="15dp"
-            android:layout_marginBottom="15sp"/>
+            android:layout_marginBottom="0sp"/>
 
         <TextView
             android:id="@+id/lb_vlTotalResultado"
@@ -422,6 +422,39 @@
             android:layout_alignTop="@+id/lb_valorTotal"
             android:layout_marginTop="-7sp"
             android:layout_marginLeft="10sp"
+            android:enabled="false"/>
+
+        <TextView
+            android:id="@+id/lb_numPedidoServidor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/campo_numpedidoservidor"
+            android:textSize="16sp"
+            android:layout_marginLeft="15sp"
+            android:textColor="@color/cor_teste"
+            android:layout_below="@+id/lb_valorTotal"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            android:layout_marginBottom="15sp"/>
+
+        <TextView
+            android:id="@+id/lb_numPedidoServidorResultado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="463"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_toEndOf="@+id/lb_numPedidoServidor"
+            android:layout_alignBottom="@+id/lb_numPedidoServidor"
+            android:layout_alignTop="@+id/lb_numPedidoServidor"
+            android:layout_marginTop="-7sp"
+            android:layout_marginLeft="10sp"
+            android:visibility="gone"
             android:enabled="false"/>
 
     </RelativeLayout>

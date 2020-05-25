@@ -97,6 +97,8 @@ public class Pedidos extends AppCompatActivity
     MenuItem me_Sincronizar;
     MenuItem me_BuscarPedido;
 
+    SYNC_Pedidos sync_Pedidos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +108,8 @@ public class Pedidos extends AppCompatActivity
 
         sv_Pedidos = (MaterialSearchView) findViewById(R.id.sv_Pedidos);
         sv_Pedidos.setVoiceSearch(true); //or false
+
+        sync_Pedidos = new SYNC_Pedidos(getApplicationContext());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -1983,21 +1987,20 @@ public class Pedidos extends AppCompatActivity
             progressDialogPedidos.dismiss();
 
             if (validou.equals("N")) {
-                MensagemUtil.addMsg(Pedidos.this, "Todos os seus pedidos que estavam em aberto foram sincronizados com o servidor");
+                MensagemUtil.addMsg(Pedidos.this, "Não foi encontrado nenhum pedido em aberto para sincronização");
             }else{
-                MensagemUtil.addMsg(Pedidos.this, "Não foi possível realizar a sincronização de todos os seus pedidos em aberto");
+                MensagemUtil.addMsg(Pedidos.this, "Todos os seus pedidos que estavam em aberto foram sincronizados com o servidor");
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
             }
         }
     }
 
     protected boolean fuSincronizarTodosPedidosAbertos(){
 
-        CL_Pedidos cl_Pedidos = new CL_Pedidos();
-        CTL_Pedidos ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
-
         if(ctl_Pedidos.fuPossuiPedidosAbertos()){
             Cursor rs_Pedidos = ctl_Pedidos.rs_Pedido;
-            SYNC_Pedidos sync_Pedidos = new SYNC_Pedidos(getApplicationContext());
 
             if(sync_Pedidos.FU_EnviarTodosPedidos(rs_Pedidos)){
                 return true;
@@ -2006,7 +2009,6 @@ public class Pedidos extends AppCompatActivity
             }
 
         }else{
-            MensagemUtil.addMsg(Pedidos.this, "Não foi encontrado nenhum pedido em aberto para sincronização");
             return false;
         }
 

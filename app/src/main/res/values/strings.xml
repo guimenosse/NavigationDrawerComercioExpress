@@ -277,5 +277,6 @@
     <string name="campo_observacaopedido">Observação do Pedido: </string>
     <string name="campo_vltotalpedido">Total Liquido do Pedido: </string>
     <string name="campo_mostrarprodutos">Mostrar Produtos</string>
+    <string name="campo_numpedidoservidor">Número do pedido salvo no servidor:</string>
 
 </resources>

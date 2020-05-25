@@ -110,7 +110,7 @@ public class CTL_VisaoGeral {
         return true;
     }
 
-    public boolean fu_CarregarDadosTipoVenda(){
+    public boolean fu_CarregarDadosTipoVenda(String dataInicial, String dataFinal){
 
         int vf_CountTipoVenda = 0;
         int vf_CountCanceladosTipoVenda = 0;
@@ -118,6 +118,27 @@ public class CTL_VisaoGeral {
         double vf_VlTotalTipoVenda = 0.0;
 
         Cursor rs_Venda = mdl_Pedidos.fu_SelecionarTodosPedidos();
+
+
+        if(!cl_VisaoGeral.getDataInicial().trim().equals("")){
+            String vf_Dia = cl_VisaoGeral.getDataInicial().substring(0, 2);
+            String vf_Mes = cl_VisaoGeral.getDataInicial().substring(3, 5);
+            String vf_Ano = cl_VisaoGeral.getDataInicial().substring(6, 10);
+            String vf_DataInicial = vf_Ano + "-" + vf_Mes + "-" + vf_Dia;
+
+            vf_Dia = cl_VisaoGeral.getDataFinal().substring(0, 2);
+            vf_Mes = cl_VisaoGeral.getDataFinal().substring(3, 5);
+            vf_Ano = cl_VisaoGeral.getDataFinal().substring(6, 10);
+
+            String vf_DataFinal = vf_Ano + "-" + vf_Mes + "-" + vf_Dia;
+
+            if(mdl_Pedidos.fu_BuscarPedidosData(dataInicial, dataFinal)) {
+                rs_Venda = mdl_Pedidos.rs_Pedido;
+            }else{
+                return false;
+            }
+
+        }
 
         if(rs_Venda != null){
             if(rs_Venda.getCount() > 0) {

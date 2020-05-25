@@ -3,6 +3,7 @@ package com.example.desenvolvimento.navigationdrawercomercioexpress;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,11 +22,15 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import classes.CL_Pedidos;
 import classes.CL_VisaoGeral;
+import controllers.CTL_Pedidos;
 import controllers.CTL_VisaoGeral;
 
 public class VisaoGeralNova extends AppCompatActivity
@@ -40,13 +45,14 @@ public class VisaoGeralNova extends AppCompatActivity
     AlertDialog.Builder bu_VisaoGeral;
 
     //Instancia da imagem para seleção da data da movimentação
-    ImageView img_DtEmissaoPicker;
+    ImageView img_DtEmissaoPicker, img_dtSelecionarDatas, img_dtSelecionarDatasFechar;
 
     //Função de calendário para seleção da data de emissão da venda
     final Calendar vc_MyCalendar = Calendar.getInstance();
 
     //Instancia das labels que apresentarão os resultados da movimentação diária
-    TextView lb_DtMovimentacaoDiaria, lb_VlVendaBrutaResultado, lb_VlDescontosVendaResultado, lb_VlVendaLiquidaResultado, lb_VlLucroMedioResultado;
+    TextView lb_DtMovimentacaoDiaria, lb_VlVendaBrutaResultado, lb_VlDescontosVendaResultado, lb_VlVendaLiquidaResultado,
+            lb_VlLucroMedioResultado, lb_DatasSelecionadas;
 
     //Instancia dos botões da seção de tipos de venda
     Button btn_Orcamentos, btn_Pedidos, btn_Vendas;
@@ -57,6 +63,9 @@ public class VisaoGeralNova extends AppCompatActivity
 
     //Instancia da label do estoque.
     TextView lb_ProdutosAtencao;
+
+    //Variáveis para quando o usuário selecionar o periodo de datas na seção de total de tipos de venda
+    String vc_DtInicial = "", vc_DtFinal = "";
 
     int vc_CountProdutosAtencao = 0;
 
@@ -110,7 +119,7 @@ public class VisaoGeralNova extends AppCompatActivity
         fu_InstanciarCampos();
 
         fu_AtualizarData("S");
-        fu_CarregarProdutosZerados();
+        //fu_CarregarProdutosZerados();
         fu_CalcularResultadosTipoVenda();
     }
 
@@ -185,6 +194,10 @@ public class VisaoGeralNova extends AppCompatActivity
 
         //Campos da seção de movimentação diária--------------------------------------------------
         img_DtEmissaoPicker = (ImageView)findViewById(R.id.img_dtEmissaoPicker);
+        img_dtSelecionarDatas = (ImageView)findViewById(R.id.img_dtSelecionarDatasPicker);
+        img_dtSelecionarDatasFechar = (ImageView)findViewById(R.id.img_dtSelecionarDatasFechar);
+
+        lb_DatasSelecionadas = (TextView)findViewById(R.id.lb_DatasSelecionadas);
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -203,12 +216,55 @@ public class VisaoGeralNova extends AppCompatActivity
 
             @Override
             public void onClick(View v) {
+
+                MensagemUtil.addMsg(VisaoGeralNova.this, "Por favor selecione a data inicial");
+
                 new DatePickerDialog(VisaoGeralNova.this, date, vc_MyCalendar
+                        .get(Calendar.YEAR), vc_MyCalendar.get(Calendar.MONTH),
+                        vc_MyCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+
+            }
+
+        });
+
+        final DatePickerDialog.OnDateSetListener dateInicial = new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                vc_MyCalendar.set(Calendar.YEAR, year);
+                vc_MyCalendar.set(Calendar.MONTH, monthOfYear);
+                vc_MyCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                fu_AtualizaDataInicial("N");
+            }
+
+        };
+
+        img_dtSelecionarDatas.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(VisaoGeralNova.this, dateInicial, vc_MyCalendar
                         .get(Calendar.YEAR), vc_MyCalendar.get(Calendar.MONTH),
                         vc_MyCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
 
         });
+
+        img_dtSelecionarDatasFechar.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                cl_VisaoGeral.setDataInicial("");
+                cl_VisaoGeral.setDataFinal("");
+
+                fu_CalcularResultadosTipoVenda();
+                lb_DatasSelecionadas.setVisibility(View.GONE);
+            }
+
+        });
+
 
         lb_DtMovimentacaoDiaria = (TextView)findViewById(R.id.lb_dataMovimentacaoDiaria);
         lb_VlVendaBrutaResultado = (TextView)findViewById(R.id.lb_vlVendaBrutaResultado);
@@ -228,7 +284,7 @@ public class VisaoGeralNova extends AppCompatActivity
         //----------------------------------------------------------------------------------------
 
         //Campos da seção de produtos-------------------------------------------------------------
-        lb_ProdutosAtencao = (TextView)findViewById(R.id.lb_produtosAtencao);
+        //lb_ProdutosAtencao = (TextView)findViewById(R.id.lb_produtosAtencao);
         //----------------------------------------------------------------------------------------
 
         //----------------------------------------------------------------------------------------
@@ -323,6 +379,48 @@ public class VisaoGeralNova extends AppCompatActivity
         }
     }
 
+    private void fu_AtualizaDataInicial(String fgDataInicial){
+
+        String data = "";
+        String myFormat = "dd/MM/yyyy"; //In which you need put
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("pt", "BR"));
+
+        cl_VisaoGeral.setDataInicial(sdf.format(vc_MyCalendar.getTime()));
+
+        MensagemUtil.addMsg(VisaoGeralNova.this, "Por favor selecione a data final");
+
+        final DatePickerDialog.OnDateSetListener dateFinal = new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                vc_MyCalendar.set(Calendar.YEAR, year);
+                vc_MyCalendar.set(Calendar.MONTH, monthOfYear);
+                vc_MyCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                fu_AtualizaDataFinal("N");
+            }
+
+        };
+
+        new DatePickerDialog(VisaoGeralNova.this, dateFinal, vc_MyCalendar
+                .get(Calendar.YEAR), vc_MyCalendar.get(Calendar.MONTH),
+                vc_MyCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+    }
+
+    private void fu_AtualizaDataFinal(String fgDataFinal){
+        String data = "";
+        String myFormat = "dd/MM/yyyy"; //In which you need put
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("pt", "BR"));
+
+        cl_VisaoGeral.setDataFinal(sdf.format(vc_MyCalendar.getTime()));
+
+        lb_DatasSelecionadas.setVisibility(View.VISIBLE);
+        lb_DatasSelecionadas.setText("Período: " + cl_VisaoGeral.getDataInicial() +  " até " + cl_VisaoGeral.getDataFinal() + "");
+
+        fu_CalcularResultadosTipoVenda();
+    }
+
     private void fu_CalcularMovimentacaoDiaria(String fgDataAtual, String data){
 
         if(ctl_VisaoGeral.fu_CarregarMovimentacaoDiaria(data)){
@@ -350,7 +448,9 @@ public class VisaoGeralNova extends AppCompatActivity
             lb_QuantidadeTipoVendaCancelados.setText(getString(R.string.label_quantidade_tipovenda_cancelados_pedidos));
             lb_VlTotalTipoVenda.setText(getString(R.string.label_valortotal_tipovenda_pedidos));
 
-            if (ctl_VisaoGeral.fu_CarregarDadosTipoVenda()) {
+            ctl_VisaoGeral = new CTL_VisaoGeral(getApplicationContext(), cl_VisaoGeral);
+
+            if (ctl_VisaoGeral.fu_CarregarDadosTipoVenda(cl_VisaoGeral.getDataInicial(), cl_VisaoGeral.getDataFinal())) {
 
                 lb_QuantidadeTipoVendaAbertosResultado.setText(String.valueOf(cl_VisaoGeral.getCountTipoVenda()) + " pedido");
 
@@ -369,6 +469,10 @@ public class VisaoGeralNova extends AppCompatActivity
                 lb_VlTotalTipoVendaResultado.setText("R$ " + vf_VlTotalTipoVenda + "");
 
             } else {
+                lb_QuantidadeTipoVendaAbertosResultado.setText("0 pedidos");
+                lb_QuantidadeTipoVendaCanceladosResultado.setText("0 pedidos");
+                lb_VlDescontoTipoVendaResultado.setText("R$ 0,00");
+                lb_VlTotalTipoVendaResultado.setText("R$ 0,00");
                 MensagemUtil.addMsg(VisaoGeralNova.this, getString(R.string.mensagem_visaogeral_falhacarregamentopedidos) + vf_TipoVenda + "s");
             }
 
@@ -377,25 +481,4 @@ public class VisaoGeralNova extends AppCompatActivity
         }
     }
 
-    private boolean fu_CarregarProdutosZerados(){
-
-        vc_CountProdutosAtencao = ctl_VisaoGeral.fu_BuscarProdutosAtencao();
-        //countProdutosAtencao = ctl_VisaoGeral.buscaProdutosAtencao();
-
-        if(vc_CountProdutosAtencao > 0){
-            if(vc_CountProdutosAtencao == 1){
-                lb_ProdutosAtencao.setText("Existe " + String.valueOf(vc_CountProdutosAtencao) + " " + getString(R.string.label_produtoatencaounico));
-            }else{
-                lb_ProdutosAtencao.setText("Existem " + String.valueOf(vc_CountProdutosAtencao) + " " + getString(R.string.label_produtosatencao));
-            }
-        }else{
-            lb_ProdutosAtencao.setText(getString(R.string.label_semprodutosatencao));
-            if(!ctl_VisaoGeral.vc_Mensagem.trim().equals("")){
-                MensagemUtil.addMsg(VisaoGeralNova.this, ctl_VisaoGeral.vc_Mensagem);
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

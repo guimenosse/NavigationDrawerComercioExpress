@@ -5,6 +5,13 @@ public class CL_VisaoGeral {
     protected int countTipoVenda, countCanceladosTipoVenda;
     protected double vlVendaBruto, vlVendaDesconto, vlVendaLiquido, vlLucroMedio, vlDescontoTipoVenda, vlTotalTipoVenda;
 
+    protected String dataInicial, dataFinal;
+
+    public CL_VisaoGeral(){
+        this.dataInicial = "";
+        this.dataFinal = "";
+    }
+
     public int getCountTipoVenda() {
         return countTipoVenda;
     }
@@ -69,4 +76,19 @@ public class CL_VisaoGeral {
         this.vlTotalTipoVenda = vlTotalTipoVenda;
     }
 
+    public String getDataInicial() {
+        return dataInicial;
+    }
+
+    public void setDataInicial(String dataInicial) {
+        this.dataInicial = dataInicial;
+    }
+
+    public String getDataFinal() {
+        return dataFinal;
+    }
+
+    public void setDataFinal(String dataFinal) {
+        this.dataFinal = dataFinal;
+    }
 }
