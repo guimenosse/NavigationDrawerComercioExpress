@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
+import models.CriaBanco;
 
 public class MDL_ItemPedido {
 

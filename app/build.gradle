@@ -11,11 +11,11 @@ android {
 
 
     defaultConfig {
-        applicationId "com.example.desenvolvimento.navigationdrawercomercioexpress"
+        applicationId "br.comercioexpress.plano"
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "2.0"
+        versionName "3.0"
         multiDexEnabled true
     }
     buildTypes {

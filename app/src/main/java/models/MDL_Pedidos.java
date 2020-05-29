@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
+import models.CriaBanco;
 
 public class MDL_Pedidos {
 
@@ -392,6 +392,42 @@ public class MDL_Pedidos {
             return false;
         }
 
+    }
+
+    public Cursor fuCarregarPedidosCliente(String cdCliente){
+        Cursor cursor;
+        String[] campos = {banco.ID};
+        String orderBy = CriaBanco.ID;
+        String where = CriaBanco.CDEMITENTE + "=" + cdCliente;
+        db = banco.getReadableDatabase();
+        cursor = db.query(banco.TABELAMESTREPEDIDO, campos, where, null, null, null, orderBy, null);
+
+        if(cursor != null){
+            cursor.moveToFirst();
+        }
+        db.close();
+        return cursor;
+    }
+
+    public boolean fuAlterarClientePedido(String numPedido, String cdCliente){
+        ContentValues valores;
+        String where;
+        long resultado;
+        db = banco.getWritableDatabase();
+
+        where = CriaBanco.ID + "=" + numPedido;
+
+        valores = new ContentValues();
+        valores.put(CriaBanco.CDEMITENTE, cdCliente);
+
+        resultado = db.update(CriaBanco.TABELAMESTREPEDIDO, valores, where, null);
+        db.close();
+
+        if(resultado == -1){
+            return false;
+        }else{
+            return true;
+        }
     }
 
 }

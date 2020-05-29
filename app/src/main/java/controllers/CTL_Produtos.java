@@ -3,9 +3,9 @@ package controllers;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
+import models.CriaBanco;
 
+import br.comercioexpress.plano.Funcoes;
 import classes.CL_Produtos;
 import models.MDL_Produtos;
 
@@ -28,6 +28,18 @@ public class CTL_Produtos {
         this.cxt_Produtos = context;
 
         funcoes = new Funcoes();
+    }
+
+    public boolean fuInserirProdutoFilial(){
+
+        if(mdl_Produtos.fuInserirProdutoFilial(cl_Produtos.getCdProduto(), cl_Produtos.getDescricao(), cl_Produtos.getEstoqueAtual(),
+                cl_Produtos.getVlUnitario(), cl_Produtos.getVlAtacado(), cl_Produtos.getDtUltimaAlteracao(), cl_Produtos.getDescMaxPermitido(),
+                cl_Produtos.getDescMaxPermitidoA(), cl_Produtos.getDescMaxPermitidoB(), cl_Produtos.getDescMaxPermitidoC(),
+                cl_Produtos.getDescMaxPermitidoD(), cl_Produtos.getDescMaxPermitidoE(), cl_Produtos.getDescMaxPermitidoFidelidade())){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public boolean fuCarregaProduto(){

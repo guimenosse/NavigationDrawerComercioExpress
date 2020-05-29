@@ -4,9 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
+import models.CriaBanco;
 
+import br.comercioexpress.plano.Funcoes;
 import classes.CL_ItemPedido;
 import classes.CL_Pedidos;
 import models.MDL_Pedidos;
@@ -372,6 +372,29 @@ public class CTL_Pedidos {
             return false;
         }
 
+    }
+
+    public boolean fuCarregarPedidosCliente(){
+        try{
+            rs_Pedido = mdl_Pedidos.fuCarregarPedidosCliente(cl_Pedidos.getCdCliente());
+
+            if(rs_Pedido.getCount() > 0){
+                rs_Pedido.moveToFirst();
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    public boolean fuAlterarClientePedido(){
+        if(mdl_Pedidos.fuAlterarClientePedido(cl_Pedidos.getNumPedido(), cl_Pedidos.getCdCliente())){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }

@@ -1,67 +1,164 @@
 package models;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
+import models.CriaBanco;
 
 public class MDL_Usuario {
 
     private SQLiteDatabase db;
     private CriaBanco banco;
 
+    public String [] arr_CamposUsuario = {banco.ID, banco.USUARIOLOGIN, banco.SENHALOGIN, banco.CDVENDEDORDEFAULT,
+            banco.NMUSUARIOSISTEMA, banco.CDCLIENTEBANCO};
+
     public MDL_Usuario(Context context)
     {
         banco = new CriaBanco(context);
     }
 
-    public String fuSelecionarCdClienteBanco(){
+    public boolean fuInserirLogin(String usuario, String senha){
+
+        try {
+            ContentValues valores;
+            db = banco.getWritableDatabase();
+
+            db.delete(banco.TABELALOGIN, null, null);
+            db.close();
+
+            db = banco.getWritableDatabase();
+
+            valores = new ContentValues();
+            valores.put(banco.USUARIOLOGIN, usuario);
+            valores.put(banco.SENHALOGIN, senha);
+
+            long resultado = db.insert(banco.TABELALOGIN, null, valores);
+            db.close();
+
+            if(resultado == -1){
+                return false;
+            }else{
+                return true;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    public boolean fuInserirCdClienteBanco(String cdCliente){
+        try{
+            ContentValues valores;
+            long resultado;
+            db = banco.getWritableDatabase();
+
+            valores = new ContentValues();
+            valores.put(CriaBanco.CDCLIENTEBANCO, cdCliente);
+
+            resultado = db.update(CriaBanco.TABELALOGIN, valores, null, null);
+            db.close();
+
+            if(resultado == -1){
+                return false;
+            }else{
+                return true;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+
+    }
+
+    public boolean fuInserirNmUsuarioSistema(String usuarioSistema){
+        try {
+            ContentValues valores;
+            long resultado;
+            db = banco.getWritableDatabase();
+
+            valores = new ContentValues();
+            valores.put(CriaBanco.NMUSUARIOSISTEMA, usuarioSistema);
+
+            resultado = db.update(CriaBanco.TABELALOGIN, valores, null, null);
+            db.close();
+
+            if(resultado == -1){
+                return false;
+            }else{
+                return true;
+            }
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    public boolean fuInserirCdVendedorDefault(String cdvendedor){
+
+        try {
+            ContentValues valores;
+            long resultado;
+            db = banco.getWritableDatabase();
+
+            valores = new ContentValues();
+            valores.put(CriaBanco.CDVENDEDORDEFAULT, cdvendedor);
+
+            resultado = db.update(CriaBanco.TABELALOGIN, valores, null, null);
+            db.close();
+
+            if(resultado == -1){
+                return false;
+            }else{
+                return true;
+            }
+        }catch (Exception e){
+            return false;
+        }
+
+    }
+
+    public Cursor fuSelecionarUsuario() {
+        Cursor cursor;
+        String[] campos = {banco.USUARIOLOGIN};
+        db = banco.getReadableDatabase();
+        cursor = db.query(banco.TABELALOGIN, campos, null, null, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        db.close();
+
+        return cursor;
+
+    }
+    public Cursor fuSelecionarCdClienteBanco(){
+
         Cursor cursor;
         String[] campos = {banco.ID, banco.CDCLIENTEBANCO};
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELALOGIN, campos, null, null, null, null, null);
-        String cdclienteBanco = "";
-        if(cursor!=null){
-            cursor.moveToFirst();
-            cdclienteBanco = cursor.getString(cursor.getColumnIndex(CriaBanco.CDCLIENTEBANCO));
-        }
 
-        cursor.close();
+        if(cursor!=null) {
+            cursor.moveToFirst();
+        }
         db.close();
-        return cdclienteBanco;
+
+        return cursor;
     }
 
-    public String fuSelecionarNmUsuarioSistema(){
+    public Cursor fuSelecionarNmUsuarioSistema(){
         Cursor cursor;
         String[] campos = {banco.ID, banco.NMUSUARIOSISTEMA};
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELALOGIN, campos, null, null, null, null, null);
-        String nmusuarioSistema = "";
-        if(cursor!=null){
+
+        if(cursor!=null) {
             cursor.moveToFirst();
-            nmusuarioSistema = cursor.getString(cursor.getColumnIndex(CriaBanco.NMUSUARIOSISTEMA));
         }
-
-        cursor.close();
         db.close();
-        return nmusuarioSistema;
-    }
 
-    public String fuSelecionarFilial(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.FILIAL};
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
-        String vf_Filial = "";
-        if(cursor!=null){
-            cursor.moveToFirst();
-            vf_Filial = cursor.getString(cursor.getColumnIndex(CriaBanco.FILIAL));
-        }
-
-        cursor.close();
-        db.close();
-        return vf_Filial;
+        return cursor;
     }
 
     public Cursor fuSelecionarVendedor(){
@@ -77,5 +174,39 @@ public class MDL_Usuario {
         db.close();
 
         return cursor;
+    }
+
+    public Cursor fuSelecionarDtSincronizacao(){
+        Cursor cursor;
+        String[] campos = {banco.DTULTSINCRONIZACAO};
+        db = banco.getReadableDatabase();
+        cursor = db.query(banco.TABELASINCRONIZACAO, campos, null, null, null, null, null);
+        if(cursor!=null){
+            cursor.moveToFirst();
+        }
+
+        db.close();
+
+        return cursor;
+    }
+
+    public boolean fuAtualizarSincronizacao(String data){
+        try {
+            ContentValues valores;
+            db = banco.getWritableDatabase();
+
+            db.delete(banco.TABELASINCRONIZACAO, null, null);
+
+            valores = new ContentValues();
+            valores.put(banco.DTULTSINCRONIZACAO, data);
+            valores.put(banco.ULTDTATUALIZACAO, data);
+
+            db.insert(banco.TABELASINCRONIZACAO, null, valores);
+            db.close();
+
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 }

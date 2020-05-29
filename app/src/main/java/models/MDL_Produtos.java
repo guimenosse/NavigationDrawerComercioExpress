@@ -1,10 +1,11 @@
 package models;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
+import models.CriaBanco;
 
 public class MDL_Produtos {
 
@@ -18,23 +19,6 @@ public class MDL_Produtos {
 
     public Cursor rs_Produto;
 
-    /*sql = "CREATE TABLE " + TABELAPRODUTOS + "(" +
-                ID + " integer primary key autoincrement, " +
-                CDPRODUTO + " text, " +
-                DESCRICAO + " text, " +
-                ESTOQUEATUAL + " integer, " +
-                VALORUNITARIO + " real, " +
-                DESCMAXPERMITIDO + " real, " +
-                DESCMAXPERMITIDOA + " real, " +
-                DESCMAXPERMITIDOB + " real, " +
-                DESCMAXPERMITIDOC + " real, " +
-                DESCMAXPERMITIDOD + " real, " +
-                DESCMAXPERMITIDOE + " real, " +
-                DESCMAXPERMITIDOFIDELIDADE + " real, " +
-                DTULTALTERACAO + " datetime)";
-
-        db.execSQL(sql);*/
-
     public String [] arr_CamposProduto = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO,
             banco.VALORATACADO,
             banco.DESCMAXPERMITIDO, banco.DESCMAXPERMITIDOA, banco.DESCMAXPERMITIDOB, banco.DESCMAXPERMITIDOC,
@@ -44,6 +28,81 @@ public class MDL_Produtos {
     public MDL_Produtos(Context context)
     {
         banco = new CriaBanco(context);
+    }
+
+
+    public boolean fuInserirProdutoFilial(String cdproduto, String descricao, String estoqueatual, String valorunitario,
+                                       String valoratacado,
+                                       String dtultalteracao, String maxdescpermitido, String maxdescpermitidoa,
+                                       String maxdescpermitidob, String maxdescpermitidoc, String maxdescpermitidod,
+                                       String maxdescpermitidoe, String maxdescpermitidofidelidade){
+        ContentValues valores;
+        long resultado;
+
+        db = banco.getWritableDatabase();
+        valores = new ContentValues();
+        valores.put(CriaBanco.CDPRODUTO, cdproduto);
+        valores.put(CriaBanco.DESCRICAO, descricao);
+        valores.put(CriaBanco.ESTOQUEATUAL, estoqueatual);
+        valores.put(CriaBanco.VALORUNITARIO, valorunitario);
+        valores.put(CriaBanco.VALORATACADO, valoratacado);
+        valores.put(CriaBanco.DTULTALTERACAO, dtultalteracao);
+        valores.put(CriaBanco.DESCMAXPERMITIDO, maxdescpermitido);
+        valores.put(CriaBanco.DESCMAXPERMITIDOA, maxdescpermitidoa);
+        valores.put(CriaBanco.DESCMAXPERMITIDOB, maxdescpermitidob);
+        valores.put(CriaBanco.DESCMAXPERMITIDOC, maxdescpermitidoc);
+        valores.put(CriaBanco.DESCMAXPERMITIDOD, maxdescpermitidod);
+        valores.put(CriaBanco.DESCMAXPERMITIDOE, maxdescpermitidoe);
+        valores.put(CriaBanco.DESCMAXPERMITIDOFIDELIDADE, maxdescpermitidofidelidade);
+
+        resultado = db.insert(CriaBanco.TABELAPRODUTOS, null, valores);
+        db.close();
+
+        if(resultado == -1){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
+    public boolean fuAtualizarValorUnitarioFilial(String cdProduto, String valorUnitario){
+
+        ContentValues valores;
+        String where;
+        long resultado;
+        db = banco.getWritableDatabase();
+
+        where = CriaBanco.CDPRODUTO + "='" + cdProduto + "'";
+
+        valores = new ContentValues();
+        valores.put(CriaBanco.VALORUNITARIO, valorUnitario);
+
+        resultado = db.update(CriaBanco.TABELAPRODUTOS, valores, where, null);
+        db.close();
+
+        if(resultado == -1){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
+    //------------------------------ Função que limpa todos os produtos para a sincronização -------------------------------------
+    public boolean fuDeletarTodosProdutos(){
+
+        try {
+
+            db = banco.getReadableDatabase();
+            db.delete(CriaBanco.TABELAPRODUTOS, null, null);
+            db.close();
+
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+
     }
 
     //FUNÇÃO PARA A CLASSE DE ESTOQUE

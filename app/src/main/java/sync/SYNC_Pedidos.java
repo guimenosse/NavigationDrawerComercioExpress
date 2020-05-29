@@ -5,9 +5,11 @@ import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
-import com.example.desenvolvimento.navigationdrawercomercioexpress.MySSLSocketFactory;
+import classes.CL_Usuario;
+import controllers.CTL_Usuario;
+import models.CriaBanco;
+import br.comercioexpress.plano.Funcoes;
+import br.comercioexpress.plano.MySSLSocketFactory;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
@@ -52,6 +54,9 @@ import models.MDL_Usuario;
 
 public class SYNC_Pedidos extends AppCompatActivity {
 
+    CL_Usuario cl_Usuario;
+    CTL_Usuario ctl_Usuario;
+
     CL_Pedidos cl_Pedidos;
     CTL_Pedidos ctl_Pedidos;
     MDL_Pedidos mdl_Pedidos;
@@ -66,7 +71,6 @@ public class SYNC_Pedidos extends AppCompatActivity {
 
     int TIMEOUT_MILLISEC = 10000;
 
-    protected String vc_CdClienteBanco = "", vc_NmUsuarioSistema = "";
 
     public SYNC_Pedidos(Context context){
 
@@ -74,9 +78,8 @@ public class SYNC_Pedidos extends AppCompatActivity {
         this.mdl_Pedidos = new MDL_Pedidos(context);
         this.funcoes = new Funcoes();
 
-        MDL_Usuario mdl_Usuario = new MDL_Usuario(context);
-        this.vc_CdClienteBanco = mdl_Usuario.fuSelecionarCdClienteBanco();
-        this.vc_NmUsuarioSistema = mdl_Usuario.fuSelecionarNmUsuarioSistema();
+        cl_Usuario = new CL_Usuario();
+        ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
 
         cl_Filial = new CL_Filial();
         CTL_Filial ctl_Filial = new CTL_Filial(context, cl_Filial);
@@ -88,6 +91,9 @@ public class SYNC_Pedidos extends AppCompatActivity {
         try {
 
             cl_Pedidos = cl_Pedido;
+
+            cl_Pedidos.setObsPedido("  CONDIÇÃO DE PAGAMENTO INFORMADA: " + cl_Pedidos.getCondPgto() + "pulalinha" + cl_Pedidos.getObsPedido());
+            cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido().replace(" ", "espaco"));
 
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             trustStore.load(null, null);
@@ -111,7 +117,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
 
             HttpClient httpclient = new DefaultHttpClient(ccm, p);
             String url = "http://www.planosistemas.com.br/" +
-                    "WebService2.php?user=" + vc_CdClienteBanco
+                    "WebService2.php?user=" + cl_Usuario.getCdClienteBanco()
                     + "&format=json&num=10&method=inserirpedidofrete&vltotal=" + cl_Pedidos.getVlTotal().replace(".", ",")
                     + "&dtemissao=" + cl_Pedidos.getDtEmissao().replace(" ", "espaco") + ""
                     + "&cdvendedor=" + cl_Pedidos.getCdVendedor() + "&cdemitente=" + cl_Pedidos.getCdCliente()
@@ -314,7 +320,9 @@ public class SYNC_Pedidos extends AppCompatActivity {
                     if(ctl_Cliente.fuSelecionarClienteSincronizacao("cdCliente")){
                         if (cl_Cliente.getFgSincronizado().equals("N")) {
                             SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
-                            cl_Pedidos.setCdCliente(sync_Clientes.FU_SincronizarClientePedido(cl_Cliente));
+                            if(sync_Clientes.FU_SincronizarClientePedido(cl_Cliente)){
+                                cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -327,7 +335,9 @@ public class SYNC_Pedidos extends AppCompatActivity {
                         if(ctl_Cliente.fuSelecionarClienteSincronizacao("cpfCnpj")) {
                             if (cl_Cliente.getFgSincronizado().equals("N")) {
                                 SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
-                                cl_Pedidos.setCdCliente(sync_Clientes.FU_SincronizarClientePedido(cl_Cliente));
+                                if(sync_Clientes.FU_SincronizarClientePedido(cl_Cliente)){
+                                    cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
+                                }
                             }
                         }
                     } catch (Exception ex) {
@@ -360,7 +370,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
 
                     HttpClient httpclient = new DefaultHttpClient(ccm, p);
                     String url = "http://www.planosistemas.com.br/" +
-                            "WebService2.php?user=" + vc_CdClienteBanco
+                            "WebService2.php?user=" + cl_Usuario.getCdClienteBanco()
                             + "&format=json&num=10&method=inserirpedidofrete&vltotal=" + cl_Pedidos.getVlTotal()
                             + "&dtemissao=" + cl_Pedidos.getDtEmissao() + ""
                             + "&cdvendedor=" + cl_Pedidos.getCdVendedor() + "&cdemitente=" + cl_Pedidos.getCdCliente() + "&rzsocial=" + cl_Pedidos.getNomeRzSocial()
@@ -593,7 +603,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                     HttpClient httpclient = new DefaultHttpClient(ccm, p);
 
                     String url = "http://www.planosistemas.com.br/" +
-                            "WebService2.php?user=" + vc_CdClienteBanco
+                            "WebService2.php?user=" + cl_Usuario.getCdClienteBanco()
                             + "&format=json&num=10&method=inseriritempedido&numpedido=" + numPedidoServidor + "&cdproduto="
                             + cl_ItemPedido.getCdProduto().replace(" ", "espaco") + "&id=" + cl_ItemPedido.getId()
                             + "&qtde=" + cl_ItemPedido.getQtde().replace(".", ",") + "&vlunitario=" + cl_ItemPedido.getVlUnitario()
@@ -673,11 +683,11 @@ public class SYNC_Pedidos extends AppCompatActivity {
 
             HttpClient httpclient = new DefaultHttpClient(ccm, p);
             String url = "http://www.planosistemas.com.br/" +
-                    "WebService2.php?user=" + vc_CdClienteBanco
+                    "WebService2.php?user=" + cl_Usuario.getCdClienteBanco()
                     + "&format=json&num=10&method=alteraSituacaoPedidoNovo&numpedido=" + numPedidoServidor
                     + "&filial=" + cl_Filial.getCdFilial()
                     + "&dtregistro=" + dataRegistro.replace(" ", "espaco")
-                    + "&usuario=" + vc_NmUsuarioSistema.replace(" ", "espaco") + "";
+                    + "&usuario=" + cl_Usuario.getNmUsuarioSistema().replace(" ", "espaco") + "";
             HttpPost httppost = new HttpPost(url);
 
             try {
@@ -729,7 +739,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
             HttpClient httpclient = new DefaultHttpClient(ccm, p);
             String url = "http://www.planosistemas.com.br/" +
-                    "WebService2.php?user=" + vc_CdClienteBanco + "&format=json&num=10&method=cancelarPedido&numpedido=" + numPedido + "";
+                    "WebService2.php?user=" + cl_Usuario.getCdClienteBanco() + "&format=json&num=10&method=cancelarPedido&numpedido=" + numPedido + "";
             HttpPost httppost = new HttpPost(url);
 
             try {

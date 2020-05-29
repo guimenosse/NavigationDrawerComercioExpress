@@ -1,9 +1,10 @@
 package controllers;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
+import models.CriaBanco;
 
 import classes.CL_Clientes;
 import models.MDL_Clientes;
@@ -25,6 +26,41 @@ public class CTL_Clientes {
 
     }
 
+    public boolean fuInserirCliente(){
+        /*public String fuInserirCliente(String cdcliente, String rzsocial, String nmfantasia, String cep, String endereco,
+                                 String numero, String complemento, String bairro, String uf, String cidade,
+                                 String cgc, String inscestadual, String telefone, String telefoneadicional,
+                                 String fax, String contato, String email, String tipcliente, String vendedor,
+                                 String tipopessoa, String dtultalteracao, String dtcadastro, String fgsincronizado,
+                                 String obscliente, String classificacao, String fidelidade, String tipopreco)*/
+
+        if(mdl_Cliente.fuInserirCliente(cl_Cliente.getCdCliente(), cl_Cliente.getNomeRzSocial(), cl_Cliente.getNomeFantasia(),
+                cl_Cliente.getCep(), cl_Cliente.getEndereco(), cl_Cliente.getNumEndereco(), cl_Cliente.getComplemento(),
+                cl_Cliente.getBairro(), cl_Cliente.getUf(), cl_Cliente.getCidade(), cl_Cliente.getCpfCnpj(),
+                cl_Cliente.getInscEstadual(), cl_Cliente.getTelefone(), cl_Cliente.getTelefoneAdicional(), cl_Cliente.getFax(),
+                cl_Cliente.getNomeContato(), cl_Cliente.getEmail(), cl_Cliente.getTipoCliente(), cl_Cliente.getVendedor(),
+                cl_Cliente.getTipoPessoa(), cl_Cliente.getDtUltimaAlteracao(), cl_Cliente.getDtCadastro(), cl_Cliente.getFgSincronizado(),
+                cl_Cliente.getObservacao(), cl_Cliente.getClassificacao(), cl_Cliente.getFidelidade(), cl_Cliente.getTipoPreco())){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean fuInserirTipoCliente(String cdTipo, String nmTipo){
+
+        try {
+            if(mdl_Cliente.fuInserirTipoCliente(cdTipo, nmTipo)){
+                return true;
+            }else{
+                return false;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+    }
+
     public boolean fuSelecionarCliente(){
 
         rs_Cliente = mdl_Cliente.fuCarregaCliente(cl_Cliente.getCdCliente());
@@ -34,7 +70,13 @@ public class CTL_Clientes {
             while(!rs_Cliente.isAfterLast()) {
 
                 if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ID)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ID)).trim().equals("")) {
-                    cl_Cliente.setCdCliente(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ID)));
+                    cl_Cliente.setId(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ID)));
+                }else{
+                    cl_Cliente.setId("0");
+                }
+
+                if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)).trim().equals("")) {
+                    cl_Cliente.setCdCliente(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)));
                 }else{
                     cl_Cliente.setCdCliente("0");
                 }
@@ -187,7 +229,13 @@ public class CTL_Clientes {
             while(!rs_Cliente.isAfterLast()) {
 
                 if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ID)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ID)).trim().equals("")) {
-                    cl_Cliente.setCdCliente(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ID)));
+                    cl_Cliente.setId(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ID)));
+                }else{
+                    cl_Cliente.setId("0");
+                }
+
+                if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)).trim().equals("")) {
+                    cl_Cliente.setCdCliente(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)));
                 }else{
                     cl_Cliente.setCdCliente("0");
                 }
@@ -206,7 +254,7 @@ public class CTL_Clientes {
                 if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CEP)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CEP)).trim().equals("")) {
                     cl_Cliente.setCep(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CEP)).replace(".", "").replace("-", ""));
                 } else {
-                    cl_Cliente.setCep("");
+                    cl_Cliente.setCep("0");
                 }
                 if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ENDERECO)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ENDERECO)).trim().equals("")) {
                     cl_Cliente.setEndereco(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.ENDERECO)).replace("'", ""));
@@ -221,7 +269,7 @@ public class CTL_Clientes {
                 if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.NUMERO)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.NUMERO)).trim().equals("")) {
                     cl_Cliente.setNumEndereco(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.NUMERO)));
                 } else {
-                    cl_Cliente.setNumEndereco("");
+                    cl_Cliente.setNumEndereco("0");
                 }
                 if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.COMPLEMENTO)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.COMPLEMENTO)).trim().equals("")) {
                     cl_Cliente.setComplemento(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.COMPLEMENTO)).replace("'", ""));
@@ -322,6 +370,12 @@ public class CTL_Clientes {
                     cl_Cliente.setTipoPreco(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.TIPOPRECO)));
                 } else {
                     cl_Cliente.setTipoPreco("");
+                }
+
+                if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)).trim().equals("")) {
+                    cl_Cliente.setFgSincronizado(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)));
+                } else {
+                    cl_Cliente.setFgSincronizado("");
                 }
 
                 rs_Cliente.moveToNext();
@@ -526,4 +580,33 @@ public class CTL_Clientes {
 
         return vf_TipoPreco;
     }
+
+    public boolean fuSelecionarClientesNaoSincronizados(){
+        try{
+
+            rs_Cliente = mdl_Cliente.fuCarregarClientesNaoSincronizados();
+
+            if(rs_Cliente.getCount() > 0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    public boolean fuDeletarTodosTiposCliente(){
+        try{
+
+            if(mdl_Cliente.fuDeletarTodosTiposCliente()){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception e){
+            return false;
+        }
+    }
+
 }

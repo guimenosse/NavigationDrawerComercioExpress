@@ -3,8 +3,8 @@ package controllers;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
+import models.CriaBanco;
+import br.comercioexpress.plano.Funcoes;
 
 import classes.CL_ItemPedido;
 import models.MDL_ItemPedido;

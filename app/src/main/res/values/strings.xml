@@ -15,7 +15,7 @@
     <string name="email">Email</string>
     <string name="telefone">Telefone</string>
     <string name="telefoneadicional">Telefone Adicional</string>
-    <string name="fax">Fax</string>
+    <string name="fax">Celular</string>
     <string name="complemento">Complemento</string>
     <string name="cep">CEP</string>
     <string name="bairro">Bairro</string>

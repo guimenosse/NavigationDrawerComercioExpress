@@ -3,7 +3,7 @@ package controllers;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
+import models.CriaBanco;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,7 @@ public class CTL_VisaoGeral {
                                 if(vf_VlTotalString.trim().equals("")){
                                     vf_VlTotal += 0.0;
                                 }else{
-                                    vf_VlTotal += Double.parseDouble(vf_VlTotalString.replace(".", "").replace(",", "."));
+                                    vf_VlTotal += Double.parseDouble(vf_VlTotalString.replace(",", "."));
                                 }
                                 vf_VlAberto += vf_VlTotal;
                             }else if(rs_Movimentacao.getString(rs_Movimentacao.getColumnIndex(CriaBanco.FGSITUACAO)).equals("CANCELADO")){
@@ -79,7 +79,7 @@ public class CTL_VisaoGeral {
                                 if(vf_VlTotalString.trim().equals("")){
                                     vf_VlTotal += 0.0;
                                 }else{
-                                    vf_VlTotal += Double.parseDouble(vf_VlTotalString.replace(".", "").replace(",", "."));
+                                    vf_VlTotal += Double.parseDouble(vf_VlTotalString.replace(",", "."));
                                 }
                                 vf_VlCancelado += vf_VlTotal;
                             }else if(rs_Movimentacao.getString(rs_Movimentacao.getColumnIndex(CriaBanco.FGSITUACAO)).equals("ENVIADO")){
@@ -88,7 +88,7 @@ public class CTL_VisaoGeral {
                                 if(vf_VlTotalString.trim().equals("")){
                                     vf_VlTotal += 0.0;
                                 }else{
-                                    vf_VlTotal += Double.parseDouble(vf_VlTotalString.replace(".", "").replace(",", "."));
+                                    vf_VlTotal += Double.parseDouble(vf_VlTotalString.replace(",", "."));
                                 }
                                 vf_VlEnviado += vf_VlTotal;
                             }
@@ -166,11 +166,11 @@ public class CTL_VisaoGeral {
                             } else {
                                 vf_VlDescontoTipoVenda += Double.parseDouble(rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLDESCONTO)));
                             }
-                            String vf_VlTotal = rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLTOTAL)).replace("Total Liquido do Pedido: R$", "");
+                            String vf_VlTotal = rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLTOTAL));
                             if (vf_VlTotal.trim().equals("")) {
                                 vf_VlTotalTipoVenda += 0.0;
                             } else {
-                                vf_VlTotalTipoVenda += Double.parseDouble(vf_VlTotal.replace(".", "").replace(",", "."));
+                                vf_VlTotalTipoVenda += Double.parseDouble(vf_VlTotal.replace(",", "."));
                             }
                         } else if (rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.FGSITUACAO)).equals("CANCELADO")) {
                             vf_CountCanceladosTipoVenda += 1;
@@ -179,11 +179,11 @@ public class CTL_VisaoGeral {
                             } else {
                                 vf_VlDescontoTipoVenda += Double.parseDouble(rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLDESCONTO)));
                             }
-                            String vf_VlTotal = rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLTOTAL)).replace("Total Liquido do Pedido: R$", "");
+                            String vf_VlTotal = rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLTOTAL));
                             if (vf_VlTotal.trim().equals("")) {
                                 vf_vlTotalCancelados += 0.0;
                             } else {
-                                vf_vlTotalCancelados += Double.parseDouble(vf_VlTotal.replace(".", "").replace(",", "."));
+                                vf_vlTotalCancelados += Double.parseDouble(vf_VlTotal.replace(",", "."));
                             }
                         }else if(rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.FGSITUACAO)).equals("ENVIADO")){
                             vf_CountEnviados += 1;
@@ -192,11 +192,11 @@ public class CTL_VisaoGeral {
                             } else {
                                 vf_VlDescontoTipoVenda += Double.parseDouble(rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLDESCONTO)));
                             }
-                            String vf_VlTotal = rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLTOTAL)).replace("Total Liquido do Pedido: R$", "");
+                            String vf_VlTotal = rs_Venda.getString(rs_Venda.getColumnIndex(CriaBanco.VLTOTAL));
                             if (vf_VlTotal.trim().equals("")) {
                                 vf_VlTotalEnviados += 0.0;
                             } else {
-                                vf_VlTotalEnviados += Double.parseDouble(vf_VlTotal.replace(".", "").replace(",", "."));
+                                vf_VlTotalEnviados += Double.parseDouble(vf_VlTotal.replace(",", "."));
                             }
                         }
                     }catch (Exception e){
