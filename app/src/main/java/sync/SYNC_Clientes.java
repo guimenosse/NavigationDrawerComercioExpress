@@ -395,7 +395,7 @@ public class SYNC_Clientes {
 
                     HttpClient httpclient = new DefaultHttpClient(ccm, p);
                     String url = "http://www.planosistemas.com.br/" +
-                            "WebService2020.php?user=" + cl_Usuario.getCdClienteBanco() +
+                            "WebService2.php?user=" + cl_Usuario.getCdClienteBanco() +
                             "&format=json&num=10&method=inserirClienteNovo&rzsocial=" + cl_Cliente.getNomeRzSocial().replace(" ", "espaco") +
                             "&nmfantasia=" + cl_Cliente.getNomeFantasia().replace(" ", "espaco") +
                             "&cep=" + cl_Cliente.getCep() +
@@ -696,7 +696,7 @@ public class SYNC_Clientes {
             HttpClient httpclient = new DefaultHttpClient(ccm, p);
 
             String url = "http://www.planosistemas.com.br/" +
-                    "WebService2020.php?user=" + cl_Usuario.getCdClienteBanco() +
+                    "WebService2.php?user=" + cl_Usuario.getCdClienteBanco() +
                     "&format=json&num=10&method=inserirClienteNovo&rzsocial=" + cl_Cliente.getNomeRzSocial().replace(" ", "espaco") +
                     "&nmfantasia=" + cl_Cliente.getNomeFantasia().replace(" ", "espaco") +
                     "&cep=" + cl_Cliente.getCep() +
