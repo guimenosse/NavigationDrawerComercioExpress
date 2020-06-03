@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -404,14 +405,14 @@ public class ManutencaoPedidos extends AppCompatActivity {
             if(!tb_vlDesconto.getText().toString().trim().equals("")){
                 vf_VlDesconto = Double.parseDouble(tb_vlDesconto.getText().toString().replace(".", "").replace(",", "."));
             }
-            cl_Pedidos.setVlDesconto(String.format("%.2f", vf_VlDesconto).replace(".", "").replace(",", "."));
+            cl_Pedidos.setVlDesconto(String.format("%.2f", vf_VlDesconto).replace(",", "."));
             cl_Pedidos.setPercDesconto(tb_percDesconto.getText().toString());
             double vf_VlFrete = 0.0;
             if(!tb_vlFrete.getText().toString().trim().equals("")){
                 vf_VlFrete = Double.parseDouble(tb_vlFrete.getText().toString().replace(".", "").replace(",", "."));
             }
-            cl_Pedidos.setVlFrete(String.format("%.2f", vf_VlFrete).replace(".", "").replace(",", "."));
-            cl_Pedidos.setVlTotal(lb_vlTotalResultado.getText().toString().replace("R$", "").replace(".", "").replace(",", "."));
+            cl_Pedidos.setVlFrete(String.format("%.2f", vf_VlFrete).replace(",", "."));
+            cl_Pedidos.setVlTotal(lb_vlTotalResultado.getText().toString().replace("R$", "").replace(",", "."));
             cl_Pedidos.setObsPedido(tb_obsPedido.getText().toString().toUpperCase());
 
             ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
@@ -934,6 +935,9 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
         }else{
             vw_ListaProdutos.setVisibility(View.GONE);
+
+            cl_Pedidos.setQtdeItens("0");
+            cl_Pedidos.setVlTotalItens("0.0");
 
             lb_valorTotalProdutos.setText("Total: R$0,00");
             lb_qtdeTotalProdutos.setText("Qtde: 0");

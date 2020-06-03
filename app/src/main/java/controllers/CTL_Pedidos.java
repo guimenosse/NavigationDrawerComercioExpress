@@ -198,9 +198,14 @@ public class CTL_Pedidos {
                             }
                         }
 
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)).trim().equals("")) {
+                            vf_VlTotalDouble = vf_VlTotalDouble + Double.parseDouble(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)).replace(",", "."));
+                        }
+
                         if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).trim().equals("")) {
                             vf_VlTotalDouble = vf_VlTotalDouble - Double.parseDouble(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).replace(",", "."));
                         }
+
 
                         vf_VlTotal = String.format("%.2f", vf_VlTotalDouble);
                         cl_Pedidos.setVlTotal(vf_VlTotal.replace(".", "").replace(",", "."));

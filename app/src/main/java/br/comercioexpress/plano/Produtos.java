@@ -26,8 +26,10 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import java.util.ArrayList;
 import java.util.List;
 
+import classes.CL_Configuracao;
 import classes.CL_Filial;
 import classes.CL_Usuario;
+import controllers.CTL_Configuracao;
 import controllers.CTL_Filial;
 import controllers.CTL_Usuario;
 import models.CriaBanco;
@@ -41,6 +43,9 @@ public class Produtos extends AppCompatActivity
 
     CL_Usuario cl_Usuario;
     CTL_Usuario ctl_Usuario;
+
+    CL_Configuracao cl_Configuracao;
+    CTL_Configuracao ctl_Configuracao;
 
     int VA_ContProdutos;
 
@@ -59,6 +64,10 @@ public class Produtos extends AppCompatActivity
         setContentView(R.layout.activity_produtos);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        cl_Configuracao = new CL_Configuracao();
+        ctl_Configuracao = new CTL_Configuracao(getApplicationContext(), cl_Configuracao);
+        ctl_Configuracao.fuCarregarFgControlaEstoquePedido();
 
         sv_Produtos = (MaterialSearchView) findViewById(R.id.sv_Produtos);
         sv_Produtos.setVoiceSearch(true); //or false
@@ -127,25 +136,14 @@ public class Produtos extends AppCompatActivity
         List<String> valorAtacado = new ArrayList<>();
 
         if (cursor != null) {
-            codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
-            descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
-            itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
-            VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
-            if (cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)) != null) {
-                VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
-            }
-            else
-            {
-                VA_ValorAtacado = "0";
-            }
-
-            valorProduto.add(VA_ValorProduto);
-            valorAtacado.add(VA_ValorAtacado);
-            VA_ContProdutos = VA_ContProdutos + 1;
-            while(cursor.moveToNext()) {
+            while(!cursor.isAfterLast()) {
                 codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
                 descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
-                itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
+                    itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)) + " / Quantidade disponível: " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
+                }else{
+                    itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                }
                 VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
                 if(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)) != null) {
                     VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
@@ -157,6 +155,8 @@ public class Produtos extends AppCompatActivity
                 valorProduto.add(VA_ValorProduto);
                 valorAtacado.add(VA_ValorAtacado);
                 VA_ContProdutos = VA_ContProdutos + 1;
+
+                cursor.moveToNext();
             }
         }
 
@@ -242,25 +242,22 @@ public class Produtos extends AppCompatActivity
                 List<String> valorAtacado = new ArrayList<>();
                 if (cursor != null) {
                     try {
-                        codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
-                        descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
-                        itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
-                        VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
-                        VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
-
-                        valorProduto.add(VA_ValorProduto);
-                        valorAtacado.add(VA_ValorAtacado);
-                        VA_ContProdutos = VA_ContProdutos + 1;
-                        while (cursor.moveToNext()) {
+                        while (!cursor.isAfterLast()) {
                             codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
                             descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
-                            itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                            if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
+                                itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)) + " / Quantidade disponível: " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
+                            }else{
+                                itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                            }
                             VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
                             VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
                             valorProduto.add(VA_ValorProduto);
                             valorAtacado.add(VA_ValorAtacado);
                             VA_ContProdutos = VA_ContProdutos + 1;
+
+                            cursor.moveToNext();
                         }
                     }catch (Exception e){
 
@@ -375,25 +372,22 @@ public class Produtos extends AppCompatActivity
                 List<String> valorAtacado = new ArrayList<>();
                 if (cursor != null) {
                     try {
-                        codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
-                        descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
-                        itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
-                        VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
-                        VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
-
-                        valorProduto.add(VA_ValorProduto);
-                        valorAtacado.add(VA_ValorAtacado);
-                        VA_ContProdutos = VA_ContProdutos + 1;
-                        while (cursor.moveToNext()) {
+                        while (!cursor.isAfterLast()) {
                             codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
                             descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
-                            itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                            if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
+                                itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)) + " / Quantidade disponível: " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
+                            }else{
+                                itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                            }
                             VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
                             VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
 
                             valorProduto.add(VA_ValorProduto);
                             valorAtacado.add(VA_ValorAtacado);
                             VA_ContProdutos = VA_ContProdutos + 1;
+
+                            cursor.moveToNext();
                         }
                     }catch (Exception e){
 

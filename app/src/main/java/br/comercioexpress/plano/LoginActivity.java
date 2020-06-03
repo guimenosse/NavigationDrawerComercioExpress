@@ -55,6 +55,7 @@ import classes.CL_Usuario;
 import controllers.CTL_Usuario;
 import models.CriaBanco;
 import sync.SYNC_Clientes;
+import sync.SYNC_Configuracao;
 import sync.SYNC_Produtos;
 import sync.SYNC_Usuario;
 
@@ -195,6 +196,12 @@ public class LoginActivity extends AppCompatActivity {
 
         if(!sync_Usuario.FU_BuscaCdVendedorDefault()){
             vc_Mensagem = "Não foi possivel realizar a sincronização do vendedor padrão do usuário. Favor verificar a conexão com a internet e o banco de dados!";
+            return false;
+        }
+
+        SYNC_Configuracao sync_Configuracao = new SYNC_Configuracao(vc_Context);
+
+        if(!sync_Configuracao.FU_SincronizarFgControlaEstoquePedido()){
             return false;
         }
 

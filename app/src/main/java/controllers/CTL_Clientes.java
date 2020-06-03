@@ -212,6 +212,14 @@ public class CTL_Clientes {
                 } else {
                     cl_Cliente.setTipoPreco("");
                 }
+
+                if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)).trim().equals("")) {
+                    cl_Cliente.setFgSincronizado(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)));
+                } else {
+                    cl_Cliente.setFgSincronizado("");
+                }
+
+                rs_Cliente.moveToNext();
             }
 
             return true;
@@ -542,6 +550,14 @@ public class CTL_Clientes {
                 } else {
                     cl_Cliente.setTipoPreco("espaco");
                 }
+
+                if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)).trim().equals("")) {
+                    cl_Cliente.setFgSincronizado(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)));
+                } else {
+                    cl_Cliente.setFgSincronizado("");
+                }
+
+                rs_Cliente.moveToNext();
 
             }
 

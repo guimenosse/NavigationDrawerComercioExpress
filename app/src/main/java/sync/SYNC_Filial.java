@@ -176,8 +176,8 @@ public class SYNC_Filial {
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
 
             // Instantiate an HttpClient
-            HttpClient httpclient = new DefaultHttpClient(p);
-            String url = "http://www.planosistemas.com.br/" +
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
+            String url = "https://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + cl_Usuario.getCdClienteBanco() + "&format=json&num=10&method=autorizacao&cdsistema=PAR&cdfuncao=CBFILIAL&nmusuario=" + cl_Usuario.getNmUsuarioSistema().replace(" ", "espaco") + "";
             HttpPost httppost = new HttpPost(url);
 

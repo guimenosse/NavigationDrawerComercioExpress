@@ -65,6 +65,7 @@ import controllers.CTL_Usuario;
 import models.CriaBanco;
 import models.MDL_Usuario;
 import sync.SYNC_Clientes;
+import sync.SYNC_Configuracao;
 import sync.SYNC_Filial;
 import sync.SYNC_Pedidos;
 import sync.SYNC_Produtos;
@@ -84,6 +85,7 @@ public class Opcoes extends AppCompatActivity
     SYNC_Clientes sync_Clientes;
     SYNC_Produtos sync_Produtos;
     SYNC_Filial sync_Filial;
+    SYNC_Configuracao sync_Configuracao;
 
     Context vc_Context;
 
@@ -141,6 +143,7 @@ public class Opcoes extends AppCompatActivity
         sync_Clientes = new SYNC_Clientes(getApplicationContext());
         sync_Produtos = new SYNC_Produtos(getApplicationContext());
         sync_Filial = new SYNC_Filial(getApplicationContext());
+        sync_Configuracao = new SYNC_Configuracao(getApplicationContext());
 
         vc_Context = getApplicationContext();
 
@@ -347,6 +350,10 @@ public class Opcoes extends AppCompatActivity
         }
 
         if(!sync_Clientes.FU_SincronizarTodosClientesServidor()){
+            return false;
+        }
+
+        if(!sync_Configuracao.FU_SincronizarFgControlaEstoquePedido()){
             return false;
         }
 

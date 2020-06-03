@@ -54,6 +54,8 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String ULTCDCLIENTE = "ultcdcliente";
     public static final String ULTDTATUALIZACAO = "ultdtatualizacao";
 
+    public static final String TABELACONFIGURACAO = "configuracao";
+    public static final String FGCONTROLAESTOQUEPEDIDO = "fgcontrolaestoquepedido";
 
     public static  final String TABELAPRODUTOS = "cadpro";
     public static final String CDPRODUTO = "cdproduto";
@@ -68,6 +70,8 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String DESCMAXPERMITIDOD = "descmaxpermitidod";
     public static final String DESCMAXPERMITIDOE = "descmaxpermitidoe";
     public static final String DESCMAXPERMITIDOFIDELIDADE = "descmaxpermitidofidelidade";
+    public static final String QTDEDISPONIVEL = "qtdedisponivel";
+    public static final String CDREFESTOQUE = "cdrefestoque";
 
     public static final String TABELAMESTREPEDIDO = "mestrepedido";
     public static final String NUMPEDIDO = "numpedido";
@@ -135,6 +139,15 @@ public class CriaBanco extends SQLiteOpenHelper {
 
         db.execSQL(sql);
 
+        sql = "CREATE TABLE IF NOT EXISTS " + TABELACONFIGURACAO + "("
+                + FGCONTROLAESTOQUEPEDIDO + " text"
+                + ")";
+
+        db.execSQL(sql);
+
+        sql = "INSERT INTO " + TABELACONFIGURACAO + " VALUES ('N')";
+        db.execSQL(sql);
+
         sql = "CREATE TABLE " + TABELATIPCLIENTE + "("
                 + ID + " integer primary key autoincrement, "
                 + CDTIPO + " text, "
@@ -196,6 +209,8 @@ public class CriaBanco extends SQLiteOpenHelper {
                 DESCMAXPERMITIDOD + " real, " +
                 DESCMAXPERMITIDOE + " real, " +
                 DESCMAXPERMITIDOFIDELIDADE + " real, " +
+                QTDEDISPONIVEL +  " real, " +
+                CDREFESTOQUE + " text, " +
                 DTULTALTERACAO + " datetime)";
 
         db.execSQL(sql);

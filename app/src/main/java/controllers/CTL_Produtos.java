@@ -3,6 +3,8 @@ package controllers;
 import android.content.Context;
 import android.database.Cursor;
 
+import java.security.interfaces.RSAKey;
+
 import models.CriaBanco;
 
 import br.comercioexpress.plano.Funcoes;
@@ -35,7 +37,8 @@ public class CTL_Produtos {
         if(mdl_Produtos.fuInserirProdutoFilial(cl_Produtos.getCdProduto(), cl_Produtos.getDescricao(), cl_Produtos.getEstoqueAtual(),
                 cl_Produtos.getVlUnitario(), cl_Produtos.getVlAtacado(), cl_Produtos.getDtUltimaAlteracao(), cl_Produtos.getDescMaxPermitido(),
                 cl_Produtos.getDescMaxPermitidoA(), cl_Produtos.getDescMaxPermitidoB(), cl_Produtos.getDescMaxPermitidoC(),
-                cl_Produtos.getDescMaxPermitidoD(), cl_Produtos.getDescMaxPermitidoE(), cl_Produtos.getDescMaxPermitidoFidelidade())){
+                cl_Produtos.getDescMaxPermitidoD(), cl_Produtos.getDescMaxPermitidoE(), cl_Produtos.getDescMaxPermitidoFidelidade(),
+                cl_Produtos.getQtdeDisponivel(), cl_Produtos.getCdRefEstoque())){
             return true;
         }else{
             return false;
@@ -143,6 +146,22 @@ public class CTL_Produtos {
                         }
                     } catch (Exception e) {
                         cl_Produtos.setDescMaxPermitidoFidelidade("0.00");
+                    }
+
+                    try {
+                        if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)).equals("null")) {
+                            cl_Produtos.setQtdeDisponivel(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
+                        }
+                    } catch (Exception e) {
+                        cl_Produtos.setQtdeDisponivel("");
+                    }
+
+                    try {
+                        if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.CDREFESTOQUE)).equals("null")) {
+                            cl_Produtos.setCdRefEstoque(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.CDREFESTOQUE)));
+                        }
+                    } catch (Exception e) {
+                        cl_Produtos.setCdRefEstoque("");
                     }
 
                     try {
@@ -270,6 +289,22 @@ public class CTL_Produtos {
                     }
 
                     try {
+                        if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)).equals("null")) {
+                            cl_Produtos.setQtdeDisponivel(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
+                        }
+                    } catch (Exception e) {
+                        cl_Produtos.setQtdeDisponivel("");
+                    }
+
+                    try {
+                        if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.CDREFESTOQUE)).equals("null")) {
+                            cl_Produtos.setCdRefEstoque(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.CDREFESTOQUE)));
+                        }
+                    } catch (Exception e) {
+                        cl_Produtos.setCdRefEstoque("");
+                    }
+
+                    try {
                         if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.DTULTALTERACAO)).equals("null")) {
                             cl_Produtos.setDtUltimaAlteracao(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.DTULTALTERACAO)));
                         }
@@ -304,5 +339,19 @@ public class CTL_Produtos {
         }
 
         return vf_VlAtacado;
+    }
+
+    public String fuBuscarCdRefEstoque(){
+        String vf_CdRefEstoque = "";
+        try {
+            rs_Produto = mdl_Produtos.fuBuscaCdRefEstoque(cl_Produtos.getCdProduto());
+            if(rs_Produto.getCount() > 0){
+                vf_CdRefEstoque = rs_Produto.getString(rs_Produto.getColumnIndex(CriaBanco.CDREFESTOQUE));
+            }
+        }catch (Exception e){
+            vf_CdRefEstoque = "";
+        }
+
+        return vf_CdRefEstoque;
     }
 }

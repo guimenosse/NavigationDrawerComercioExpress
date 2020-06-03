@@ -15,6 +15,10 @@ public class CL_Produtos {
     protected String descMaxPermitidoD;
     protected String descMaxPermitidoE;
     protected String descMaxPermitidoFidelidade;
+    protected String cdRefEstoque;
+
+    protected String qtdeDisponivel;
+
     protected String dtUltimaAlteracao;
 
     public CL_Produtos(){
@@ -31,6 +35,8 @@ public class CL_Produtos {
         this.descMaxPermitidoD = "";
         this.descMaxPermitidoE = "";
         this.descMaxPermitidoFidelidade = "";
+        this.qtdeDisponivel = "";
+        this.cdRefEstoque = "";
         this.dtUltimaAlteracao = "";
     }
 
@@ -136,6 +142,22 @@ public class CL_Produtos {
 
     public void setDescMaxPermitidoFidelidade(String descMaxPermitidoFidelidade) {
         this.descMaxPermitidoFidelidade = descMaxPermitidoFidelidade;
+    }
+
+    public String getQtdeDisponivel() {
+        return qtdeDisponivel;
+    }
+
+    public void setQtdeDisponivel(String qtdeDisponivel) {
+        this.qtdeDisponivel = qtdeDisponivel;
+    }
+
+    public String getCdRefEstoque() {
+        return cdRefEstoque;
+    }
+
+    public void setCdRefEstoque(String cdRefEstoque) {
+        this.cdRefEstoque = cdRefEstoque;
     }
 
     public String getDtUltimaAlteracao() {

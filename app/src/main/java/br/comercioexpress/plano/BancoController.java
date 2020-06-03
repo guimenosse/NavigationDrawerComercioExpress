@@ -23,17 +23,6 @@ public class BancoController {
         banco = new CriaBanco(context);
     }
 
-
-    public void alteraTabelaCliente(){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-
-        db.execSQL("ALTER TABLE " + CriaBanco.TABELA + " ADD " + CriaBanco.OBSCLIENTE +  " text");
-        db.execSQL("UPDATE " + CriaBanco.TABELA + " SET " + CriaBanco.OBSCLIENTE + " = ''");
-        db.close();
-    }
-
     /*-------------------------------------------------Funções para clientes -------------------------------
     --------------------------------------------------------------------------------------------------------
      */
@@ -42,6 +31,28 @@ public class BancoController {
             ---------------------------------------------------------------------------------
             */
 
+    public String fu_CarregarCdCliente() {
+        String cdEmitente = "1";
+        Cursor cursor;
+        String[] campos = {CriaBanco.ID};
+        db = banco.getReadableDatabase();
+        cursor = db.query(banco.TABELA, campos, null, null, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                if(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID))) > Integer.parseInt(cdEmitente)){
+                    break;
+                }
+                cdEmitente = String.valueOf(Integer.parseInt(cdEmitente) + 1);
+                cursor.moveToNext();
+            }
+        }
+
+        cursor.close();
+        //db.close();
+
+        return cdEmitente;
+    }
 
     //----------------------- Função para inclusão de um novo cliente --------------------------------------
     public String inserirCliente(String cdcliente, String rzsocial, String nmfantasia, String cep, String endereco,
@@ -56,7 +67,7 @@ public class BancoController {
 
         db = banco.getWritableDatabase();
         valores = new ContentValues();
-        valores.put(CriaBanco.CDCLIENTE, cdcliente);
+        valores.put(CriaBanco.CDCLIENTE, fu_CarregarCdCliente());
         valores.put(CriaBanco.RZSOCIAL, rzsocial);
         valores.put(CriaBanco.NMFANTASIA, nmfantasia);
         valores.put(CriaBanco.CEP, cep);
@@ -614,7 +625,7 @@ public class BancoController {
     public Cursor carregaProdutosCompleto(){
 
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.QTDEDISPONIVEL, banco.VALORUNITARIO, banco.VALORATACADO};
         String orderBy = CriaBanco.DESCRICAO;
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, null, null, null, null, orderBy, null);
@@ -937,7 +948,7 @@ public class BancoController {
 
     public Cursor carregaProdutosDescricaoPedido(String descricao){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.QTDEDISPONIVEL, banco.VALORUNITARIO, banco.VALORATACADO};
         String where = "(" + CriaBanco.DESCRICAO + " LIKE '%" + descricao + "%'";
         where += " OR " + CriaBanco.CDPRODUTO + " LIKE '%" + descricao + "%')";
 
@@ -1284,47 +1295,6 @@ public class BancoController {
         return vendedor;
     }
 
-
-
-    public void atualizaSincronizacao(String data, int ultCdCliente){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        db.delete("sincronizacao",null,null);
-        db.close();
-
-        db = banco.getWritableDatabase();
-
-        valores = new ContentValues();
-        valores.put("ultdtsincronizacao", data);
-        valores.put("ultcdcliente", ultCdCliente);
-        valores.put("ultdtatualizacao", data);
-
-        db.insert("sincronizacao", null, valores);
-        db.close();
-    }
-
-
-
-    public void deletaTipoCliente(){
-        db = banco.getWritableDatabase();
-
-        db.delete(CriaBanco.TABELATIPCLIENTE, null, null);
-        db.close();
-    }
-
-    public void insereTipoCliente(String cdTipo, String nmTipo){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        valores = new ContentValues();
-        valores.put(CriaBanco.CDTIPO, cdTipo);
-        valores.put(CriaBanco.NMTIPO, nmTipo);
-
-        db.insert(CriaBanco.TABELATIPCLIENTE, null, valores);
-        db.close();
-    }
-
     public Cursor selecionarTipoClienteCursor(){
         Cursor cursor;
         String[] campos = {banco.ID, banco.CDTIPO, banco.NMTIPO};
@@ -1338,26 +1308,6 @@ public class BancoController {
         return cursor;
     }
 
-
-
-
-    public void insereEstado(String uf, String nmEstado, String cdIBGE){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        db.delete("cadest",null,null);
-        db.close();
-
-        db = banco.getWritableDatabase();
-
-        valores = new ContentValues();
-        valores.put("uf", uf);
-        valores.put("nmestado", nmEstado);
-        valores.put("cdibge", cdIBGE);
-
-        db.insert("cadest", null, valores);
-        db.close();
-    }
 
     public ArrayList<String> selecionarEstado(){
         Cursor cursor;
@@ -1378,138 +1328,6 @@ public class BancoController {
         db.close();
         return estados;
     }
-
-    public void insereCidade(String cdUFIBGE, String cdCidadeIBGE, String nmCidadeIBGE){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        db.delete("cidadesibge",null,null);
-        db.close();
-
-        db = banco.getWritableDatabase();
-
-        valores = new ContentValues();
-        valores.put("cdufibge", cdUFIBGE);
-        valores.put("cdcidadeibge", cdCidadeIBGE);
-        valores.put("nmcidade", nmCidadeIBGE);
-
-        db.insert("cidadesibge", null, valores);
-        db.close();
-    }
-
-    public ArrayList<String> selecionarCidade(String uf){
-        Cursor cursor;
-        String[] campos = {"nmcidade"};
-        String where = "uf = '" + uf+ "'";
-        db = banco.getReadableDatabase();
-        final String MY_QUERY = "SELECT nmcidade FROM cidadesibge INNER JOIN cadest ON cidadesibge.cdufibge = cadest.cdibge WHERE cadest.uf = '" + uf + "'";
-        cursor = db.rawQuery(MY_QUERY, campos);
-        //cursor = db.query("cidadesibge", campos, where, null, null, null, null);
-        ArrayList<String> cidades = new ArrayList<String>();
-        if(cursor!=null){
-            cursor.moveToFirst();
-
-            while(!cursor.isAfterLast()) {
-                cidades.add(cursor.getString(cursor.getColumnIndex("nmcidade")));
-                cursor.moveToNext();
-            }
-        }
-
-        cursor.close();
-        db.close();
-        return cidades;
-    }
-
-    public String carregaUsuario(){
-        Cursor cursor;
-        String usuario = "";
-        String[] campos = {"usuario"};
-        db = banco.getReadableDatabase();
-        cursor = db.query("login", campos, null, null, null, null, null);
-        if(cursor!=null){
-            cursor.moveToFirst();
-
-            //while(!cursor.isAfterLast()) {
-                usuario = cursor.getString(cursor.getColumnIndex("usuario"));
-                //cursor.moveToNext();
-            //}
-        }
-
-        cursor.close();
-        db.close();
-        return usuario;
-    }
-
-    public String carregaDtSincronizacao(){
-        Cursor cursor;
-        String[] campos = {"ultdtsincronizacao"};
-        db = banco.getReadableDatabase();
-        cursor = db.query("sincronizacao", campos, null, null, null, null, null);
-        String dtultalteracao = "";
-        if(cursor!=null){
-            cursor.moveToFirst();
-
-            while(!cursor.isAfterLast()) {
-                dtultalteracao = cursor.getString(cursor.getColumnIndex("ultdtsincronizacao"));
-                cursor.moveToNext();
-            }
-        }
-
-        cursor.close();
-        db.close();
-        return dtultalteracao;
-    }
-
-
-    /*------------------------------------------Inicio dos comandos de Filial -----------------------------------------
-    -------------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------------
-     */
-
-    /*------------------------ Funções de CRUD básicas ------------------------------
-            ---------------------------------------------------------------------------------
-            */
-
-    //----------------------------------------Função para criação da tabela de filial -----------------------------------
-    public void criaTabelaFilial(){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + CriaBanco.TABELAFILIAL + "(" +
-                CriaBanco.ID + " integer primary key, " +
-                CriaBanco.CDFILIAL + " integer, " +
-                CriaBanco.FILIAL + " text, " +
-                CriaBanco.FGSELECIONADA + " text, " +
-                CriaBanco.FGTROCAFILIAL + " text )");
-
-        db.close();
-    }
-
-    //--------------------------------Função para inserir uma nova Filial na sincronização ----------------------------
-    public void inserirFilial(String cdFilial, String filial, String fgselecionada, String fgtrocafilial){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        valores = new ContentValues();
-        valores.put(CriaBanco.CDFILIAL, cdFilial);
-        valores.put(CriaBanco.FILIAL, filial);
-        valores.put(CriaBanco.FGSELECIONADA, fgselecionada);
-        valores.put(CriaBanco.FGTROCAFILIAL, fgtrocafilial);
-
-        db.insert(CriaBanco.TABELAFILIAL, null, valores);
-        db.close();
-    }
-
-    //---------------------------- Função para limpar a tabela de filial para sincronização das filiais ------------------
-    public void deletaFilial(){
-        db = banco.getReadableDatabase();
-        db.delete(CriaBanco.TABELAFILIAL, null, null);
-        db.close();
-    }
-
-    /*---------------------------------------Funções para seleção de Filial--------------------
-    ---------------------------------------------------------------------------------------------
-     */
 
     //----------------------------------- Função para seleção da filial na listview da tela de filial ------------------
     public void selecionaFilial(int id){
@@ -1539,35 +1357,6 @@ public class BancoController {
 
     }
 
-    //-------------------- Função para atualizar se o vendedor possui ou não autorização para a troca de filial -----------------------
-    public void atualizarAutorizaTrocaFilial(String fgtrocafilial){
-        ContentValues valores;
-        String where;
-        long resultado;
-        db = banco.getWritableDatabase();
-
-
-        valores = new ContentValues();
-        valores.put(CriaBanco.FGTROCAFILIAL, fgtrocafilial);
-
-        resultado = db.update(CriaBanco.TABELAFILIAL, valores, null, null);
-        db.close();
-    }
-
-    //------------------------- Função para preencher o listview de filial da tela de filial--------------------------------------
-    public Cursor buscaFilial(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CDFILIAL, banco.FILIAL};
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-        }
-        db.close();
-        return cursor;
-    }
-
     //----------------------- Função para atualizar a listview de filial de acordo com o nome da filial digitado no campo de busca--------
     public Cursor buscaFilialNome(String nome){
         Cursor cursor;
@@ -1582,326 +1371,6 @@ public class BancoController {
         }
         db.close();
         return cursor;
-    }
-
-    //----------------------- Função para buscar o código da filial selecionada ----------------------------------------------------
-    public String buscaFilialSelecionada(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CDFILIAL, banco.FILIAL};
-        String where = CriaBanco.FGSELECIONADA + "= 'S'";
-        String cdfilial = "N";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAFILIAL, campos, where, null, null, null, null);
-
-        if (cursor != null) {
-            cursor.moveToFirst();
-            cdfilial = cursor.getString(cursor.getColumnIndex(CriaBanco.CDFILIAL));
-        }
-
-        db.close();
-        return cdfilial;
-    }
-
-    //--------------------- Função para mostrar a filial selecionada na tela de Opções -------------------------------------------
-    public String buscaNmFilialSelecionada(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CDFILIAL, banco.FILIAL};
-        String where = CriaBanco.FGSELECIONADA + "= 'S'";
-        String cdfilial = "N";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAFILIAL, campos, where, null, null, null, null);
-
-        if (cursor != null) {
-            cursor.moveToFirst();
-            cdfilial = cursor.getString(cursor.getColumnIndex(CriaBanco.FILIAL));
-        }
-
-        db.close();
-        return cdfilial;
-    }
-
-    //------------------------------- Função para verificar se o vendedor possui autorização para troca de filial ------------------
-    public String autorizaTrocaFilial(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CDFILIAL, banco.FILIAL, banco.FGTROCAFILIAL};
-        //String where = CriaBanco.FGTROCAFILIAL + "= 'S'";
-        String fgtrocafilial = "N";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-            while(!cursor.isAfterLast()) {
-                if (cursor.getString(cursor.getColumnIndex(CriaBanco.FGTROCAFILIAL)).equals("S")) {
-                    fgtrocafilial = "S";
-                }
-                cursor.moveToNext();
-            }
-        }
-        db.close();
-        return fgtrocafilial;
-    }
-
-    //----------------------------- Função para verificar quantas filiais foram sincronizadas, caso só tenha uma
-    //----------------------------então essa filial será selecionada automaticamente -------------------------------------------
-    public int countFilial(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CDFILIAL, banco.FILIAL};
-        int VA_CountFilial = 0;
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-            while(!cursor.isAfterLast()) {
-                VA_CountFilial += 1;
-                cursor.moveToNext();
-            }
-        }
-        db.close();
-        return VA_CountFilial;
-    }
-
-    /*------------------------------------------Fim dos comandos de Filial -------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------------
-    */
-
-    public void criaColunasClassificacaoFidelidade(){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        db.execSQL("ALTER TABLE " + CriaBanco.TABELA + " ADD " +
-                CriaBanco.CLASSIFICACAO + " text null, " +
-                CriaBanco.FIDELIDADE + " text null");
-
-        db.close();
-    }
-
-    public String verificaColunasClassificacaoFidelidade(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CLASSIFICACAO, banco.FIDELIDADE};
-        //String where = CriaBanco.FGTROCAFILIAL + "= 'S'";
-        String fgtrocafilial = "N";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELA, campos, null, null, null, null, null);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-
-            fgtrocafilial = "S";
-
-        }
-        db.close();
-        return fgtrocafilial;
-    }
-
-    public void criaColunaPrecoIndividualizado(){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        db.execSQL("ALTER TABLE " + CriaBanco.TABELAFILIAL + " ADD COLUMN " +
-                CriaBanco.PRECOINDIVIDUALIZADO + " text DEFAULT 'N'");
-
-        db.close();
-    }
-
-    public void criaColunasProduto(){
-        ContentValues valores;
-        db = banco.getWritableDatabase();
-
-        db.execSQL("ALTER TABLE " + CriaBanco.TABELAPRODUTOS + " ADD COLUMN " +
-                CriaBanco.DESCMAXPERMITIDOA + " real, " +
-                CriaBanco.DESCMAXPERMITIDOB + " real, " +
-                CriaBanco.DESCMAXPERMITIDOC + " real, " +
-                CriaBanco.DESCMAXPERMITIDOD + " real, " +
-                CriaBanco.DESCMAXPERMITIDOE + " real, " +
-                CriaBanco.DESCMAXPERMITIDOFIDELIDADE + " real ");
-
-        db.close();
-    }
-
-
-
-    public String verificaColunaPrecoIndividualizado(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.PRECOINDIVIDUALIZADO};
-        //String where = CriaBanco.FGTROCAFILIAL + "= 'S'";
-        String fgprecoindividualizado = "N";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
-
-        if(cursor!=null){
-            fgprecoindividualizado = "S";
-        }
-        db.close();
-        return fgprecoindividualizado;
-    }
-
-    public void atualizarPrecoIndividualizado(String precoindividualizado){
-        ContentValues valores;
-        String where;
-        long resultado;
-        db = banco.getWritableDatabase();
-
-
-        valores = new ContentValues();
-        valores.put(CriaBanco.PRECOINDIVIDUALIZADO, precoindividualizado);
-
-        resultado = db.update(CriaBanco.TABELAFILIAL, valores, null, null);
-        db.close();
-    }
-
-    public String buscaPrecoIndividualizado(){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.PRECOINDIVIDUALIZADO};
-        //String where = CriaBanco.FGTROCAFILIAL + "= 'S'";
-        String fgprecoindividualizado = "N";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-
-            fgprecoindividualizado = cursor.getString(cursor.getColumnIndex(CriaBanco.PRECOINDIVIDUALIZADO));
-
-        }
-        db.close();
-        return fgprecoindividualizado;
-    }
-
-    public String buscaClassificacaoCliente(String cdcliente){
-
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CLASSIFICACAO};
-        String where = CriaBanco.CDCLIENTE + "='" + cdcliente + "'";
-        String classificacao = "N";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-            if(cursor.getCount() != 0) {
-                if (cursor.getString(cursor.getColumnIndex(CriaBanco.CLASSIFICACAO)).trim().equals("")) {
-                    classificacao = "N";
-                } else {
-                    classificacao = cursor.getString(cursor.getColumnIndex(CriaBanco.CLASSIFICACAO));
-                }
-            }
-        }
-        db.close();
-        return classificacao;
-
-    }
-
-    public String buscaFidelidadeCliente(String cdcliente){
-
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.FIDELIDADE};
-        String where = CriaBanco.CDCLIENTE + "='" + cdcliente + "'";
-        String fidelidade = "N";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-            if(cursor.getCount() != 0){
-                fidelidade = cursor.getString(cursor.getColumnIndex(CriaBanco.FIDELIDADE));
-            }
-        }
-        db.close();
-        return fidelidade;
-
-    }
-
-    public String buscaClientePedido(String numpedido){
-
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CDEMITENTE};
-        String where = CriaBanco.ID + "=" + numpedido;
-        String cdcliente = "";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAMESTREPEDIDO, campos, where, null, null, null, null);
-
-        if(cursor!=null){
-            cursor.moveToFirst();
-
-            cdcliente = cursor.getString(cursor.getColumnIndex(CriaBanco.CDEMITENTE));
-
-        }
-        db.close();
-        return cdcliente;
-
-    }
-
-    /*--------------------------------- Funções para busca de descontos dos produtos de acordo com a classificação
-    -------------------------------------------------------------------------------------------------------------
-     */
-
-    public Cursor buscaDescontos(String cdproduto){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCMAXPERMITIDOA,  banco.DESCMAXPERMITIDOB, banco.DESCMAXPERMITIDOC, banco.DESCMAXPERMITIDOD, banco.DESCMAXPERMITIDOE};
-        String where = CriaBanco.CDPRODUTO + "='" + cdproduto + "'";
-        String cdcliente = "";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null);
-
-        if(cursor != null){
-            cursor.moveToFirst();
-        }
-        db.close();
-        return cursor;
-    }
-
-    public Cursor buscaDescontoFidelidade(String cdproduto){
-        Cursor cursor;
-        String[] campos = {banco.ID, banco.DESCMAXPERMITIDOFIDELIDADE};
-        String where = CriaBanco.CDPRODUTO + "='" + cdproduto + "'";
-        String cdcliente = "";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null);
-
-        if(cursor != null){
-            cursor.moveToFirst();
-        }
-        db.close();
-        return cursor;
-    }
-
-    public String buscaTipoPrecoCliente(String cdcliente){
-        String tipoPreco = "N";
-        Cursor cursor;
-        String[] campos = {banco.TIPOPRECO};
-        String where = CriaBanco.CDCLIENTE + "='" + cdcliente + "'";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null);
-
-        if(cursor != null){
-            cursor.moveToFirst();
-            if(cursor.getCount() != 0) {
-                tipoPreco = cursor.getString(cursor.getColumnIndex(banco.TIPOPRECO));
-            }
-        }
-        db.close();
-
-        return tipoPreco;
-    }
-
-    public String buscaValorAtacado(String cdproduto){
-        String vlAtacado = "";
-        Cursor cursor;
-        String[] campos = {banco.VALORATACADO};
-        String where = CriaBanco.CDPRODUTO + "='" + cdproduto + "'";
-        db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null);
-
-        if(cursor != null){
-            cursor.moveToFirst();
-            vlAtacado = cursor.getString(cursor.getColumnIndex(banco.VALORATACADO));
-        }
-        db.close();
-
-        return vlAtacado;
     }
 
 }

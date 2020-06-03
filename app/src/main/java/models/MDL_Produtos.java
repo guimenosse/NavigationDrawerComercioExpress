@@ -22,7 +22,8 @@ public class MDL_Produtos {
     public String [] arr_CamposProduto = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO,
             banco.VALORATACADO,
             banco.DESCMAXPERMITIDO, banco.DESCMAXPERMITIDOA, banco.DESCMAXPERMITIDOB, banco.DESCMAXPERMITIDOC,
-            banco.DESCMAXPERMITIDOD, banco.DESCMAXPERMITIDOE, banco.DESCMAXPERMITIDOFIDELIDADE,
+            banco.DESCMAXPERMITIDOD, banco.DESCMAXPERMITIDOE, banco.DESCMAXPERMITIDOFIDELIDADE, banco.QTDEDISPONIVEL,
+            banco.CDREFESTOQUE,
             banco.DTULTALTERACAO};
 
     public MDL_Produtos(Context context)
@@ -35,7 +36,7 @@ public class MDL_Produtos {
                                        String valoratacado,
                                        String dtultalteracao, String maxdescpermitido, String maxdescpermitidoa,
                                        String maxdescpermitidob, String maxdescpermitidoc, String maxdescpermitidod,
-                                       String maxdescpermitidoe, String maxdescpermitidofidelidade){
+                                       String maxdescpermitidoe, String maxdescpermitidofidelidade, String qtdeDisponivel, String cdRefEstoque){
         ContentValues valores;
         long resultado;
 
@@ -54,6 +55,8 @@ public class MDL_Produtos {
         valores.put(CriaBanco.DESCMAXPERMITIDOD, maxdescpermitidod);
         valores.put(CriaBanco.DESCMAXPERMITIDOE, maxdescpermitidoe);
         valores.put(CriaBanco.DESCMAXPERMITIDOFIDELIDADE, maxdescpermitidofidelidade);
+        valores.put(CriaBanco.QTDEDISPONIVEL, qtdeDisponivel);
+        valores.put(CriaBanco.CDREFESTOQUE, cdRefEstoque);
 
         resultado = db.insert(CriaBanco.TABELAPRODUTOS, null, valores);
         db.close();
@@ -77,6 +80,29 @@ public class MDL_Produtos {
 
         valores = new ContentValues();
         valores.put(CriaBanco.VALORUNITARIO, valorUnitario);
+
+        resultado = db.update(CriaBanco.TABELAPRODUTOS, valores, where, null);
+        db.close();
+
+        if(resultado == -1){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
+    public boolean fuAtualizarQtdeDisponivel(String cdProduto, String qtdeDisponivel){
+
+        ContentValues valores;
+        String where;
+        long resultado;
+        db = banco.getWritableDatabase();
+
+        where = CriaBanco.CDPRODUTO + "='" + cdProduto + "'";
+
+        valores = new ContentValues();
+        valores.put(CriaBanco.QTDEDISPONIVEL, qtdeDisponivel);
 
         resultado = db.update(CriaBanco.TABELAPRODUTOS, valores, where, null);
         db.close();
@@ -195,10 +221,25 @@ public class MDL_Produtos {
         return cursor;
     }
 
-    public Cursor buscaDescontoFidelidade(String cdproduto){
+    public Cursor fuBuscaDescontoFidelidade(String cdproduto){
         Cursor cursor;
         String[] campos = {banco.ID, banco.DESCMAXPERMITIDOFIDELIDADE};
         String where = CriaBanco.CDPRODUTO + "='" + cdproduto + "'";
+        String cdcliente = "";
+        db = banco.getReadableDatabase();
+        cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null);
+
+        if(cursor != null){
+            cursor.moveToFirst();
+        }
+        db.close();
+        return cursor;
+    }
+
+    public Cursor fuBuscaCdRefEstoque(String cdProduto){
+        Cursor cursor;
+        String[] campos = {banco.ID, banco.CDREFESTOQUE};
+        String where = CriaBanco.CDPRODUTO + "='" + cdProduto + "'";
         String cdcliente = "";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null);

@@ -446,7 +446,7 @@ public class SYNC_Clientes {
                             if (!jObject.getString("CdCliente").equals("null")) {
 
                                 CL_Pedidos cl_Pedidos = new CL_Pedidos();
-                                cl_Pedidos.setCdCliente(cl_Clientes.getCdCliente());
+                                cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
 
                                 CTL_Pedidos ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
 
@@ -694,6 +694,14 @@ public class SYNC_Clientes {
             HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
 
             HttpClient httpclient = new DefaultHttpClient(ccm, p);
+
+            if(cl_Cliente.getCep().trim().equals("")){
+                cl_Cliente.setCep("0");
+            }
+
+            if(cl_Cliente.getNumEndereco().trim().equals("")){
+                cl_Cliente.setNumEndereco("0");
+            }
 
             String url = "http://www.planosistemas.com.br/" +
                     "WebService2.php?user=" + cl_Usuario.getCdClienteBanco() +

@@ -35,9 +35,11 @@ import java.util.List;
 
 import br.comercioexpress.plano.Funcoes;
 import br.comercioexpress.plano.MySSLSocketFactory;
+import classes.CL_Configuracao;
 import classes.CL_Filial;
 import classes.CL_Produtos;
 import classes.CL_Usuario;
+import controllers.CTL_Configuracao;
 import controllers.CTL_Filial;
 import controllers.CTL_Produtos;
 import controllers.CTL_Usuario;
@@ -50,6 +52,9 @@ public class SYNC_Produtos {
     CTL_Usuario ctl_Usuario;
 
     CL_Filial cl_Filial;
+
+    CL_Configuracao cl_Configuracao;
+    CTL_Configuracao  ctl_Configuracao;
 
     CL_Produtos cl_Produtos;
     CTL_Produtos ctl_Produtos;
@@ -71,6 +76,10 @@ public class SYNC_Produtos {
 
         cl_Usuario= new CL_Usuario();
         ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
+
+        cl_Configuracao = new CL_Configuracao();
+        ctl_Configuracao = new CTL_Configuracao(vc_Context, cl_Configuracao);
+        ctl_Configuracao.fuCarregarFgControlaEstoquePedido();
 
         cl_Filial = new CL_Filial();
         CTL_Filial ctl_Filial = new CTL_Filial(context, cl_Filial);
@@ -160,6 +169,17 @@ public class SYNC_Produtos {
                         cl_Produtos.setDescMaxPermitidoD(jObject.getString("DescontoD"));
                         cl_Produtos.setDescMaxPermitidoE(jObject.getString("DescontoE"));
                         cl_Produtos.setDescMaxPermitidoFidelidade(jObject.getString("DescontoFidelidade"));
+                        cl_Produtos.setCdRefEstoque(jObject.getString("CdRefEstoque"));
+
+                        if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
+                            double vf_QtdePedSaida = Double.parseDouble(jObject.getString("QtdePedSaida"));
+                            double vf_EstAtual = Double.parseDouble(jObject.getString("EstAtual"));
+                            double vf_QtdeDisponivel = vf_EstAtual - vf_QtdePedSaida;
+
+                            cl_Produtos.setQtdeDisponivel(String.valueOf(vf_QtdeDisponivel));
+                        }else{
+                            cl_Produtos.setQtdeDisponivel("");
+                        }
 
                         ctl_Produtos =  new CTL_Produtos(vc_Context, cl_Produtos);
 
@@ -272,6 +292,85 @@ public class SYNC_Produtos {
                             if (Double.parseDouble(jObject.getString("PercDescontoFidelidade")) > 0) {
                                 mdl_Produtos.fuAtualizarValorUnitarioFilial(VA_CdProduto, jObject.getString("PercDescontoFidelidade"));
                             }
+
+                        }
+                    }catch(Exception e3) {
+                        return false;
+                    }
+
+                }
+
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+                return false;
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                return false;
+            }
+
+        } catch (Throwable t) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean FU_SincronizarFgControlaEstoquePedido(){
+        try {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            MySSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+            HttpParams p = new BasicHttpParams();
+
+            HttpProtocolParams.setVersion(p, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(p, HTTP.UTF_8);
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(p, registry);
+
+
+            HttpConnectionParams.setConnectionTimeout(p,
+                    TIMEOUT_MILLISEC);
+            HttpConnectionParams.setSoTimeout(p, TIMEOUT_MILLISEC);
+
+            HttpClient httpclient = new DefaultHttpClient(ccm, p);
+
+            String url = "https://www.planosistemas.com.br/" +
+                    "WebService2.php?user=" + cl_Usuario.getCdClienteBanco() + "&format=json&num=10&method=fgcontrolaestoquepedido";
+            HttpPost httppost = new HttpPost(url);
+
+            // Instantiate a GET HTTP method
+            try {
+                Log.i(getClass().getSimpleName(), "send  task - start");
+                //
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(
+                        2);
+                nameValuePairs.add(new BasicNameValuePair("user", "1"));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                String responseBody = httpclient.execute(httppost, responseHandler);
+                // Parse
+                JSONObject json = new JSONObject(responseBody);
+                JSONArray jArray = json.getJSONArray("posts");
+                ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
+
+                MDL_Produtos mdl_Produtos = new MDL_Produtos(vc_Context);
+
+                for (int i = 0; i < jArray.length(); i++) {
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    JSONObject e = jArray.getJSONObject(i);
+                    String s = e.getString("post");
+                    JSONObject jObject = new JSONObject(s);
+                    try {
+
+                        if (!jObject.getString("FgControlaEstoquePedido").equals("null")) {
 
                         }
                     }catch(Exception e3) {

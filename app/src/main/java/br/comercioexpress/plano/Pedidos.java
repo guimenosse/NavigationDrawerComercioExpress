@@ -105,7 +105,7 @@ public class Pedidos extends AppCompatActivity
 
     private long lastBackPressTime = 0;
 
-    String codigo_lista;
+    String codigo_lista, vc_Mensagem = "";
 
     MaterialSearchView sv_Pedidos;
 
@@ -326,11 +326,11 @@ public class Pedidos extends AppCompatActivity
         if (ctl_Pedidos.fuCarregarPedido()) {
 
             CL_Clientes cl_Clientes = new CL_Clientes();
-            cl_Clientes.setId(cl_Pedidos.getCdCliente());
+            cl_Clientes.setCdCliente(cl_Pedidos.getCdCliente());
 
             CTL_Clientes ctl_Clientes = new CTL_Clientes(vc_Context, cl_Clientes);
 
-            if(ctl_Clientes.fuCarregarClienteId()){
+            if(ctl_Clientes.fuSelecionarCliente()){
                 if(cl_Clientes.getFgSincronizado().equals("N")){
                     if(sync_Clientes.FU_SincronizarClientePedido(cl_Clientes)){
                         cl_Pedidos.setCdCliente(cl_Clientes.getCdCliente());
@@ -781,7 +781,11 @@ public class Pedidos extends AppCompatActivity
             progressDialogPedidos.dismiss();
 
             if (validou.equals("N")) {
-                MensagemUtil.addMsg(Pedidos.this, "Não foi encontrado nenhum pedido em aberto para sincronização");
+                if(vc_Mensagem.trim().equals("")) {
+                    MensagemUtil.addMsg(Pedidos.this, "Não foi encontrado nenhum pedido em aberto para sincronização");
+                }else{
+                    MensagemUtil.addMsg(Pedidos.this, vc_Mensagem);
+                }
             }else{
                 MensagemUtil.addMsg(Pedidos.this, "Todos os seus pedidos que estavam em aberto foram sincronizados com o servidor");
                 Intent intent = getIntent();
@@ -796,8 +800,14 @@ public class Pedidos extends AppCompatActivity
         if(ctl_Pedidos.fuPossuiPedidosAbertos()){
             Cursor rs_Pedidos = ctl_Pedidos.rs_Pedido;
 
-            if(sync_Pedidos.FU_EnviarTodosPedidos(rs_Pedidos)){
-                return true;
+            if(fuConsisteEnvioTodosPedidosAbertos()) {
+                if (sync_Pedidos.FU_EnviarTodosPedidos(rs_Pedidos)) {
+                    vc_Mensagem = "";
+                    return true;
+                } else {
+                    vc_Mensagem = "";
+                    return false;
+                }
             }else{
                 return false;
             }
@@ -806,6 +816,89 @@ public class Pedidos extends AppCompatActivity
             return false;
         }
 
+    }
+
+    protected  boolean fuConsisteEnvioTodosPedidosAbertos(){
+
+        CL_Pedidos vf_cl_Pedidos = new CL_Pedidos();
+        CTL_Pedidos vf_ctl_Pedidos = new CTL_Pedidos(vc_Context, vf_cl_Pedidos);
+
+        if(vf_ctl_Pedidos.fuPossuiPedidosAbertos()){
+            Cursor vf_rs_Pedidos = vf_ctl_Pedidos.rs_Pedido;
+
+            while (!vf_rs_Pedidos.isAfterLast()){
+
+                String vf_NumPedido = "";
+                try {
+                    if (!vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).equals("null") && !vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).trim().equals("")) {
+                        vf_NumPedido = vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.ID));
+                    }
+                } catch (Exception e) {
+                    vf_NumPedido = "";
+                }
+
+                String vf_CdEmitente = vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CDEMITENTE));
+
+                try {
+                    if (!vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).equals("null") && !vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).trim().equals("")) {
+                        vf_CdEmitente = vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CDEMITENTE));
+                    }
+                } catch (Exception e) {
+                    vf_CdEmitente = "";
+                }
+
+                double vf_VlTotal = 0.0, vf_VlFrete = 0.0;
+
+                try {
+                    if (!vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).equals("null") && !vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).trim().equals("")) {
+                        vf_VlTotal = Double.parseDouble(vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.VLTOTAL)));
+                    }
+                } catch (Exception e) {
+                    vf_VlTotal = 0.0;
+                }
+
+                try {
+                    if (!vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.VLFRETE)).equals("null") && !vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.VLFRETE)).trim().equals("")) {
+                        vf_VlFrete = Double.parseDouble(vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.VLFRETE)));
+                    }
+                } catch (Exception e) {
+                    vf_VlFrete = 0.0;
+                }
+
+                double vf_VlLiquido = vf_VlTotal - vf_VlFrete;
+
+                String vf_CondPgto = "";
+
+                try {
+                    if (!vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CONDPGTO)).equals("null") && !vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CONDPGTO)).trim().equals("")) {
+                        vf_CondPgto = vf_rs_Pedidos.getString(vf_rs_Pedidos.getColumnIndexOrThrow(CriaBanco.CONDPGTO));
+                    }
+                } catch (Exception e) {
+                    vf_CondPgto = "";
+                }
+
+
+                if(vf_CdEmitente.trim().equals("")) {
+                    vc_Mensagem = "Favor selecionar um cliente no pedido " + vf_NumPedido + "!";
+                    return false;
+                }
+
+                if(vf_VlLiquido <= 0) {
+                    vc_Mensagem = "Deve ser informado ao menos um produto no pedido " + vf_NumPedido + ".";
+                    return  false;
+                }
+                if(vf_CondPgto.trim().equals("")){
+                    vc_Mensagem = "Deve ser informada a forma de pagamento do pedido " + vf_NumPedido + "!";
+                    return false;
+                }
+
+                vf_rs_Pedidos.moveToNext();
+            }
+        }
+
+
+
+        return true;
     }
 
     //Função referente ao atendimento 19449 de duplicação do pedido
