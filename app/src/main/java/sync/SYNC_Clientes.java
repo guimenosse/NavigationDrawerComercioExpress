@@ -412,7 +412,7 @@ public class SYNC_Clientes {
                             "&telefoneadicional=" + cl_Cliente.getTelefoneAdicional() +
                             "&fax=" + cl_Cliente.getFax() +
                             "&contato=" + cl_Cliente.getNomeContato().replace(" ", "espaco") +
-                            "&email=" + cl_Cliente.getEmail() +
+                            "&email=" + cl_Cliente.getEmail().toUpperCase() +
                             "&vendedor=" + cl_Cliente.getVendedor() +
                             "&tipocliente=" + cl_Cliente.getTipoCliente().replace(" ", "espaco") +
                             "&dtcadastro=" + cl_Cliente.getDtCadastro().replace(" ", "espaco") + "" +
@@ -721,7 +721,7 @@ public class SYNC_Clientes {
                     "&telefoneadicional=" + cl_Cliente.getTelefoneAdicional() +
                     "&fax=" + cl_Cliente.getFax() +
                     "&contato=" + cl_Cliente.getNomeContato().replace(" ", "espaco") +
-                    "&email=" + cl_Cliente.getEmail() +
+                    "&email=" + cl_Cliente.getEmail().toUpperCase() +
                     "&vendedor=" + cl_Cliente.getVendedor() +
                     "&tipocliente=" + cl_Cliente.getTipoCliente().replace(" ", "espaco") +
                     "&dtcadastro=" + cl_Cliente.getDtCadastro().replace(" ", "espaco") + "" +

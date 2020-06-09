@@ -143,7 +143,12 @@ public class SYNC_Produtos {
                     String s = e.getString("post");
                     JSONObject jObject = new JSONObject(s);
 
+
                     cl_Produtos.setCdProduto(jObject.getString("CdProduto"));
+                    if(cl_Produtos.getCdProduto().equals("2071")){
+                        String teste = "";
+                        String testando =  teste + "";
+                    }
                     cl_Produtos.setDescricao(e.getString("post2"));
 
                     if (!cl_Produtos.getDescricao().equals("null")) {

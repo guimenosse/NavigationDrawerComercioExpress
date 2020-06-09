@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -35,6 +36,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.barteksc.pdfviewer.PDFView;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -96,6 +98,20 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
     FloatingActionButton fab_SalvarPedidos;
     SYNC_Pedidos sync_Pedidos;
+
+    private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
+            Font.BOLD);
+    private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+            Font.NORMAL, BaseColor.RED);
+    private static Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+            Font.NORMAL);
+    private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+            Font.BOLD);
+
+    private static Font negritoMenor = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+            Font.BOLD);
+    private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+            Font.BOLD);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,8 +269,11 @@ public class ManutencaoPedidos extends AppCompatActivity {
                     MensagemUtil.addMsg(ManutencaoPedidos.this, e.getMessage().toString());
                 }
             }else {
+
+                String vf_CdEmitente = intent.getStringExtra("codigo");
+
                 CL_Clientes cl_Cliente = new CL_Clientes();
-                cl_Cliente.setId(String.valueOf(resultado));
+                cl_Cliente.setId(vf_CdEmitente);
 
                 CTL_Clientes ctl_Clientes = new CTL_Clientes(getApplicationContext(), cl_Cliente);
 
@@ -406,7 +425,11 @@ public class ManutencaoPedidos extends AppCompatActivity {
                 vf_VlDesconto = Double.parseDouble(tb_vlDesconto.getText().toString().replace(".", "").replace(",", "."));
             }
             cl_Pedidos.setVlDesconto(String.format("%.2f", vf_VlDesconto).replace(",", "."));
-            cl_Pedidos.setPercDesconto(tb_percDesconto.getText().toString());
+            if(tb_percDesconto.getText().toString().trim().equals("")){
+                cl_Pedidos.setPercDesconto("0");
+            }else {
+                cl_Pedidos.setPercDesconto(tb_percDesconto.getText().toString());
+            }
             double vf_VlFrete = 0.0;
             if(!tb_vlFrete.getText().toString().trim().equals("")){
                 vf_VlFrete = Double.parseDouble(tb_vlFrete.getText().toString().replace(".", "").replace(",", "."));
@@ -1046,35 +1069,22 @@ public class ManutencaoPedidos extends AppCompatActivity {
         }
     }
 
-    private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
-            Font.BOLD);
-    private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-            Font.NORMAL, BaseColor.RED);
-    private static Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
-            Font.NORMAL);
-    private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
-            Font.BOLD);
-
-    private static Font negritoMenor = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-            Font.BOLD);
-    private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-            Font.BOLD);
-
     private void suCriarPDF() {
 
+        boolean vf_Gerou = false;
         Document document = new Document();
+        String filename = "";
+        String pathFile = "";
 
         try {
 
-
-
-            String filename = "pedido_" + cl_Pedidos.getNumPedido() + ".pdf";
+            filename = "pedido_" + cl_Pedidos.getNumPedido() + ".pdf";
 
             document = new Document(PageSize.A4);
 
-            String path = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
+            pathFile = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
 
-            File dir = new File(path, filename);
+            File dir = new File(pathFile, filename);
             if (!dir.exists()) {
                 dir.getParentFile().mkdirs();
             }
@@ -1215,8 +1225,27 @@ public class ManutencaoPedidos extends AppCompatActivity {
             MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível gerar o PDF");
         } finally {
             document.close();
+            vf_Gerou = true;
             MensagemUtil.addMsg(ManutencaoPedidos.this, "PDF do pedido gerado com sucesso na pasta " + Environment.getExternalStorageDirectory() + "/PedidosPDF/");
         }
+
+        if(vf_Gerou){
+
+            Uri uri_Arquivo = Uri.parse(pathFile + filename);
+
+            try {
+
+                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                sharingIntent.setType("*/*");
+                sharingIntent.putExtra(Intent.EXTRA_STREAM, uri_Arquivo);
+                startActivity(Intent.createChooser(sharingIntent, "Share image using"));
+
+            }catch (Exception e){
+                MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível abrir o PDF do pedido");
+            }
+
+        }
+
     }
 
     private static void addEmptyLine(Paragraph paragraph, int number) {

@@ -14,6 +14,24 @@ public class CL_ItemPedido {
     protected String vlLiquido;
     protected String vlTotal;
 
+    protected String observacao;
+
+    public CL_ItemPedido(){
+        this.id = "";
+        this.numPedido = "";
+        this.cdProduto = "";
+        this.descricao = "";
+        this.qtde = "";
+        this.percDesconto = "";
+        this.vlMaxDescPermitido = "";
+        this.vlDesconto = "";
+        this.vlUnitario = "";
+        this.vlLiquido = "";
+        this.vlTotal = "";
+
+        this.observacao = "";
+    }
+
     public String getId() {
         return id;
     }
@@ -100,5 +118,13 @@ public class CL_ItemPedido {
 
     public void setVlTotal(String vlTotal) {
         this.vlTotal = vlTotal;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
     }
 }

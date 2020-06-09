@@ -175,5 +175,9 @@
     <string name="campo_vltotalpedido">Total Liquido do Pedido: </string>
     <string name="campo_mostrarprodutos">Mostrar Produtos</string>
     <string name="campo_numpedidoservidor">Número do pedido salvo no servidor:</string>
+    <string name="campo_valorliquidoproduto">Valor líquido: </string>
+    <string name="campo_valorsemdescontoproduto">Valor sem desconto: </string>
+    <string name="campo_valorcomdescontoproduto">Valor com desconto: </string>
+    <string name="campo_observacaoitempedido">Observação do produto:</string>
 
 </resources>

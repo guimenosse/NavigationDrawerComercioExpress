@@ -422,7 +422,7 @@
             android:layout_alignRight="@+id/tb_telefone"
             android:layout_alignEnd="@+id/tb_telefone"
             android:hint="(##)####-####"
-            android:maxLength="14"
+            android:maxLength="15"
             android:textColorHint="@color/cor_dica"
             android:padding="10dip"
             android:textColor="@color/black"

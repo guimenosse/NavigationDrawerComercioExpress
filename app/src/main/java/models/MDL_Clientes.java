@@ -132,7 +132,7 @@ public class MDL_Clientes {
     public Cursor fuCarregaCliente(String cdCliente){
         Cursor cursor;
         String[] campos = arr_CamposCliente;
-        String where = CriaBanco.CDCLIENTE + " = " + cdCliente + "";
+        String where = CriaBanco.CDCLIENTE + " = '" + cdCliente + "'";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null, null);
 

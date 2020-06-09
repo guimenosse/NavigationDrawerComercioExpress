@@ -194,6 +194,14 @@ public class CTL_Produtos {
                 while (!rs_Produto.isAfterLast()){
 
                     try {
+                        if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.ID)).equals("null")) {
+                            cl_Produtos.setId(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.ID)));
+                        }
+                    } catch (Exception e) {
+                        cl_Produtos.setId("0");
+                    }
+
+                    try {
                         if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)).equals("null")) {
                             cl_Produtos.setCdProduto(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
                         }

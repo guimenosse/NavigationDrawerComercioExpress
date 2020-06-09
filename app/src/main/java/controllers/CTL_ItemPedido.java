@@ -33,7 +33,7 @@ public class CTL_ItemPedido {
 
         if(mdl_ItemPedido.fuInserirItemPedido(cl_ItemPedido.getNumPedido(), cl_ItemPedido.getCdProduto(), cl_ItemPedido.getDescricao(),
                 cl_ItemPedido.getQtde(), cl_ItemPedido.getPercDesconto(), cl_ItemPedido.getVlDesconto(), cl_ItemPedido.getVlMaxDescPermitido(),
-                cl_ItemPedido.getVlUnitario(), cl_ItemPedido.getVlLiquido(), cl_ItemPedido.getVlTotal())){
+                cl_ItemPedido.getVlUnitario(), cl_ItemPedido.getVlLiquido(), cl_ItemPedido.getVlTotal(), cl_ItemPedido.getObservacao())){
             return true;
         }else{
             return false;
@@ -45,7 +45,7 @@ public class CTL_ItemPedido {
 
         if(mdl_ItemPedido.fuAlterarItemPedido(cl_ItemPedido.getNumPedido(), cl_ItemPedido.getCdProduto(),
                 cl_ItemPedido.getQtde(), cl_ItemPedido.getPercDesconto(), cl_ItemPedido.getVlDesconto(),
-                cl_ItemPedido.getVlUnitario(), cl_ItemPedido.getVlLiquido(), cl_ItemPedido.getVlTotal())){
+                cl_ItemPedido.getVlUnitario(), cl_ItemPedido.getVlLiquido(), cl_ItemPedido.getVlTotal(), cl_ItemPedido.getObservacao())){
             return true;
         }else{
             return false;
@@ -166,6 +166,14 @@ public class CTL_ItemPedido {
                 cl_ItemPedido.setVlTotal("0");
             }
 
+            try {
+                if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).trim().equals("")) {
+                    cl_ItemPedido.setObservacao(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)));
+                }
+            } catch (Exception e) {
+                cl_ItemPedido.setObservacao("");
+            }
+
             return true;
         } else {
             return false;
@@ -179,7 +187,7 @@ public class CTL_ItemPedido {
 
         if (rs_ItemPedido.getCount() > 0) {
 
-            cl_ItemPedido = new CL_ItemPedido();
+            //cl_ItemPedido = new CL_ItemPedido();
 
             try {
                 if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.ID)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.ID)).trim().equals("")) {
@@ -267,6 +275,14 @@ public class CTL_ItemPedido {
                 }
             } catch (Exception e) {
                 cl_ItemPedido.setVlTotal("0");
+            }
+
+            try {
+                if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).trim().equals("")) {
+                    cl_ItemPedido.setObservacao(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)));
+                }
+            } catch (Exception e) {
+                cl_ItemPedido.setObservacao("");
             }
 
             return true;
@@ -373,9 +389,17 @@ public class CTL_ItemPedido {
                     cl_ItemPedido.setVlTotal("0");
                 }
 
+                try {
+                    if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).trim().equals("")) {
+                        cl_ItemPedido.setObservacao(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)));
+                    }
+                } catch (Exception e) {
+                    cl_ItemPedido.setObservacao("");
+                }
+
                 if (!mdl_ItemPedido.fuDuplicarItensPedido(cl_ItemPedido.getNumPedido(), cl_ItemPedido.getCdProduto(), cl_ItemPedido.getDescricao(),
                         cl_ItemPedido.getQtde(), cl_ItemPedido.getPercDesconto(), cl_ItemPedido.getVlDesconto(), cl_ItemPedido.getVlMaxDescPermitido(),
-                        cl_ItemPedido.getVlUnitario(), cl_ItemPedido.getVlLiquido(), cl_ItemPedido.getVlTotal())) {
+                        cl_ItemPedido.getVlUnitario(), cl_ItemPedido.getVlLiquido(), cl_ItemPedido.getVlTotal(), cl_ItemPedido.getObservacao())) {
                     vc_Mensagem = mdl_ItemPedido.vc_Mensagem;
                     return false;
                 }
@@ -478,6 +502,14 @@ public class CTL_ItemPedido {
                     }
                 } catch (Exception e) {
                     cl_ItemPedido.setVlTotal("0");
+                }
+
+                try {
+                    if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).trim().equals("")) {
+                        cl_ItemPedido.setObservacao(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)));
+                    }
+                } catch (Exception e) {
+                    cl_ItemPedido.setObservacao("");
                 }
 
                 rs_ItemPedido.moveToNext();

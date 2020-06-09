@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,8 +39,9 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
     CL_Produtos cl_Produto;
 
-    TextView lb_descricaoProduto, lb_produtoAdicionado;
-    EditText tb_codigoProduto, tb_quantidadeProduto, tb_descontoProduto, tb_valorUnitarioProduto;
+    TextView lb_descricaoProduto, lb_produtoAdicionado, lb_codigoProdutoResultado, lb_valorLiquidoResultado,
+            lb_valorSemDescontoResultado, lb_valorComDescontoResultado;
+    EditText tb_quantidadeProduto, tb_descontoProduto, tb_valorUnitarioProduto, tb_observacaoItemPedido;
 
     String vc_CdProduto, vc_NumPedido, vc_Operacao, vc_Alteracao;
 
@@ -76,9 +79,9 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     lb_descricaoProduto.setText("");
                 }
                 try {
-                    tb_codigoProduto.setText(cl_ItemPedido.getCdProduto());
+                    lb_codigoProdutoResultado.setText(cl_ItemPedido.getCdProduto());
                 } catch (Exception e) {
-                    tb_codigoProduto.setText("0");
+                    lb_codigoProdutoResultado.setText("0");
                 }
                 try {
                     tb_quantidadeProduto.setText(cl_ItemPedido.getQtde());
@@ -95,12 +98,39 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     tb_valorUnitarioProduto.setText("0");
                 }
 
-                try {
+                /*try {
                         tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlLiquido().replace(",", "."));
                         String valorLiquido = String.format("%.2f", Double.parseDouble(tb_valorUnitarioProduto.getText().toString()));
                         tb_valorUnitarioProduto.setText(valorLiquido);
                 } catch (Exception e) {
                     tb_valorUnitarioProduto.setText("0");
+                }*/
+
+                try {
+                    lb_valorLiquidoResultado.setText(cl_ItemPedido.getVlLiquido());
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorLiquidoResultado.setText("R$0,00");
+                }
+
+                try {
+                    double vf_VlSemDesconto = 0.0;
+                    vf_VlSemDesconto = Double.parseDouble(cl_ItemPedido.getVlUnitario().replace(",", ".")) * Double.parseDouble(cl_ItemPedido.getQtde().replace(",", "."));
+
+                    lb_valorSemDescontoResultado.setText("R$" + String.format("%.2f", vf_VlSemDesconto));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorSemDescontoResultado.setText("R$0,00");
+                }
+
+                try {
+                    double vf_VlComDesconto = 0.0;
+                    vf_VlComDesconto = Double.parseDouble(cl_ItemPedido.getVlLiquido().replace("R$", "").replace(",", ".")) * Double.parseDouble(cl_ItemPedido.getQtde().replace(",", "."));
+
+                    lb_valorComDescontoResultado.setText("R$" + String.format("%.2f", vf_VlComDesconto));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorComDescontoResultado.setText("R$0,00");
                 }
 
 
@@ -112,9 +142,26 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     tb_descontoProduto.setText("0");
                 }
 
+                try {
+                    tb_observacaoItemPedido.setText(cl_ItemPedido.getObservacao());
+                } catch (Exception e) {
+                    tb_observacaoItemPedido.setText("");
+                }
+
                 lb_produtoAdicionado.setVisibility(View.VISIBLE);
 
                 suBuscaPrecosCliente("S");
+
+                cl_Produto = new CL_Produtos();
+                cl_Produto.setCdProduto(lb_codigoProdutoResultado.getText().toString());
+
+                CTL_Produtos ctl_Produtos = new CTL_Produtos(getApplicationContext(), cl_Produto);
+
+                if(ctl_Produtos.fuCarregaProdutoCdProduto()){
+                    vc_CdProduto = cl_Produto.getId();
+                }
+
+
             }
 
         } else {
@@ -123,19 +170,25 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
             CTL_Produtos ctl_Produtos = new CTL_Produtos(getApplicationContext(), cl_Produto);
             if(ctl_Produtos.fuCarregaProduto()){
+                cl_ItemPedido = new CL_ItemPedido();
 
                 try {
                     lb_descricaoProduto.setText(cl_Produto.getDescricao().toUpperCase());
+                    cl_ItemPedido.setDescricao(cl_Produto.getDescricao().toUpperCase());
                 } catch (Exception e) {
                     lb_descricaoProduto.setText("");
+                    cl_ItemPedido.setDescricao("");
                 }
                 try {
-                    tb_codigoProduto.setText(cl_Produto.getCdProduto());
+                    lb_codigoProdutoResultado.setText(cl_Produto.getCdProduto());
+                    cl_ItemPedido.setCdProduto(lb_codigoProdutoResultado.getText().toString());
                 } catch (Exception e) {
-                    tb_codigoProduto.setText("0");
+                    lb_codigoProdutoResultado.setText("0");
+                    cl_ItemPedido.setCdProduto("0");
                 }
 
                 tb_quantidadeProduto.setText("1");
+                cl_ItemPedido.setQtde("1");
 
                 try {
                     tb_valorUnitarioProduto.setText(cl_Produto.getVlUnitario());
@@ -144,15 +197,50 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     String valor = String.format("%.2f", Double.parseDouble(valorProduto));
                     tb_valorUnitarioProduto.setText(valor.replace(",", "."));
                     VL_valorBruto = Double.parseDouble(tb_valorUnitarioProduto.getText().toString());
+                    cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                    cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
                 } catch (Exception e) {
                     tb_valorUnitarioProduto.setText("0.00");
+                    cl_ItemPedido.setVlUnitario("0.00");
+                    cl_ItemPedido.setVlLiquido("0.00");
                 }
 
                 suBuscaPrecosCliente("N");
 
-                tb_descontoProduto.setText(String.valueOf(percDescontoClassificacao));
+                //tb_descontoProduto.setText(String.valueOf(percDescontoClassificacao));
+                cl_ItemPedido.setVlDesconto("0.00");
+                cl_ItemPedido.setVlTotal("0.00");
+
+                try {
+                    lb_valorLiquidoResultado.setText("R$" + String.format("%.2f", Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."))));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorLiquidoResultado.setText("R$0,00");
+                }
+
+                try {
+                    double vf_VlSemDesconto = 0.0;
+                    vf_VlSemDesconto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", ".")) * 1;
+
+                    lb_valorSemDescontoResultado.setText("R$" + String.format("%.2f", vf_VlSemDesconto));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorSemDescontoResultado.setText("R$0,00");
+                }
+
+                try {
+                    double vf_VlComDesconto = 0.0;
+                    vf_VlComDesconto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", ".")) * 1;
+
+                    lb_valorComDescontoResultado.setText("R$" + String.format("%.2f", vf_VlComDesconto));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorComDescontoResultado.setText("R$0,00");
+                }
 
                 suVerificaItemPedido();
+
+
             }
 
         }
@@ -180,14 +268,44 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                                     double valorBruto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."));
                                     double valorLiquido = valorBruto - VA_VlUnitarioNovo;
 
+                                    if(valorLiquido == 0.0){
 
-                                    double porcentagem = ((valorBruto - valorLiquido) / valorBruto) * 100;
-                                    porcentagem = 100 - porcentagem;
-                                    if (porcentagem > percdescmaxvendedor) {
-                                        MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Desconto informado é maior que o permitido!");
-                                        tb_valorUnitarioProduto.setText(cl_Produto.getVlUnitario());
-                                    } else {
-                                        tb_descontoProduto.setText(String.format("%.5f", 100 - porcentagem).replace(",", "."));
+                                        tb_descontoProduto.setText(String.format("%.5f", 0.0).replace(",", "."));
+                                        tb_valorUnitarioProduto.setText(String.format("%.2f", valorBruto).replace(".", "").replace(",", "."));
+
+                                        tb_descontoProduto.setEnabled(true);
+
+                                        cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                                        cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                                        cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                                        suCalculaValorItemPedido();
+
+                                    }else {
+
+                                        double porcentagem = ((valorBruto - valorLiquido) / valorBruto) * 100;
+                                        porcentagem = 100 - porcentagem;
+                                        if (porcentagem > percdescmaxvendedor) {
+                                            MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Desconto informado é maior que o permitido!");
+                                            tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
+                                            tb_descontoProduto.setText("0.00000");
+
+                                            cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                                            cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                                            cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                                            suCalculaValorItemPedido();
+
+                                        } else {
+                                            tb_descontoProduto.setText(String.format("%.5f", porcentagem).replace(",", "."));
+                                            valorLiquido = VL_valorBruto - Double.parseDouble(tb_valorUnitarioProduto.getText().toString().replace(",", "."));
+                                            tb_valorUnitarioProduto.setText(String.format("%.2f", VL_valorBruto).replace(".", "").replace(",", "."));
+
+                                            tb_descontoProduto.setEnabled(true);
+
+                                            cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                                            cl_ItemPedido.setVlLiquido(String.format("%.2f", VA_VlUnitarioNovo));
+                                            cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                                            suCalculaValorItemPedido();
+                                        }
                                     }
                                 }
 
@@ -196,17 +314,24 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
                             }
 
-                            double valorLiquido = VL_valorBruto - Double.parseDouble(tb_valorUnitarioProduto.getText().toString().replace(",", "."));
-                            tb_valorUnitarioProduto.setText(String.format("%.2f", VL_valorBruto).replace(".", "").replace(",", "."));
-                            double porcentagem = ((VL_valorBruto - valorLiquido) / VL_valorBruto) * 100;
-                            tb_descontoProduto.setText(String.format("%.5f", 100 - porcentagem).replace(",", "."));
-                            tb_descontoProduto.setEnabled(true);
+
 
                         } else if (VA_VlUnitarioNovo - VL_valorBruto > 0) {
                             tb_descontoProduto.setEnabled(false);
                             tb_descontoProduto.setText("0.00000");
+
+                            cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                            cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                            cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                            suCalculaValorItemPedido();
                         } else {
                             tb_descontoProduto.setEnabled(true);
+
+                            cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                            cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                            cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                            suCalculaValorItemPedido();
+
                             //tb_descontoProduto.setText("0");
                         }
                         VA_VlUnitarioNovo = VL_valorBruto; //Realizado esse tratamento para que o sistema mantenha o valor incial do produto
@@ -217,6 +342,155 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                 }
             }
         });
+
+        tb_quantidadeProduto.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                suCalculaValorItemPedido();
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        tb_descontoProduto.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                suConsisteDescontos();
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+    }
+
+    protected void suCalculaValorItemPedido(){
+        if (tb_quantidadeProduto.getText().toString().trim().equals("")) {
+            cl_ItemPedido.setQtde("0");
+        } else {
+            cl_ItemPedido.setQtde(tb_quantidadeProduto.getText().toString());
+
+            try {
+                double vf_vlTotalItemPedido = Double.parseDouble(cl_ItemPedido.getVlLiquido().replace(",", ".")) * Double.parseDouble(cl_ItemPedido.getQtde().replace(",", "."));
+                cl_ItemPedido.setVlTotal(String.valueOf(vf_vlTotalItemPedido));
+
+                try {
+                    lb_valorLiquidoResultado.setText("R$" + String.format("%.2f", Double.parseDouble(cl_ItemPedido.getVlLiquido().replace(",", "."))));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorLiquidoResultado.setText("R$0,00");
+                }
+
+                try {
+                    double vf_VlSemDesconto = 0.0;
+                    vf_VlSemDesconto = Double.parseDouble(cl_ItemPedido.getVlUnitario().replace(",", ".")) * Double.parseDouble(cl_ItemPedido.getQtde());
+
+                    lb_valorSemDescontoResultado.setText("R$" + String.format("%.2f", vf_VlSemDesconto));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorSemDescontoResultado.setText("R$0,00");
+                }
+
+                try {
+                    double vf_VlComDesconto = 0.0;
+                    vf_VlComDesconto = Double.parseDouble(cl_ItemPedido.getVlLiquido().replace(",", ".")) * Double.parseDouble(cl_ItemPedido.getQtde());
+
+                    lb_valorComDescontoResultado.setText("R$" + String.format("%.2f", vf_VlComDesconto));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorComDescontoResultado.setText("R$0,00");
+                }
+            }catch (Exception e){
+                MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Não foi possível realizar o calculo do valor total do item do pedido");
+            }
+
+        }
+    }
+
+    protected void suConsisteDescontos() {
+
+        try {
+            if(tb_descontoProduto.getText().toString().trim().equals("")){
+                tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
+                //tb_descontoProduto.setText("0.00000");
+
+                cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                suCalculaValorItemPedido();
+            }else {
+                double vf_PercDesconto = Double.parseDouble(tb_descontoProduto.getText().toString());
+
+
+                if (vf_PercDesconto > percdescmaxvendedor) {
+                    MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Desconto informado é maior que o permitido!");
+                    tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
+                    tb_descontoProduto.setText("0.00000");
+
+                    cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                    cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                    cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                    suCalculaValorItemPedido();
+                } else {
+                    if (vf_PercDesconto > 0.0) {
+                        CL_Produtos cl_Produto = new CL_Produtos();
+                        cl_Produto.setId(vc_CdProduto);
+
+                        CTL_Produtos ctl_Produto = new CTL_Produtos(getApplicationContext(), cl_Produto);
+
+                        if (ctl_Produto.fuCarregaProduto()) {
+                            double vf_ValorBruto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."));
+                            double vf_ValorLiquido = vf_ValorBruto - (vf_ValorBruto * (vf_PercDesconto / 100));
+
+                            cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                            cl_ItemPedido.setVlLiquido(String.valueOf(vf_ValorLiquido));
+                            cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                            suCalculaValorItemPedido();
+                        } else {
+
+                            MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Não foi possível carregar os valores do produto para aplicar o desconto!");
+
+                            tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
+                            tb_descontoProduto.setText("0.00000");
+
+                            cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                            cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                            cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                            suCalculaValorItemPedido();
+                        }
+                    } else {
+                        tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
+                        //tb_descontoProduto.setText("0.00000");
+
+                        cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                        cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                        cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                        suCalculaValorItemPedido();
+                    }
+                }
+            }
+
+
+        } catch (Exception e) {
+
+        }
 
     }
 
@@ -298,10 +572,17 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
         });
 
         lb_descricaoProduto = (TextView) findViewById(R.id.lb_descricaoProdutoManutencao);
-        tb_codigoProduto = (EditText) findViewById(R.id.tb_cdProdutoManutencao);
+        lb_codigoProdutoResultado = (TextView) findViewById(R.id.lb_codigoProdutoResultado);
         tb_quantidadeProduto = (EditText) findViewById(R.id.tb_qtdeProdutoManutencao);
         tb_descontoProduto = (EditText) findViewById(R.id.tb_descontoProdutoManutencao);
         tb_valorUnitarioProduto = (EditText) findViewById(R.id.tb_valorUnitarioManutencao);
+
+        //Novos campos adicionados:
+        tb_observacaoItemPedido = (EditText)findViewById(R.id.tb_obsItemPedido);
+        lb_valorLiquidoResultado = (TextView)findViewById(R.id.lb_vlTotalLiquidoResultado);
+        lb_valorSemDescontoResultado = (TextView)findViewById(R.id.lb_vlTotalSemDescontoResultado);
+        lb_valorComDescontoResultado = (TextView)findViewById(R.id.lb_vlTotalComDescontoResultado);
+
 
         lb_produtoAdicionado = (TextView) findViewById(R.id.lb_produtoAdicionado);
     }
@@ -345,7 +626,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                 //Toast.makeText(ManutencaoProdutoPedido.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
                 try {
 
-                    cl_ItemPedido.setCdProduto(tb_codigoProduto.getText().toString());
+                    cl_ItemPedido.setCdProduto(lb_codigoProdutoResultado.getText().toString());
                     ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
 
                     if(ctl_ItemPedido.fuDeletarItemPedido()){
@@ -446,15 +727,16 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
             String valorunitarioteste = String.format("%.2f", VA_vlUnitarioProduto);
 
             cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
-            cl_ItemPedido.setCdProduto(tb_codigoProduto.getText().toString());
+            cl_ItemPedido.setCdProduto(lb_codigoProdutoResultado.getText().toString());
             cl_ItemPedido.setDescricao(lb_descricaoProduto.getText().toString());
             cl_ItemPedido.setQtde(tb_quantidadeProduto.getText().toString());
             cl_ItemPedido.setPercDesconto(valorPercDesconto);
             cl_ItemPedido.setVlDesconto(valorTotalDesconto.replace(",", "."));
             cl_ItemPedido.setVlMaxDescPermitido(vlmaxdescpermitido.replace(",", "."));
             cl_ItemPedido.setVlUnitario(valorunitarioteste);
-            cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+            cl_ItemPedido.setVlLiquido(lb_valorLiquidoResultado.getText().toString());
             cl_ItemPedido.setVlTotal(valor);
+            cl_ItemPedido.setObservacao(tb_observacaoItemPedido.getText().toString().toUpperCase());
 
             ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
 
@@ -541,7 +823,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
             try {
                 BancoController crud = new BancoController(getBaseContext());
-                Cursor cursorVlUnitario = crud.carregaDadosProdutosByCdProduto(tb_codigoProduto.getText().toString());
+                Cursor cursorVlUnitario = crud.carregaDadosProdutosByCdProduto(lb_codigoProdutoResultado.getText().toString());
 
                 VL_valorBruto = Double.parseDouble(cursorVlUnitario.getString(cursorVlUnitario.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", "."));
                 if (VL_valorBruto != 0) {
@@ -622,6 +904,13 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
         ctl_Pedidos = new CTL_Pedidos(getApplicationContext(), cl_Pedidos);
 
         String vf_CdCliente = ctl_Pedidos.fuBuscarCdClientePedido();
+        int indexPonto = vf_CdCliente.indexOf(".");
+        String vf_CdClienteInt = "";
+        if(indexPonto == -1){
+            vf_CdClienteInt = vf_CdCliente;
+        }else{
+            vf_CdClienteInt = vf_CdCliente.substring(0, indexPonto).replace(".", "");
+        }
 
         CL_Clientes cl_Cliente = new CL_Clientes();
         cl_Cliente.setCdCliente(vf_CdCliente);
@@ -636,7 +925,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
             }
 
             cl_Produto = new CL_Produtos();
-            cl_Produto.setCdProduto(tb_codigoProduto.getText().toString());
+            cl_Produto.setCdProduto(lb_codigoProdutoResultado.getText().toString());
 
             CTL_Produtos ctl_Produtos = new CTL_Produtos(getApplicationContext(), cl_Produto);
 
@@ -695,7 +984,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
             if (ctl_Clientes.fuBuscaTipoPrecoCliente().equals("A")) {
                 CL_Produtos vf_Cl_Produto = new CL_Produtos();
-                vf_Cl_Produto.setCdProduto(tb_codigoProduto.getText().toString());
+                vf_Cl_Produto.setCdProduto(lb_codigoProdutoResultado.getText().toString());
 
                 CTL_Produtos ctl_Produtos = new CTL_Produtos(getApplicationContext(), cl_Produto);
 
@@ -719,6 +1008,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
     protected void suVerificaItemPedido(){
 
+        cl_ItemPedido.setNumPedido(vc_NumPedido);
         cl_ItemPedido.setCdProduto(cl_Produto.getCdProduto());
 
         ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
@@ -744,18 +1034,51 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
 
                     String valorProduto = tb_valorUnitarioProduto.getText().toString();
-                    String valor = String.format("%.2f", Double.parseDouble(valorProduto));
-                    tb_valorUnitarioProduto.setText(valor.replace(",", "."));
+                    String valor = String.format("%.2f", Double.parseDouble(valorProduto.replace(",", ".")));
+                    tb_valorUnitarioProduto.setText(valor);
                 } catch (Exception e) {
-                    tb_valorUnitarioProduto.setText("0.00");
+                    tb_valorUnitarioProduto.setText("0,00");
                 }
 
-                try {
+                /*try {
                     tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlLiquido());
                     String valorLiquido = String.format("%.2f", Double.parseDouble(tb_valorUnitarioProduto.getText().toString()));
                     tb_valorUnitarioProduto.setText(valorLiquido.replace(",", "."));
                 } catch (Exception e) {
                     tb_valorUnitarioProduto.setText("0");
+                }*/
+
+                try {
+                    lb_valorLiquidoResultado.setText(cl_ItemPedido.getVlLiquido());
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorLiquidoResultado.setText("R$0,00");
+                }
+
+                try {
+                    double vf_VlSemDesconto = 0.0;
+                    vf_VlSemDesconto = Double.parseDouble(cl_ItemPedido.getVlUnitario().replace(",", ".")) * Double.parseDouble(cl_ItemPedido.getQtde().replace(",", "."));
+
+                    lb_valorSemDescontoResultado.setText("R$" + String.format("%.2f", vf_VlSemDesconto));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorSemDescontoResultado.setText("R$0,00");
+                }
+
+                try {
+                    double vf_VlComDesconto = 0.0;
+                    vf_VlComDesconto = Double.parseDouble(cl_ItemPedido.getVlLiquido().replace("R$", "").replace(",", ".")) * Double.parseDouble(cl_ItemPedido.getQtde().replace(",", "."));
+
+                    lb_valorComDescontoResultado.setText("R$" + String.format("%.2f", vf_VlComDesconto));
+                    //lb_valorLiquidoResultado.setText(valorLiquido);
+                } catch (Exception e) {
+                    lb_valorComDescontoResultado.setText("R$0,00");
+                }
+
+                try{
+                    tb_observacaoItemPedido.setText(cl_ItemPedido.getObservacao());
+                }catch (Exception e){
+                    tb_observacaoItemPedido.setText("");
                 }
 
                 vc_Operacao = "A";

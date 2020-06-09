@@ -92,6 +92,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String VLUNITARIO = "vlunitario";
     public static final String VLLIQUIDO = "vlliquido";
     public static final String VLMAXDESCPERMITIDO = "vlmaxdescpermitido";
+    public static final String OBSERVACAOITEMPEDIDO = "observacaoitempedido";
 
     public static final String TABELABANCODADOS = "bancodados";
     public static final String IP = "ip";
@@ -244,6 +245,7 @@ public class CriaBanco extends SQLiteOpenHelper {
                 VLUNITARIO + " real, " +
                 VLLIQUIDO + " real, " +
                 VLTOTAL + " real, " +
+                OBSERVACAOITEMPEDIDO + " text, " +
                 "FOREIGN KEY(" + NUMPEDIDO + ") REFERENCES mestrepedido(" + ID + "), " +
                 "FOREIGN KEY(" + CDPRODUTO + ") REFERENCES cadpro(" + ID + "))";
 

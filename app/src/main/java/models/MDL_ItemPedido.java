@@ -18,7 +18,7 @@ public class MDL_ItemPedido {
 
     public String [] arr_CamposItemPedido = {banco.ID, banco.NUMPEDIDO, banco.CDPRODUTO, banco.DESCRICAO, banco.QTDE,
             banco.PERCDESCONTO, banco.VLMAXDESCPERMITIDO, banco.VLDESCONTO, banco.VLUNITARIO,
-            banco.VLLIQUIDO, banco.VLTOTAL};
+            banco.VLLIQUIDO, banco.VLTOTAL, banco.OBSERVACAOITEMPEDIDO};
 
     public MDL_ItemPedido(Context context)
     {
@@ -26,7 +26,7 @@ public class MDL_ItemPedido {
     }
 
     public boolean fuInserirItemPedido(String numPedido, String cdProduto, String descricao, String qtde, String percDesconto,
-                                      String vlDesconto, String vlMaxDescPermitido, String vlUnitario, String vlLiquido, String vlTotal){
+                                      String vlDesconto, String vlMaxDescPermitido, String vlUnitario, String vlLiquido, String vlTotal, String observacao){
 
         ContentValues valores;
         long resultado;
@@ -43,6 +43,7 @@ public class MDL_ItemPedido {
         valores.put(CriaBanco.VLUNITARIO, vlUnitario);
         valores.put(CriaBanco.VLLIQUIDO, vlLiquido);
         valores.put(CriaBanco.VLTOTAL, vlTotal);
+        valores.put(CriaBanco.OBSERVACAOITEMPEDIDO, observacao);
 
         resultado = db.insert(CriaBanco.TABELAITEMPEDIDO, null, valores);
         db.close();
@@ -57,7 +58,7 @@ public class MDL_ItemPedido {
 
     //---------------------------Função para alteração dos itens incluidos no pedido -----------------------------------------
     public boolean fuAlterarItemPedido(String numPedido, String cdProduto, String qtde, String percDesconto,
-                                       String vlDesconto, String vlUnitario, String vlLiquido, String vlTotal){
+                                       String vlDesconto, String vlUnitario, String vlLiquido, String vlTotal, String observacao){
 
         ContentValues valores;
         String where;
@@ -73,6 +74,7 @@ public class MDL_ItemPedido {
         valores.put(CriaBanco.VLLIQUIDO, vlLiquido);
         valores.put(CriaBanco.VLTOTAL, vlTotal);
         valores.put(CriaBanco.VLUNITARIO, vlUnitario);
+        valores.put(CriaBanco.OBSERVACAOITEMPEDIDO, observacao);
 
         resultado = db.update(CriaBanco.TABELAITEMPEDIDO, valores, where, null);
         db.close();
@@ -103,7 +105,7 @@ public class MDL_ItemPedido {
     //Função para duplicação dos itens de um pedido que foi duplicado
     public boolean fuDuplicarItensPedido(String numPedido, String cdProduto, String descricao, String qtde,
                                          String percDesconto, String vlDesconto, String vlMaxDescPermitido,
-                                         String vlUnitario, String vlLiquido, String vlTotal){
+                                         String vlUnitario, String vlLiquido, String vlTotal, String observacao){
         ContentValues valores;
         long resultado;
 
@@ -119,6 +121,7 @@ public class MDL_ItemPedido {
         valores.put(CriaBanco.VLUNITARIO, vlUnitario);
         valores.put(CriaBanco.VLLIQUIDO, vlLiquido);
         valores.put(CriaBanco.VLTOTAL, vlTotal);
+        valores.put(CriaBanco.OBSERVACAOITEMPEDIDO, observacao);
 
         resultado = db.insert(CriaBanco.TABELAITEMPEDIDO, null, valores);
         db.close();

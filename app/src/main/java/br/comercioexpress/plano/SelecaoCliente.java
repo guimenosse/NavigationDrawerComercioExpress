@@ -59,8 +59,8 @@ public class SelecaoCliente extends AppCompatActivity {
                 cursor.moveToPosition(position);
                 codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
                 Intent intent = new Intent();
-                setResult(Integer.parseInt(codigo), intent);
-                //intent.putExtra("codigo", codigo);
+                intent.putExtra("codigo", codigo);
+                setResult(1, intent);
                 //startActivity(intent);
                 finish();
             }
@@ -116,7 +116,8 @@ public class SelecaoCliente extends AppCompatActivity {
                         cursor.moveToPosition(position);
                         codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
                         Intent intent = new Intent();
-                        setResult(Integer.parseInt(codigo), intent);
+                        intent.putExtra("codigo", codigo);
+                        setResult(1, intent);
                         //intent.putExtra("codigo", codigo);
                         //startActivity(intent);
                         finish();
