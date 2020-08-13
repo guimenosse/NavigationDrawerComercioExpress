@@ -87,6 +87,7 @@ public class Filial extends AppCompatActivity {
         vc_Operacao = this.getIntent().getStringExtra("operacao");
 
         sync_Filial = new SYNC_Filial(getApplicationContext());
+        sync_Clientes = new SYNC_Clientes(getApplicationContext());
         vc_Context = getApplicationContext();
 
 
@@ -193,7 +194,8 @@ public class Filial extends AppCompatActivity {
                                 if(vf_Ctl_Filial.fuBuscarFiliais()){
                                     Cursor rs_Filial = vf_Ctl_Filial.rs_Filial;
 
-                                    vf_Ctl_Filial.cl_Filial.setId(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.ID)));
+                                    //vf_Ctl_Filial.cl_Filial.setId(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.ID)));
+                                    vf_Ctl_Filial.cl_Filial.setId(codigo);
 
                                     if(vf_Ctl_Filial.fuSelecionarFilial()){
                                         LoadingAsyncPrecoFilial async_PrecoProdutoFilial = new LoadingAsyncPrecoFilial();
@@ -202,6 +204,13 @@ public class Filial extends AppCompatActivity {
                                         MensagemUtil.addMsg(Filial.this, "Não foi possível selecionar a filial");
                                     }
                                 }
+
+                            }
+                        });
+
+                        builder.setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
                             }
                         });

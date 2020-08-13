@@ -68,7 +68,9 @@ public class CTL_Filial {
             if(rs_Filial!=null){
                 if(rs_Filial.getCount() > 0){
                     rs_Filial.moveToFirst();
-                    cl_Filial.setCdFilial(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.CDFILIAL)));
+                    if(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.FGSELECIONADA)).equals("S")) {
+                        cl_Filial.setCdFilial(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.CDFILIAL)));
+                    }
                 }else{
                     cl_Filial.setCdFilial(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.CDFILIAL)));
                 }
@@ -91,7 +93,12 @@ public class CTL_Filial {
             if(rs_Filial!=null){
                 if(rs_Filial.getCount() > 0){
                     rs_Filial.moveToFirst();
-                    cl_Filial.setNomeFilial(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.FILIAL)));
+                    while (!rs_Filial.isAfterLast()) {
+                        if (rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.FGSELECIONADA)).equals("S")) {
+                            cl_Filial.setNomeFilial(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.FILIAL)));
+                        }
+                        rs_Filial.moveToNext();
+                    }
                 }else{
                     cl_Filial.setNomeFilial(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.FILIAL)));
                 }

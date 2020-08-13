@@ -588,14 +588,14 @@ public class Pedidos extends AppCompatActivity
 
             builder = new AlertDialog.Builder(this);
 
-            if(diffDays > 2 && diffDays < 3){
+            /*if(diffDays > 2 && diffDays < 3){
                 MensagemUtil.addMsg(Pedidos.this, "Você não fez nenhuma sincronização nas últimas 48 horas, necessária a realização da sincronização.");
-            }else if(diffDays >= 3){
-
+            }else if(diffDays >= 3){*/
+            if(diffDays >= 1){
                 //define o titulo
                 builder.setTitle("ATENÇÃO!");
                 //define a mensagem
-                builder.setMessage("Você não fez nenhuma sincronização nas últimas 72 horas, obrigatória a realização da sincronização. É necessária conexão com a internet para a realização da sincronização.");
+                builder.setMessage("Você não fez nenhuma sincronização nas últimas 24 horas, obrigatória a realização da sincronização. É necessária conexão com a internet para a realização da sincronização.");
 
                 //define um botão como positivo
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

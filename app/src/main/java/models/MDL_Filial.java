@@ -117,7 +117,7 @@ public class MDL_Filial {
 
     public Cursor fuBuscarFiliais(){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.FILIAL};
+        String[] campos = {banco.ID, banco.FILIAL, banco.FGSELECIONADA};
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
         if(cursor!=null) {

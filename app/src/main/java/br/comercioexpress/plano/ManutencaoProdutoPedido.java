@@ -66,8 +66,10 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //Função que instancia os campos do xml para utilizar na classe
         suInstanciarCampos();
 
+        //Verifica se o produto que está vindo foi chamado a partir da lista de itens do pedido(alteração) ou a partir da lista de produtos(inclusão)
         if (vc_Alteracao.equals("S")) {
             cl_ItemPedido.setId(vc_CdProduto);
             ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
@@ -206,10 +208,22 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                 }
 
                 suBuscaPrecosCliente("N");
+                if(percDescontoClassificacao > 0) {
+                    tb_descontoProduto.setText(String.valueOf(percDescontoClassificacao));
+                }else{
+                    tb_descontoProduto.setText("0");
+                }
+                cl_ItemPedido.setVlDesconto(String.valueOf(percDescontoClassificacao));
 
-                //tb_descontoProduto.setText(String.valueOf(percDescontoClassificacao));
-                cl_ItemPedido.setVlDesconto("0.00");
-                cl_ItemPedido.setVlTotal("0.00");
+                if(percDescontoClassificacao > 0){
+                    double vf_PercDesconto = Double.parseDouble(tb_descontoProduto.getText().toString());
+                    double vf_ValorBruto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."));
+                    double vf_ValorLiquido = vf_ValorBruto - (vf_ValorBruto * (vf_PercDesconto / 100));
+
+                    cl_ItemPedido.setVlLiquido(String.valueOf(vf_ValorLiquido));
+                }
+                suCalculaValorItemPedido();
+                /*cl_ItemPedido.setVlTotal("0.00");
 
                 try {
                     lb_valorLiquidoResultado.setText("R$" + String.format("%.2f", Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."))));
@@ -236,7 +250,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     //lb_valorLiquidoResultado.setText(valorLiquido);
                 } catch (Exception e) {
                     lb_valorComDescontoResultado.setText("R$0,00");
-                }
+                }*/
 
                 suVerificaItemPedido();
 
@@ -286,8 +300,10 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                                         porcentagem = 100 - porcentagem;
                                         if (porcentagem > percdescmaxvendedor) {
                                             MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Desconto informado é maior que o permitido!");
-                                            tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
+                                            tb_valorUnitarioProduto.setText(String.format("%.2f", valorBruto));
+                                            //tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
                                             tb_descontoProduto.setText("0.00000");
+                                            tb_valorUnitarioProduto.setText(String.format("%.2f", valorBruto));
 
                                             cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
                                             cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
@@ -320,8 +336,9 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                             tb_descontoProduto.setEnabled(false);
                             tb_descontoProduto.setText("0.00000");
 
-                            cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
-                            cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                            tb_valorUnitarioProduto.setText(String.format("%.2f", VA_VlUnitarioNovo));
+                            cl_ItemPedido.setVlUnitario(String.valueOf(VA_VlUnitarioNovo));
+                            cl_ItemPedido.setVlLiquido(String.valueOf(VA_VlUnitarioNovo));
                             cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
                             suCalculaValorItemPedido();
                         } else {
@@ -389,7 +406,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
             try {
                 double vf_vlTotalItemPedido = Double.parseDouble(cl_ItemPedido.getVlLiquido().replace(",", ".")) * Double.parseDouble(cl_ItemPedido.getQtde().replace(",", "."));
-                cl_ItemPedido.setVlTotal(String.valueOf(vf_vlTotalItemPedido));
+                cl_ItemPedido.setVlTotal(String.format("%.2f",vf_vlTotalItemPedido));
 
                 try {
                     lb_valorLiquidoResultado.setText("R$" + String.format("%.2f", Double.parseDouble(cl_ItemPedido.getVlLiquido().replace(",", "."))));
@@ -460,7 +477,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                             double vf_ValorLiquido = vf_ValorBruto - (vf_ValorBruto * (vf_PercDesconto / 100));
 
                             cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
-                            cl_ItemPedido.setVlLiquido(String.valueOf(vf_ValorLiquido));
+                            cl_ItemPedido.setVlLiquido(String.format("%.2f", vf_ValorLiquido));
                             cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
                             suCalculaValorItemPedido();
                         } else {
@@ -476,7 +493,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                             suCalculaValorItemPedido();
                         }
                     } else {
-                        tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlUnitario());
+                        tb_valorUnitarioProduto.setText(cl_ItemPedido.getVlLiquido());
                         //tb_descontoProduto.setText("0.00000");
 
                         cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
@@ -734,7 +751,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
             cl_ItemPedido.setVlDesconto(valorTotalDesconto.replace(",", "."));
             cl_ItemPedido.setVlMaxDescPermitido(vlmaxdescpermitido.replace(",", "."));
             cl_ItemPedido.setVlUnitario(valorunitarioteste);
-            cl_ItemPedido.setVlLiquido(lb_valorLiquidoResultado.getText().toString());
+            cl_ItemPedido.setVlLiquido(lb_valorLiquidoResultado.getText().toString().replace("R$", ""));
             cl_ItemPedido.setVlTotal(valor);
             cl_ItemPedido.setObservacao(tb_observacaoItemPedido.getText().toString().toUpperCase());
 
@@ -836,7 +853,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                 if (vf_VlUnitarioProduto < VL_valorBruto) {
 
                     try {
-                        double VA_VlUnitarioNovo = Double.parseDouble(tb_valorUnitarioProduto.getText().toString().trim());
+                        double VA_VlUnitarioNovo = Double.parseDouble(tb_valorUnitarioProduto.getText().toString().trim().replace(",", "."));
                         if (VA_VlUnitarioNovo - VL_valorBruto < 0) {
 
                             try {
@@ -850,10 +867,17 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
                                 if (porcentagem > percdescmaxvendedor) {
                                     MensagemUtil.addMsg(ManutencaoProdutoPedido.this, "Desconto informado é maior que o permitido!");
-                                    tb_valorUnitarioProduto.setText(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)));
+                                    tb_valorUnitarioProduto.setText(String.format("%.2f", valorBruto));
+                                    tb_descontoProduto.setText("0.00000");
+                                    tb_valorUnitarioProduto.setText(String.format("%.2f", valorBruto));
+
+                                    cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
+                                    cl_ItemPedido.setVlLiquido(tb_valorUnitarioProduto.getText().toString());
+                                    cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
+                                    suCalculaValorItemPedido();
                                     return false;
                                 } else {
-                                    tb_descontoProduto.setText(String.format("%.5f", 100 - porcentagem).replace(",", "."));
+                                    tb_descontoProduto.setText(String.format("%.5f", porcentagem).replace(",", "."));
                                 }
 
                             } catch (Exception e) {
@@ -875,7 +899,7 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 } else if (vf_VlUnitarioProduto > VL_valorBruto) {
-                    tb_descontoProduto.setText("0");
+                    //tb_descontoProduto.setText("0");
                     vf_DescontoProduto = 0;
                 } else {
                     //tb_descontoProduto.setText("0");

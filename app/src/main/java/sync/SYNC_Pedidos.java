@@ -138,7 +138,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                     + "&vldesconto=" + cl_Pedidos.getVlDesconto().replace(".", ",") + ""
                     + "&vlfrete=" + cl_Pedidos.getVlFrete().replace(".", ",")
                     + "&condpgto=" + cl_Pedidos.getCondPgto().replace(" ", "espaco")
-                    + "&obs=" + cl_Pedidos.getObsPedido().replace(" ", "espaco").replace("\n", "pulalinha")
+                    + "&obs=" + cl_Pedidos.getObsPedido().replace("Ç", "C").replace("ç", "c").replace(" ", "espaco").replace("\n", "pulalinha")
                     + "&filial=" + cl_Filial.getCdFilial() + "";
             HttpPost httppost = new HttpPost(url);
 
@@ -635,7 +635,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                             + "&vldesconto=" + cl_ItemPedido.getVlDesconto().replace(".", ",")
                             + "&percdesconto=" + cl_ItemPedido.getPercDesconto().replace(".", ",")
                             + "&cdrefestoque=" + vf_CdRefEstoque
-                            + "&observacao=" + cl_ItemPedido.getObservacao().replace(" ", "espaco")
+                            + "&observacao=" + cl_ItemPedido.getObservacao().replace("Ç", "C").replace("ç", "c").replace(" ", "espaco")
                             + "&filial=" + cl_Filial.getCdFilial() + "";
 
                     HttpPost httppost = new HttpPost(url);
