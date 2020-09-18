@@ -69,6 +69,7 @@ import controllers.CTL_ItemPedido;
 import controllers.CTL_Pedidos;
 import controllers.CTL_Usuario;
 import models.CriaBanco;
+import sync.SYNC_Clientes;
 import sync.SYNC_Pedidos;
 
 public class ManutencaoPedidos extends AppCompatActivity {
@@ -1061,6 +1062,20 @@ public class ManutencaoPedidos extends AppCompatActivity {
     }
 
     public boolean fuEnviarPedido() {
+
+        CL_Clientes cl_Clientes = new CL_Clientes();
+        cl_Clientes.setCdCliente(cl_Pedidos.getCdCliente());
+
+        CTL_Clientes ctl_Clientes = new CTL_Clientes(getApplicationContext(), cl_Clientes);
+
+        if(ctl_Clientes.fuSelecionarCliente()){
+            if(cl_Clientes.getFgSincronizado().equals("N")){
+                SYNC_Clientes sync_Clientes = new SYNC_Clientes(getApplicationContext());
+                if(sync_Clientes.FU_SincronizarClientePedido(cl_Clientes)){
+                    cl_Pedidos.setCdCliente(cl_Clientes.getCdCliente());
+                }
+            }
+        }
 
         if(sync_Pedidos.FU_EnviarPedido(cl_Pedidos)){
             return true;
