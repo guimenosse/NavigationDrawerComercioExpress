@@ -111,6 +111,9 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
     private static Font negritoMenor = new Font(Font.FontFamily.TIMES_ROMAN, 12,
             Font.BOLD);
+
+    private static Font negritoDescricao = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+            Font.BOLD);
     private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
             Font.BOLD);
 
@@ -1110,7 +1113,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
             PdfWriter.getInstance(document, fOut);
             document.open();
 
-            try {
+            /*try {
                 Drawable d = getResources().getDrawable(R.drawable.logo_expres_mobile);
                 BitmapDrawable bitDw = ((BitmapDrawable) d);
                 Bitmap bmp = bitDw.getBitmap();
@@ -1127,7 +1130,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
             catch(IOException ex)
             {
 
-            }
+            }*/
 
             Paragraph preface = new Paragraph();
             // We add one empty line
@@ -1282,6 +1285,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             Phrase ph_Descricao = new Phrase();
             ph_Descricao.setFont(negritoMenor);
+            //ph_Descricao.setFont(negritoDescricao);
             ph_Descricao.add(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
 
 
@@ -1293,6 +1297,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             Phrase ph_QtdeProdutos = new Phrase();
             ph_QtdeProdutos.setFont(negritoMenor);
+            //ph_QtdeProdutos.setFont(negritoDescricao);
             ph_QtdeProdutos.add("Quantidade: " + rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
 
             PdfPCell c2 = new PdfPCell(ph_QtdeProdutos);
@@ -1303,6 +1308,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             Phrase ph_VlTotal = new Phrase();
             ph_VlTotal.setFont(negritoMenor);
+            //ph_VlTotal.setFont(negritoDescricao);
             ph_VlTotal.add("Valor total: " + "R$" + String.format("%.2f", Double.parseDouble(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).replace(",", "."))));
 
             PdfPCell c3 = new PdfPCell(ph_VlTotal);

@@ -173,8 +173,8 @@ public class BancoController {
     public Cursor carregaClientes(){
 
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDCLIENTE, banco.RZSOCIAL};
-        String orderBy = "rzsocial";
+        String[] campos = {banco.ID, banco.CDCLIENTE, banco.RZSOCIAL, banco.NMFANTASIA, banco.TELEFONE, banco.EMAIL};
+        String orderBy = banco.RZSOCIAL;
         db = banco.getReadableDatabase();
         cursor = db.query(banco.TABELA, campos, null, null, null, null, orderBy, null);
 
@@ -189,9 +189,9 @@ public class BancoController {
     //------------------------Função para carregamento da listview de clientes de acordo com o nome digitado no campo de busca------------
     public Cursor carregaClientesNome(String nome){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.RZSOCIAL};
+        String[] campos = {banco.ID, banco.CDCLIENTE, banco.RZSOCIAL, banco.NMFANTASIA, banco.TELEFONE, banco.EMAIL};
+        String orderBy = banco.RZSOCIAL;
         String where = CriaBanco.RZSOCIAL + " LIKE '%" + nome + "%'";
-        String orderBy = "rzsocial";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, orderBy, null);
 

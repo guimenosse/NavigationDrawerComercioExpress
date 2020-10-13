@@ -26,6 +26,9 @@ import android.widget.Toast;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import classes.CL_Filial;
 import classes.CL_Usuario;
 import controllers.CTL_Filial;
@@ -114,70 +117,7 @@ public class HomeActivity extends AppCompatActivity
             Log.d("CARREGARVENDEDOR", "Não foi possivel carregar o vendedor por causa dessa situação: " + e.getMessage());
         }
 
-        BancoController crud = new BancoController(getBaseContext());
-        final Cursor cursor = crud.carregaClientes();
-
-        String[] nomeCampos = new String[] {CriaBanco.ID, CriaBanco.RZSOCIAL};
-        int[] idViews = new int[] {R.id.cdCliente, R.id.rzsociallist};
-
-        SimpleCursorAdapter adaptador = new SimpleCursorAdapter(getBaseContext(), R.layout.listviewteste, cursor, nomeCampos, idViews, 0);
-        lista = (ListView)findViewById(R.id.listView);
-        lista.setAdapter(adaptador);
-
-        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String codigo;
-                cursor.moveToPosition(position);
-                codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
-                Intent intent = new Intent(HomeActivity.this, CadastroClientes.class);
-                intent.putExtra("codigo", codigo);
-                startActivity(intent);
-            }
-        });
-
-
-        final EditText tb_buscarcliente = (EditText)findViewById(R.id.tb_buscarcliente);
-
-        tb_buscarcliente.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                BancoController crud = new BancoController(getBaseContext());
-                final Cursor cursor = crud.carregaClientesNome(tb_buscarcliente.getText().toString());
-
-                String[] nomeCampos = new String[]{CriaBanco.RZSOCIAL};
-                int[] idViews = new int[]{R.id.rzsociallist};
-
-                SimpleCursorAdapter adaptador = new SimpleCursorAdapter(getBaseContext(), R.layout.listviewteste, cursor, nomeCampos, idViews, 0);
-                lista = (ListView) findViewById(R.id.listView);
-                lista.setAdapter(adaptador);
-
-                lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        String codigo;
-                        cursor.moveToPosition(position);
-                        codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
-                        Intent intent = new Intent(HomeActivity.this, CadastroClientes.class);
-                        intent.putExtra("codigo", codigo);
-                        startActivity(intent);
-                    }
-                });
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        carregaListaClientes("");
 
         final TextView lb_TituloClientes = (TextView) findViewById(R.id.lb_TituloClientes);
 
@@ -190,33 +130,7 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public boolean onQueryTextChange(String vf_Nome) {
 
-                String vf_RazaoSocialNome = vf_Nome;
-                try{
-                    BancoController crud = new BancoController(getBaseContext());
-                    final Cursor cursor = crud.carregaClientesNome(vf_RazaoSocialNome);
-
-                    String[] nomeCampos = new String[]{CriaBanco.RZSOCIAL};
-                    int[] idViews = new int[]{R.id.rzsociallist};
-
-                    SimpleCursorAdapter adaptador = new SimpleCursorAdapter(getBaseContext(), R.layout.listviewteste, cursor, nomeCampos, idViews, 0);
-                    lista = (ListView) findViewById(R.id.listView);
-                    lista.setAdapter(adaptador);
-
-                    lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            String codigo;
-                            cursor.moveToPosition(position);
-                            codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
-                            Intent intent = new Intent(HomeActivity.this, CadastroClientes.class);
-                            intent.putExtra("codigo", codigo);
-                            startActivity(intent);
-                        }
-                    });
-                }catch (Exception e){
-                    MensagemUtil.addMsg(HomeActivity.this, "Não foi possível selecionar o cliente");
-                }
+                carregaListaClientes(vf_Nome);
 
                 return false;
             }
@@ -323,7 +237,60 @@ public class HomeActivity extends AppCompatActivity
     }
 
 
+    public void carregaListaClientes(String parametroNomeRazaoSocial){
+        BancoController crud = new BancoController(getBaseContext());
+        Cursor cursorCliente = crud.carregaClientes();
+        if(parametroNomeRazaoSocial.trim() != ""){
+            cursorCliente = crud.carregaClientesNome(parametroNomeRazaoSocial);
+        }
+        final Cursor cursor = cursorCliente;
 
+        final List<String> codigo = new ArrayList<>();
+        List<String> nomeRazaoSocial = new ArrayList<>();
+        List<String> nomeFantasia = new ArrayList<>();
+        List<String> telefone = new ArrayList<>();
+        List<String> email = new ArrayList<>();
+
+        if (cursor != null) {
+            while(!cursor.isAfterLast()) {
+
+                String codigoCliente = "";
+                try{
+                    int indexPontoCdCliente = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE)).indexOf(".");
+                    codigoCliente = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE)).substring(0, indexPontoCdCliente);
+                    //int codigoCliente = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE)));
+                }catch (Exception e){
+                    codigoCliente = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE));
+                }
+
+
+                codigo.add(codigoCliente);
+                nomeRazaoSocial.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)));
+                nomeFantasia.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.NMFANTASIA)));
+                telefone.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.TELEFONE)));
+                email.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.EMAIL)));
+
+                cursor.moveToNext();
+            }
+        }
+
+        lista = (ListView)findViewById(R.id.listView);
+        ListaClientesCustomizadaAdapter adapter = new ListaClientesCustomizadaAdapter(this, codigo, nomeRazaoSocial, nomeFantasia, telefone, email);
+        lista.setAdapter(adapter);
+
+        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String codigo;
+                cursor.moveToPosition(position);
+                codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
+                Intent intent = new Intent(HomeActivity.this, CadastroClientes.class);
+                intent.putExtra("codigo", codigo);
+                startActivity(intent);
+            }
+        });
+    }
 
 
 }

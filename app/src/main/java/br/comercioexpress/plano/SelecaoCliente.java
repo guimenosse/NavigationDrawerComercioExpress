@@ -19,6 +19,9 @@ import android.widget.Toast;
 
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import models.CriaBanco;
 
 public class SelecaoCliente extends AppCompatActivity {
@@ -41,7 +44,9 @@ public class SelecaoCliente extends AppCompatActivity {
         sv_ClientesPedido = (MaterialSearchView) findViewById(R.id.sv_ClientesPedidos);
         sv_ClientesPedido.setVoiceSearch(true); //or false
 
-        BancoController crud = new BancoController(getBaseContext());
+        carregaListaClientes("");
+
+        /*BancoController crud = new BancoController(getBaseContext());
         final Cursor cursor = crud.carregaClientes();
 
         String[] nomeCampos = new String[] {CriaBanco.ID, CriaBanco.RZSOCIAL};
@@ -64,28 +69,8 @@ public class SelecaoCliente extends AppCompatActivity {
                 //startActivity(intent);
                 finish();
             }
-        });
+        });*/
 
-
-        final EditText tb_buscarcliente = (EditText)findViewById(R.id.tb_buscarclienteSelecaoClientes);
-
-        tb_buscarcliente.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
 
         final TextView lb_TituloClientesPedidos = (TextView) findViewById(R.id.lb_TituloClientesPedidos);
 
@@ -98,31 +83,7 @@ public class SelecaoCliente extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String nomeRazaoSocial) {
 
-                BancoController crud = new BancoController(getBaseContext());
-                final Cursor cursor = crud.carregaClientesNome(nomeRazaoSocial);
-
-                String[] nomeCampos = new String[]{CriaBanco.RZSOCIAL};
-                int[] idViews = new int[]{R.id.rzsociallist};
-
-                SimpleCursorAdapter adaptador = new SimpleCursorAdapter(getBaseContext(), R.layout.listviewteste, cursor, nomeCampos, idViews, 0);
-                lista = (ListView) findViewById(R.id.listView);
-                lista.setAdapter(adaptador);
-
-                lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        String codigo;
-                        cursor.moveToPosition(position);
-                        codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
-                        Intent intent = new Intent();
-                        intent.putExtra("codigo", codigo);
-                        setResult(1, intent);
-                        //intent.putExtra("codigo", codigo);
-                        //startActivity(intent);
-                        finish();
-                    }
-                });
+                carregaListaClientes(nomeRazaoSocial);
 
                 return false;
             }
@@ -188,6 +149,63 @@ public class SelecaoCliente extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void carregaListaClientes(String parametroNomeRazaoSocial){
+        BancoController crud = new BancoController(getBaseContext());
+        Cursor cursorCliente = crud.carregaClientes();
+        if(parametroNomeRazaoSocial.trim() != ""){
+            cursorCliente = crud.carregaClientesNome(parametroNomeRazaoSocial);
+        }
+        final Cursor cursor = cursorCliente;
+
+        final List<String> codigo = new ArrayList<>();
+        List<String> nomeRazaoSocial = new ArrayList<>();
+        List<String> nomeFantasia = new ArrayList<>();
+        List<String> telefone = new ArrayList<>();
+        List<String> email = new ArrayList<>();
+
+        if (cursor != null) {
+            while(!cursor.isAfterLast()) {
+
+                String codigoCliente = "";
+                try{
+                    int indexPontoCdCliente = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE)).indexOf(".");
+                    codigoCliente = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE)).substring(0, indexPontoCdCliente);
+                    //int codigoCliente = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE)));
+                }catch (Exception e){
+                    codigoCliente = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDCLIENTE));
+                }
+
+
+                codigo.add(codigoCliente);
+                nomeRazaoSocial.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)));
+                nomeFantasia.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.NMFANTASIA)));
+                telefone.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.TELEFONE)));
+                email.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.EMAIL)));
+
+                cursor.moveToNext();
+            }
+        }
+
+        lista = (ListView)findViewById(R.id.listView);
+        ListaClientesCustomizadaAdapter adapter = new ListaClientesCustomizadaAdapter(this, codigo, nomeRazaoSocial, nomeFantasia, telefone, email);
+        lista.setAdapter(adapter);
+
+        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String codigo;
+                cursor.moveToPosition(position);
+                codigo = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ID));
+                Intent intent = new Intent();
+                intent.putExtra("codigo", codigo);
+                setResult(1, intent);
+                //startActivity(intent);
+                finish();
+            }
+        });
     }
 
 }

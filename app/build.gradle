@@ -14,8 +14,8 @@ android {
         applicationId "br.comercioexpress.plano"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 7
-        versionName "3.6"
+        versionCode 8
+        versionName "3.7"
         multiDexEnabled true
     }
     buildTypes {

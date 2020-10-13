@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/NavigationDrawerComercioExpress.iml" filepath="$PROJECT_DIR$/NavigationDrawerComercioExpress.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/com�rcio_express_mobile/com�rcio_express_mobile.iml" filepath="$PROJECT_DIR$/com�rcio_express_mobile/com�rcio_express_mobile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NavigationDrawerComercioExpress.iml" filepath="$PROJECT_DIR$/NavigationDrawerComercioExpress.iml" group="NavigationDrawerComercioExpress" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="NavigationDrawerComercioExpress/app" />
+      <module fileurl="file://$PROJECT_DIR$/com�rcio_express_mobile/com�rcio_express_mobile.iml" filepath="$PROJECT_DIR$/com�rcio_express_mobile/com�rcio_express_mobile.iml" group="NavigationDrawerComercioExpress/com�rcio_express_mobile" />
     </modules>
   </component>
 </project>
