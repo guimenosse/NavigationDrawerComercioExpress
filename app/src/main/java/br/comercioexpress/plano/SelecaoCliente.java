@@ -164,6 +164,7 @@ public class SelecaoCliente extends AppCompatActivity {
         List<String> nomeFantasia = new ArrayList<>();
         List<String> telefone = new ArrayList<>();
         List<String> email = new ArrayList<>();
+        List<String> fgBloqueio = new ArrayList<>();
 
         if (cursor != null) {
             while(!cursor.isAfterLast()) {
@@ -183,13 +184,14 @@ public class SelecaoCliente extends AppCompatActivity {
                 nomeFantasia.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.NMFANTASIA)));
                 telefone.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.TELEFONE)));
                 email.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.EMAIL)));
+                fgBloqueio.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGBLOQUEIO)));
 
                 cursor.moveToNext();
             }
         }
 
         lista = (ListView)findViewById(R.id.listView);
-        ListaClientesCustomizadaAdapter adapter = new ListaClientesCustomizadaAdapter(this, codigo, nomeRazaoSocial, nomeFantasia, telefone, email);
+        ListaClientesCustomizadaAdapter adapter = new ListaClientesCustomizadaAdapter(this, codigo, nomeRazaoSocial, nomeFantasia, telefone, email, fgBloqueio);
         lista.setAdapter(adapter);
 
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {

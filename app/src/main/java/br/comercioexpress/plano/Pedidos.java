@@ -334,6 +334,9 @@ public class Pedidos extends AppCompatActivity
                 if(cl_Clientes.getFgSincronizado().equals("N")){
                     if(sync_Clientes.FU_SincronizarClientePedido(cl_Clientes)){
                         cl_Pedidos.setCdCliente(cl_Clientes.getCdCliente());
+                    }else{
+                        vc_Mensagem = sync_Clientes.mensagem;
+                        return false;
                     }
                 }
             }
@@ -661,7 +664,12 @@ public class Pedidos extends AppCompatActivity
                 Intent intent = new Intent(Pedidos.this, Pedidos.class);
                 startActivity(intent);
             }else {
-                MensagemUtil.addMsg(Pedidos.this, "Não foi possivel realizar a sincronização do pedido. Favor verificar a conexão com a internet.");
+                if(vc_Mensagem.equals("")){
+                    MensagemUtil.addMsg(Pedidos.this, "Não foi possivel realizar a sincronização do pedido. Favor verificar a conexão com a internet.");
+                }else{
+                    MensagemUtil.addMsg(Pedidos.this, vc_Mensagem);
+                }
+
             }
         }
     }
@@ -787,6 +795,7 @@ public class Pedidos extends AppCompatActivity
                     MensagemUtil.addMsg(Pedidos.this, vc_Mensagem);
                 }
             }else{
+
                 MensagemUtil.addMsg(Pedidos.this, "Todos os seus pedidos que estavam em aberto foram sincronizados com o servidor");
                 Intent intent = getIntent();
                 finish();
@@ -805,7 +814,10 @@ public class Pedidos extends AppCompatActivity
                     vc_Mensagem = "";
                     return true;
                 } else {
-                    vc_Mensagem = "";
+                    if(!sync_Pedidos.mensagem.equals("")){
+                        vc_Mensagem = sync_Pedidos.mensagem;
+                    }
+                    //vc_Mensagem = "";
                     return false;
                 }
             }else{

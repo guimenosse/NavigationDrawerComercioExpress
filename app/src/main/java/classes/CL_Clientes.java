@@ -31,6 +31,7 @@ public class CL_Clientes {
     protected String fgSincronizado;
     protected String observacao;
     protected String classificacao;
+    protected String fgBloqueio;
 
     //INSCESTADUAL FIDELIDADE TIPOPRECO
 
@@ -263,5 +264,13 @@ public class CL_Clientes {
 
     public void setDtCadastro(String dtCadastro) {
         this.dtCadastro = dtCadastro;
+    }
+
+    public String getFgBloqueio() {
+        return fgBloqueio;
+    }
+
+    public void setFgBloqueio(String fgBloqueio) {
+        this.fgBloqueio = fgBloqueio;
     }
 }

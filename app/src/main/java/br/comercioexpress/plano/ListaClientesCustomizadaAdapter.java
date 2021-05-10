@@ -22,14 +22,16 @@ public class ListaClientesCustomizadaAdapter extends BaseAdapter {
     private List<String> nomeFantasia;
     private List<String> telefone;
     private List<String> email;
+    private List<String> fgBloqueio;
 
-    public ListaClientesCustomizadaAdapter(Context context, List<String> codigo, List<String> nomeRazaoSocial, List<String> nomeFantasia, List<String> telefone, List<String> email){
+    public ListaClientesCustomizadaAdapter(Context context, List<String> codigo, List<String> nomeRazaoSocial, List<String> nomeFantasia, List<String> telefone, List<String> email, List<String> fgBloqueio){
         this.context = context;
         this.codigo = codigo;
         this.nomeRazaoSocial = nomeRazaoSocial;
         this.nomeFantasia = nomeFantasia;
         this.telefone = telefone;
         this.email = email;
+        this.fgBloqueio = fgBloqueio;
     }
 
     private class ViewHolder{
@@ -38,6 +40,8 @@ public class ListaClientesCustomizadaAdapter extends BaseAdapter {
         TextView textoNomeFantasia;
         TextView textoTelefone;
         TextView textoEmail;
+        ImageView imagemIconblock;
+        TextView textDescricaoBlock;
     }
 
     @Override
@@ -71,6 +75,8 @@ public class ListaClientesCustomizadaAdapter extends BaseAdapter {
             holder.textoNomeFantasia = (TextView) convertView.findViewById(R.id.nomeFantasiaClienteLista);
             holder.textoTelefone = (TextView)convertView.findViewById(R.id.telefoneClienteLista);
             holder.textoEmail = (TextView)convertView.findViewById(R.id.emailClienteLista);
+            holder.imagemIconblock = (ImageView)convertView.findViewById((R.id.imagemIconblock));
+            holder.textDescricaoBlock = (TextView) convertView.findViewById((R.id.descricaoBlock));
 
             convertView.setTag(holder);
         } else {
@@ -84,6 +90,19 @@ public class ListaClientesCustomizadaAdapter extends BaseAdapter {
         holder.textoNomeFantasia.setText(nomeFantasia.get(position));
         holder.textoTelefone.setText(telefone.get(position));
         holder.textoEmail.setText(email.get(position));
+        if(fgBloqueio.get(position) == null){
+            holder.imagemIconblock.setVisibility(View.GONE);
+            holder.textDescricaoBlock.setVisibility(View.GONE);
+        }else{
+            if(fgBloqueio.get(position).equals("N")){
+                holder.imagemIconblock.setVisibility(View.GONE);
+                holder.textDescricaoBlock.setVisibility(View.GONE);
+            }else{
+                holder.imagemIconblock.setVisibility(View.VISIBLE);
+                holder.textDescricaoBlock.setVisibility(View.VISIBLE);
+            }
+        }
+
 
 
         return convertView;

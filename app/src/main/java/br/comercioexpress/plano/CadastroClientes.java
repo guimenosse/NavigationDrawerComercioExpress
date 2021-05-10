@@ -208,7 +208,7 @@ public class CadastroClientes extends AppCompatActivity {
                 adaptadorTipoPessoa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 tipopessoa.setAdapter(adaptadorTipoPessoa);
                 if (!compareValueTipoPessoa.equals(null)) {
-                    if(compareValueTipoPessoa.equals("F")){
+                    if(compareValueTipoPessoa.substring(0, 1).equals("F")){
                         compareValueTipoPessoa = "Física";
                     }else{
                         compareValueTipoPessoa = "Jurídica";

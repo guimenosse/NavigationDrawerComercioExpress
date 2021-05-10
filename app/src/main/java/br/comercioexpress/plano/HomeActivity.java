@@ -29,8 +29,10 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import java.util.ArrayList;
 import java.util.List;
 
+import classes.CL_Clientes;
 import classes.CL_Filial;
 import classes.CL_Usuario;
+import controllers.CTL_Clientes;
 import controllers.CTL_Filial;
 import controllers.CTL_Usuario;
 import models.CriaBanco;
@@ -64,6 +66,14 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        try{
+            CL_Clientes cl_Cliente = new CL_Clientes();
+            CTL_Clientes ctl_Cliente = new CTL_Clientes(getApplicationContext(), cl_Cliente);
+            ctl_Cliente.fuIncluirColunaFgBloqueio();
+        }catch (Exception e){
+            Log.d("FGBLOQUEIO", "Coluna já incluida anteriormente");
+        }
 
         sv_Clientes = (MaterialSearchView) findViewById(R.id.sv_Clientes);
         sv_Clientes.setVoiceSearch(true); //or false
@@ -240,7 +250,7 @@ public class HomeActivity extends AppCompatActivity
     public void carregaListaClientes(String parametroNomeRazaoSocial){
         BancoController crud = new BancoController(getBaseContext());
         Cursor cursorCliente = crud.carregaClientes();
-        if(parametroNomeRazaoSocial.trim() != ""){
+        if(!parametroNomeRazaoSocial.trim().equals("")){
             cursorCliente = crud.carregaClientesNome(parametroNomeRazaoSocial);
         }
         final Cursor cursor = cursorCliente;
@@ -250,6 +260,7 @@ public class HomeActivity extends AppCompatActivity
         List<String> nomeFantasia = new ArrayList<>();
         List<String> telefone = new ArrayList<>();
         List<String> email = new ArrayList<>();
+        List<String> fgBloqueio = new ArrayList<>();
 
         if (cursor != null) {
             while(!cursor.isAfterLast()) {
@@ -269,13 +280,14 @@ public class HomeActivity extends AppCompatActivity
                 nomeFantasia.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.NMFANTASIA)));
                 telefone.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.TELEFONE)));
                 email.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.EMAIL)));
+                fgBloqueio.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.FGBLOQUEIO)));
 
                 cursor.moveToNext();
             }
         }
 
         lista = (ListView)findViewById(R.id.listView);
-        ListaClientesCustomizadaAdapter adapter = new ListaClientesCustomizadaAdapter(this, codigo, nomeRazaoSocial, nomeFantasia, telefone, email);
+        ListaClientesCustomizadaAdapter adapter = new ListaClientesCustomizadaAdapter(this, codigo, nomeRazaoSocial, nomeFantasia, telefone, email, fgBloqueio);
         lista.setAdapter(adapter);
 
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {

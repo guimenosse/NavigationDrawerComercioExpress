@@ -40,7 +40,7 @@ public class CTL_Clientes {
                 cl_Cliente.getInscEstadual(), cl_Cliente.getTelefone(), cl_Cliente.getTelefoneAdicional(), cl_Cliente.getFax(),
                 cl_Cliente.getNomeContato(), cl_Cliente.getEmail(), cl_Cliente.getTipoCliente(), cl_Cliente.getVendedor(),
                 cl_Cliente.getTipoPessoa(), cl_Cliente.getDtUltimaAlteracao(), cl_Cliente.getDtCadastro(), cl_Cliente.getFgSincronizado(),
-                cl_Cliente.getObservacao(), cl_Cliente.getClassificacao(), cl_Cliente.getFidelidade(), cl_Cliente.getTipoPreco())){
+                cl_Cliente.getObservacao(), cl_Cliente.getClassificacao(), cl_Cliente.getFidelidade(), cl_Cliente.getTipoPreco(), cl_Cliente.getFgBloqueio())){
             return true;
         }else{
             return false;
@@ -219,6 +219,12 @@ public class CTL_Clientes {
                     cl_Cliente.setFgSincronizado("");
                 }
 
+                if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGBLOQUEIO)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGBLOQUEIO)).trim().equals("")) {
+                    cl_Cliente.setFgBloqueio(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGBLOQUEIO)));
+                } else {
+                    cl_Cliente.setFgBloqueio("");
+                }
+
                 rs_Cliente.moveToNext();
             }
 
@@ -384,6 +390,12 @@ public class CTL_Clientes {
                     cl_Cliente.setFgSincronizado(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGSINCRONIZADO)));
                 } else {
                     cl_Cliente.setFgSincronizado("");
+                }
+
+                if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGBLOQUEIO)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGBLOQUEIO)).trim().equals("")) {
+                    cl_Cliente.setFgBloqueio(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.FGBLOQUEIO)));
+                } else {
+                    cl_Cliente.setFgBloqueio("");
                 }
 
                 rs_Cliente.moveToNext();
@@ -623,6 +635,10 @@ public class CTL_Clientes {
         }catch (Exception e){
             return false;
         }
+    }
+
+    public void fuIncluirColunaFgBloqueio(){
+        mdl_Cliente.fuIncluirColunaFgBloqueio();
     }
 
 }

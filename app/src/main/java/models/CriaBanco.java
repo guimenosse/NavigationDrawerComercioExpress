@@ -40,6 +40,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String CLASSIFICACAO = "classificacao";
     public static final String FIDELIDADE = "fidelidade";
     public static final String TIPOPRECO = "tipopreco";
+    public static final String FGBLOQUEIO = "fgbloqueio";
     public static final int VERSAO = 1;
 
     public static final String TABELALOGIN = "login";
@@ -192,6 +193,7 @@ public class CriaBanco extends SQLiteOpenHelper {
                 + CLASSIFICACAO + " text, "
                 + FIDELIDADE + " text, "
                 + TIPOPRECO + " text, "
+                + FGBLOQUEIO + " text DEFAULT 'N', "
                 + FGSINCRONIZADO + " text )";
 
         db.execSQL(sql);
@@ -259,6 +261,10 @@ public class CriaBanco extends SQLiteOpenHelper {
                 FGSELECIONADA + " text, " +
                 FGTROCAFILIAL + " text, " +
                 PRECOINDIVIDUALIZADO + " text DEFAULT 'N')";
+
+        db.execSQL(sql);
+
+        sql = "ALTER TABLE " + TABELA + " ADD " + FGBLOQUEIO + " text DEFAULT 'N'";
 
         db.execSQL(sql);
 

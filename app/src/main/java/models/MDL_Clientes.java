@@ -17,7 +17,7 @@ public class MDL_Clientes {
             banco.NUMERO, banco.COMPLEMENTO, banco.BAIRRO, banco.UF, banco.CIDADE, banco.CNPJ,
             banco.TELEFONE, banco.TELEFONEADICIONAL, banco.FAX, banco.CONTATO, banco.EMAIL, banco.TIPCLIENTE,
             banco.VENDEDOR, banco.DTULTALTERACAO, banco.DTCADASTRO, banco.TIPOPESSOA, banco.FGSINCRONIZADO, banco.OBSCLIENTE,
-            banco.CLASSIFICACAO, banco.INSCESTADUAL, banco.TIPOPRECO, banco.FIDELIDADE};
+            banco.CLASSIFICACAO, banco.INSCESTADUAL, banco.TIPOPRECO, banco.FIDELIDADE, banco.FGBLOQUEIO};
 
     public MDL_Clientes(Context context)
     {
@@ -31,7 +31,7 @@ public class MDL_Clientes {
                                  String cgc, String inscestadual, String telefone, String telefoneadicional,
                                  String fax, String contato, String email, String tipcliente, String vendedor,
                                  String tipopessoa, String dtultalteracao, String dtcadastro, String fgsincronizado,
-                                 String obscliente, String classificacao, String fidelidade, String tipopreco)
+                                 String obscliente, String classificacao, String fidelidade, String tipopreco, String fgBloqueio)
     {
         ContentValues valores;
         long resultado;
@@ -65,6 +65,7 @@ public class MDL_Clientes {
         valores.put(CriaBanco.CLASSIFICACAO, classificacao);
         valores.put(CriaBanco.FIDELIDADE, fidelidade);
         valores.put(CriaBanco.TIPOPRECO, tipopreco);
+        valores.put(CriaBanco.FGBLOQUEIO, fgBloqueio);
 
         resultado = db.insert(CriaBanco.TABELA, null, valores);
         db.close();
@@ -229,5 +230,11 @@ public class MDL_Clientes {
 
     }
 
+    public void fuIncluirColunaFgBloqueio(){
+        String sql = "ALTER TABLE " + CriaBanco.TABELA + " ADD " + CriaBanco.FGBLOQUEIO + " text DEFAULT 'N'";
+        db = banco.getWritableDatabase();
+        db.execSQL(sql);
+        db.close();
+    }
 
 }

@@ -345,6 +345,9 @@ public class SYNC_Pedidos extends AppCompatActivity {
                             SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
                             if(sync_Clientes.FU_SincronizarClientePedido(cl_Cliente)){
                                 cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
+                            }else{
+                                mensagem = sync_Clientes.mensagem;
+                                return false;
                             }
                         }
                     }
@@ -360,6 +363,9 @@ public class SYNC_Pedidos extends AppCompatActivity {
                                 SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
                                 if(sync_Clientes.FU_SincronizarClientePedido(cl_Cliente)){
                                     cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
+                                }else{
+                                    mensagem = sync_Clientes.mensagem;
+                                    return false;
                                 }
                             }
                         }

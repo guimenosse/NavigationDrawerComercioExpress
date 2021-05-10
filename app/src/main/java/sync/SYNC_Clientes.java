@@ -412,7 +412,8 @@ public class SYNC_Clientes {
                             "&telefoneadicional=" + cl_Cliente.getTelefoneAdicional() +
                             "&fax=" + cl_Cliente.getFax() +
                             "&contato=" + cl_Cliente.getNomeContato().replace(" ", "espaco") +
-                            "&email=" + cl_Cliente.getEmail().toUpperCase() +
+                            //"&email=" + cl_Cliente.getEmail().toUpperCase() +
+                            "&email=" + cl_Cliente.getEmail() +
                             "&vendedor=" + cl_Cliente.getVendedor() +
                             "&tipocliente=" + cl_Cliente.getTipoCliente().replace(" ", "espaco") +
                             "&dtcadastro=" + cl_Cliente.getDtCadastro().replace(" ", "espaco") + "" +
@@ -441,31 +442,37 @@ public class SYNC_Clientes {
                             HashMap<String, String> map = new HashMap<String, String>();
                             JSONObject e = jArray.getJSONObject(i);
                             String s = e.getString("post");
-                            JSONObject jObject = new JSONObject(s);
+                            if(s.equals("false")){
+                                mensagem = "Cliente " + cl_Cliente.getNomeRzSocial() + " já cadastrado na base de dados do sistema.";
+                                return false;
+                            }else{
+                                JSONObject jObject = new JSONObject(s);
 
-                            if (!jObject.getString("CdCliente").equals("null")) {
+                                if (!jObject.getString("CdCliente").equals("null")) {
 
-                                CL_Pedidos cl_Pedidos = new CL_Pedidos();
-                                cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
+                                    CL_Pedidos cl_Pedidos = new CL_Pedidos();
+                                    cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
 
-                                CTL_Pedidos ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
+                                    CTL_Pedidos ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
 
-                                if (ctl_Pedidos.fuCarregarPedidosCliente()) {
-                                    Cursor rs_Pedido = ctl_Pedidos.rs_Pedido;
-                                    if (rs_Pedido.getCount() > 0) {
-                                        while (!rs_Pedido.isAfterLast()) {
+                                    if (ctl_Pedidos.fuCarregarPedidosCliente()) {
+                                        Cursor rs_Pedido = ctl_Pedidos.rs_Pedido;
+                                        if (rs_Pedido.getCount() > 0) {
+                                            while (!rs_Pedido.isAfterLast()) {
 
-                                            cl_Pedidos.setCdCliente(jObject.getString("CdCliente"));
-                                            cl_Pedidos.setNumPedido(rs_Pedido.getString(rs_Pedido.getColumnIndex(CriaBanco.ID)));
+                                                cl_Pedidos.setCdCliente(jObject.getString("CdCliente"));
+                                                cl_Pedidos.setNumPedido(rs_Pedido.getString(rs_Pedido.getColumnIndex(CriaBanco.ID)));
 
-                                            ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
-                                            ctl_Pedidos.fuAlterarClientePedido();
+                                                ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
+                                                ctl_Pedidos.fuAlterarClientePedido();
 
-                                            rs_Pedido.moveToNext();
+                                                rs_Pedido.moveToNext();
+                                            }
                                         }
                                     }
                                 }
                             }
+
                         }
 
 
@@ -629,6 +636,7 @@ public class SYNC_Clientes {
                         cl_Clientes.setClassificacao(jObject.getString("Classificacao"));
                         cl_Clientes.setFidelidade(jObject.getString("Fidelidade"));
                         cl_Clientes.setTipoPreco(jObject.getString("TipoPreco"));
+                        cl_Clientes.setFgBloqueio(jObject.getString("FgBloqueio"));
 
                         ctl_Clientes = new CTL_Clientes(vc_Context, cl_Clientes);
                         ctl_Clientes.fuInserirCliente();
@@ -747,19 +755,25 @@ public class SYNC_Clientes {
                     HashMap<String, String> map = new HashMap<String, String>();
                     JSONObject e = jArray.getJSONObject(i);
                     String s = e.getString("post");
-                    JSONObject jObject = new JSONObject(s);
+                    if(s.equals("false")){
+                        mensagem = "Cliente " + cl_Cliente.getNomeRzSocial() + " já cadastrado na base de dados do sistema.";
+                        return false;
+                    }else{
+                        JSONObject jObject = new JSONObject(s);
 
-                    if (!jObject.getString("CdCliente").equals("null")) {
+                        if (!jObject.getString("CdCliente").equals("null")) {
 
 
-                        cl_Cliente.setCdCliente(jObject.getString("CdCliente"));
-                        CTL_Clientes ctl_Clientes = new CTL_Clientes(vc_Context, cl_Cliente);
+                            cl_Cliente.setCdCliente(jObject.getString("CdCliente"));
+                            CTL_Clientes ctl_Clientes = new CTL_Clientes(vc_Context, cl_Cliente);
 
-                        if(ctl_Clientes.fuAlteraClientePedido()){
-                            vf_CdClienteServidor = cl_Cliente.getCdCliente();
+                            if(ctl_Clientes.fuAlteraClientePedido()){
+                                vf_CdClienteServidor = cl_Cliente.getCdCliente();
+                            }
+
                         }
-
                     }
+
                 }
 
             } catch (ClientProtocolException e) {

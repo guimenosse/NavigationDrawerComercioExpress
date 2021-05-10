@@ -331,13 +331,19 @@ public class Opcoes extends AppCompatActivity
                 lb_sincronizacao.setText(ctl_Usuario.cl_Usuario.getDtUltimaSincronizacao());
 
             } else {
-                MensagemUtil.addMsg(Opcoes.this, "Não foi possivel realizar a sincronização de clientes e produtos. Favor verificar a conexão com a internet e o banco de dados!");
+                if(mensagem.equals("")){
+                    MensagemUtil.addMsg(Opcoes.this, "Não foi possivel realizar a sincronização de clientes e produtos. Favor verificar a conexão com a internet e o banco de dados!");
+                }else{
+                    MensagemUtil.addMsg(Opcoes.this, mensagem);
+                }
+
             }
 
 
         }
     }
 
+    public String mensagem = "";
     protected boolean FU_Sincronizar(){
 
         CL_Clientes cl_Clientes = new CL_Clientes();
@@ -345,6 +351,11 @@ public class Opcoes extends AppCompatActivity
 
         if(ctl_Clientes.fuSelecionarClientesNaoSincronizados()){
             if(!sync_Clientes.FU_SincronizarClientes(ctl_Clientes.rs_Cliente)){
+                if(sync_Clientes.mensagem.equals("")){
+                    mensagem = "";
+                }else{
+                    mensagem = sync_Clientes.mensagem;
+                }
                 return false;
             }
         }
