@@ -264,10 +264,6 @@ public class CriaBanco extends SQLiteOpenHelper {
 
         db.execSQL(sql);
 
-        sql = "ALTER TABLE " + TABELA + " ADD " + FGBLOQUEIO + " text DEFAULT 'N'";
-
-        db.execSQL(sql);
-
     }
 
     @Override

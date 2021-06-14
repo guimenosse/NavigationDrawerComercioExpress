@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,8 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import java.util.ArrayList;
 import java.util.List;
 
+import classes.CL_Clientes;
+import controllers.CTL_Clientes;
 import models.CriaBanco;
 
 public class SelecaoCliente extends AppCompatActivity {
@@ -40,6 +43,14 @@ public class SelecaoCliente extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        try{
+            CL_Clientes cl_Cliente = new CL_Clientes();
+            CTL_Clientes ctl_Cliente = new CTL_Clientes(getApplicationContext(), cl_Cliente);
+            ctl_Cliente.fuIncluirColunaFgBloqueio();
+        }catch (Exception e){
+            Log.d("FGBLOQUEIO", "Coluna já incluida anteriormente");
+        }
 
         sv_ClientesPedido = (MaterialSearchView) findViewById(R.id.sv_ClientesPedidos);
         sv_ClientesPedido.setVoiceSearch(true); //or false
