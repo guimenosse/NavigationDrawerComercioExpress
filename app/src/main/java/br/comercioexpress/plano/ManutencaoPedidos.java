@@ -1089,7 +1089,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
     private void suCriarPDF() {
 
-        boolean vf_Gerou = false;
+        boolean vf_Gerou = true;
         Document document = new Document();
         String filename = "";
         String pathFile = "";
@@ -1100,7 +1100,15 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             document = new Document(PageSize.A4);
 
-            pathFile = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
+            /*
+            Comando para buscar no armazenamento interno:
+            String outDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PDFs/" ;
+             */
+
+            pathFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PedidosPDF/";
+
+            //Comando original
+            //pathFile = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
 
             File dir = new File(pathFile, filename);
             if (!dir.exists()) {
@@ -1234,17 +1242,21 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
         } catch (DocumentException e) {
             e.printStackTrace();
+            vf_Gerou = false;
             MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível gerar o PDF");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            vf_Gerou = false;
             MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível gerar o PDF");
         } catch (IOException e) {
             e.printStackTrace();
+            vf_Gerou = false;
             MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível gerar o PDF");
         } finally {
             document.close();
-            vf_Gerou = true;
-            MensagemUtil.addMsg(ManutencaoPedidos.this, "PDF do pedido gerado com sucesso na pasta " + Environment.getExternalStorageDirectory() + "/PedidosPDF/");
+            if(vf_Gerou){
+                MensagemUtil.addMsg(ManutencaoPedidos.this, "PDF do pedido gerado com sucesso na pasta " + Environment.getExternalStorageDirectory() + "/PedidosPDF/");
+            }
         }
 
         if(vf_Gerou){
