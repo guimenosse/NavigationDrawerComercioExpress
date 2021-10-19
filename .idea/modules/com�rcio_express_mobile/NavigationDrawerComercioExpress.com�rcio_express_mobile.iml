@@ -10,16 +10,18 @@
     </facet>
     <facet type="java-gradle" name="Java-Gradle">
       <configuration>
-        <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/../../../com�rcio_express_mobile/build" />
         <option name="BUILDABLE" value="false" />
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/../../../com�rcio_express_mobile/out/production/classes" />
+    <output-test url="file://$MODULE_DIR$/../../../com�rcio_express_mobile/out/test/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../com�rcio_express_mobile">
       <excludeFolder url="file://$MODULE_DIR$/../../../com�rcio_express_mobile/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../../com�rcio_express_mobile/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../com�rcio_express_mobile/out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

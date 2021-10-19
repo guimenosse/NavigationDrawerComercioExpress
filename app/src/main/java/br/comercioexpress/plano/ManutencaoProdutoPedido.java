@@ -476,8 +476,11 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                             double vf_ValorBruto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."));
                             double vf_ValorLiquido = vf_ValorBruto - (vf_ValorBruto * (vf_PercDesconto / 100));
 
+                            DecimalFormat fmt = new DecimalFormat("0.000");   //limita o número de casas decimais
+                            String vf_VlLiquidoFormatado = fmt.format(vf_ValorLiquido);
                             cl_ItemPedido.setVlUnitario(tb_valorUnitarioProduto.getText().toString());
-                            cl_ItemPedido.setVlLiquido(String.format("%.2f", vf_ValorLiquido));
+                            //cl_ItemPedido.setVlLiquido(String.format("%.2f", testeVlLiquido));
+                            cl_ItemPedido.setVlLiquido(vf_VlLiquidoFormatado);
                             cl_ItemPedido.setVlDesconto(tb_descontoProduto.getText().toString());
                             suCalculaValorItemPedido();
                         } else {
