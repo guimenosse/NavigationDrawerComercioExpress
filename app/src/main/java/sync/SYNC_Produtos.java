@@ -136,62 +136,70 @@ public class SYNC_Produtos {
 
                 for (int i = 0; i < jArray.length(); i++) {
 
-                    cl_Produtos = new CL_Produtos();
+                    try{
+                        cl_Produtos = new CL_Produtos();
 
-                    HashMap<String, String> map = new HashMap<String, String>();
-                    JSONObject e = jArray.getJSONObject(i);
-                    String s = e.getString("post");
-                    JSONObject jObject = new JSONObject(s);
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        JSONObject e = jArray.getJSONObject(i);
+                        String s = e.getString("post");
+                        JSONObject jObject = new JSONObject(s);
 
 
-                    cl_Produtos.setCdProduto(jObject.getString("CdProduto"));
-                    if(cl_Produtos.getCdProduto().equals("2071")){
-                        String teste = "";
-                        String testando =  teste + "";
-                    }
-                    cl_Produtos.setDescricao(e.getString("post2"));
-
-                    if (!cl_Produtos.getDescricao().equals("null")) {
-
-                        cl_Produtos.setEstoqueAtual(jObject.getString("EstAtual"));
-                        cl_Produtos.setVlUnitario(jObject.getString("VlVenda"));
-                        cl_Produtos.setVlAtacado(jObject.getString("VlAtacado"));
-                        cl_Produtos.setDtUltimaAlteracao(jObject.getString("DtUltAlteracao"));
-
-                        String vf_Desconto = "0";
-                        if(Double.parseDouble(jObject.getString("PercDescMaxVendedor")) > 0) {
-                            vf_Desconto = jObject.getString("PercDescMaxVendedor");
-                        }else if(Double.parseDouble(jObject.getString("DescCategoria")) > 0) {
-                            vf_Desconto = jObject.getString("DescCategoria");
-                        }else if(Double.parseDouble(jObject.getString("DescDepartamento")) > 0) {
-                            vf_Desconto = jObject.getString("DescDepartamento");
+                        cl_Produtos.setCdProduto(jObject.getString("CdProduto"));
+                        if(cl_Produtos.getCdProduto().equals("2071")){
+                            String teste = "";
+                            String testando =  teste + "";
                         }
-                        cl_Produtos.setDescMaxPermitido(vf_Desconto);
+                        cl_Produtos.setDescricao(e.getString("post2"));
 
-                        cl_Produtos.setDescMaxPermitidoA(jObject.getString("DescontoA"));
-                        cl_Produtos.setDescMaxPermitidoB(jObject.getString("DescontoB"));
-                        cl_Produtos.setDescMaxPermitidoC(jObject.getString("DescontoC"));
-                        cl_Produtos.setDescMaxPermitidoD(jObject.getString("DescontoD"));
-                        cl_Produtos.setDescMaxPermitidoE(jObject.getString("DescontoE"));
-                        cl_Produtos.setDescMaxPermitidoFidelidade(jObject.getString("DescontoFidelidade"));
-                        cl_Produtos.setCdRefEstoque(jObject.getString("CdRefEstoque"));
+                        if (!cl_Produtos.getDescricao().equals("null")) {
 
-                        if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
-                            double vf_QtdePedSaida = Double.parseDouble(jObject.getString("QtdePedSaida"));
-                            double vf_EstAtual = Double.parseDouble(jObject.getString("EstAtual"));
-                            double vf_QtdeDisponivel = vf_EstAtual - vf_QtdePedSaida;
+                            cl_Produtos.setEstoqueAtual(jObject.getString("EstAtual"));
+                            cl_Produtos.setVlUnitario(jObject.getString("VlVenda"));
+                            cl_Produtos.setVlAtacado(jObject.getString("VlAtacado"));
+                            cl_Produtos.setDtUltimaAlteracao(jObject.getString("DtUltAlteracao"));
 
-                            cl_Produtos.setQtdeDisponivel(String.valueOf(vf_QtdeDisponivel));
-                        }else{
-                            cl_Produtos.setQtdeDisponivel("");
+                            String vf_Desconto = "0";
+                            if(Double.parseDouble(jObject.getString("PercDescMaxVendedor")) > 0) {
+                                vf_Desconto = jObject.getString("PercDescMaxVendedor");
+                            }else if(Double.parseDouble(jObject.getString("DescCategoria")) > 0) {
+                                vf_Desconto = jObject.getString("DescCategoria");
+                            }else if(Double.parseDouble(jObject.getString("DescDepartamento")) > 0) {
+                                vf_Desconto = jObject.getString("DescDepartamento");
+                            }
+                            cl_Produtos.setDescMaxPermitido(vf_Desconto);
+
+                            cl_Produtos.setDescMaxPermitidoA(jObject.getString("DescontoA"));
+                            cl_Produtos.setDescMaxPermitidoB(jObject.getString("DescontoB"));
+                            cl_Produtos.setDescMaxPermitidoC(jObject.getString("DescontoC"));
+                            cl_Produtos.setDescMaxPermitidoD(jObject.getString("DescontoD"));
+                            cl_Produtos.setDescMaxPermitidoE(jObject.getString("DescontoE"));
+                            cl_Produtos.setDescMaxPermitidoFidelidade(jObject.getString("DescontoFidelidade"));
+                            cl_Produtos.setCdRefEstoque(jObject.getString("CdRefEstoque"));
+
+                            if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
+                                double vf_QtdePedSaida = Double.parseDouble(jObject.getString("QtdePedSaida"));
+                                double vf_EstAtual = Double.parseDouble(jObject.getString("EstAtual"));
+                                double vf_QtdeDisponivel = vf_EstAtual - vf_QtdePedSaida;
+
+                                cl_Produtos.setQtdeDisponivel(String.valueOf(vf_QtdeDisponivel));
+                            }else{
+                                cl_Produtos.setQtdeDisponivel("");
+                            }
+
+                            ctl_Produtos =  new CTL_Produtos(vc_Context, cl_Produtos);
+
+
+                                if(!ctl_Produtos.fuInserirProdutoFilial()){
+
+                                }
+
+
+
                         }
-
-                        ctl_Produtos =  new CTL_Produtos(vc_Context, cl_Produtos);
-
-                        if(!ctl_Produtos.fuInserirProdutoFilial()){
-
-                        }
-
+                    }catch (Exception e_Insert){
+                        e_Insert.getMessage();
+                        String error_Insert = e_Insert.getMessage();
                     }
 
                 }

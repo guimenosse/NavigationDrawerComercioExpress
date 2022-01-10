@@ -730,13 +730,24 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
                 if (!tb_descontoProduto.getText().toString().trim().equals("")) {
 
-
+                    double vf_ValorBruto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."));
                     double VA_vlDesconto = Double.parseDouble(tb_descontoProduto.getText().toString());
-                    double porcentagem = VA_vlDesconto / 100;
+                    double vf_ValorLiquido =  vf_ValorBruto - (vf_ValorBruto * (VA_vlDesconto / 100));
+
+                    DecimalFormat fmt = new DecimalFormat("0.00");   //limita o número de casas decimais
+                    String vf_VlLiquidoFormatado = fmt.format(vf_ValorLiquido);
+                    double vlTotalLiquido = Double.parseDouble(tb_quantidadeProduto.getText().toString()) * Double.parseDouble(vf_VlLiquidoFormatado.replace(",", "."));
+                    valor = String.format("%.2f", vlTotalLiquido);;
+
+
+                    /*double porcentagem = VA_vlDesconto / 100;
                     vldesconto = vltotal * porcentagem;
                     double resultadoTotal = vltotal - vldesconto;
                     vltotal = Double.valueOf(String.format(Locale.US, "%.2f", resultadoTotal));
-                    valor = String.format("%.2f", vltotal);
+                    DecimalFormat fmt = new DecimalFormat("0.00");   //limita o número de casas decimais
+                    String vf_VlTotalFormatado = fmt.format(vltotal);
+                    valor = vf_VlTotalFormatado;*/
+                    //valor = String.format("%.2f", vltotal);
                 }
 
                 if (!tb_descontoProduto.getText().toString().trim().equals("")) {
@@ -757,6 +768,9 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
             cl_ItemPedido.setVlMaxDescPermitido(vlmaxdescpermitido.replace(",", "."));
             cl_ItemPedido.setVlUnitario(valorunitarioteste);
             cl_ItemPedido.setVlLiquido(lb_valorLiquidoResultado.getText().toString().replace("R$", ""));
+
+
+
             cl_ItemPedido.setVlTotal(valor);
             cl_ItemPedido.setObservacao(tb_observacaoItemPedido.getText().toString().toUpperCase());
 

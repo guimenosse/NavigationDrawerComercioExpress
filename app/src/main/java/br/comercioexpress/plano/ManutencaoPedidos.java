@@ -1392,7 +1392,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
                     public void onClick(DialogInterface arg0, int arg1) {
                         //fuVerificaPermissaoStorage();
                         ActivityCompat.requestPermissions(ManutencaoPedidos.this,
-                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE},
                                 1);
                     }
                 });
