@@ -39,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.KeyStore;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -138,9 +139,12 @@ public class SYNC_Pedidos extends AppCompatActivity {
                     + "&vldesconto=" + cl_Pedidos.getVlDesconto().replace(".", ",") + ""
                     + "&vlfrete=" + cl_Pedidos.getVlFrete().replace(".", ",")
                     + "&condpgto=" + cl_Pedidos.getCondPgto().replace(" ", "espaco")
-                    + "&obs=" + cl_Pedidos.getObsPedido().replace("Ç", "C").replace("ç", "c").replace(" ", "espaco").replace("\n", "pulalinha")
+                    + "&obs=" + substituirCaracteres(cl_Pedidos.getObsPedido().replace(" ", "espaco").replace("\n", "pulalinha"))
                     + "&filial=" + cl_Filial.getCdFilial() + "";
             HttpPost httppost = new HttpPost(url);
+
+            //Replace da observação
+            //.replace("Ç", "C").replace("ç", "c")
 
             // Instantiate a GET HTTP method
             try {
@@ -641,7 +645,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                             + "&vldesconto=" + cl_ItemPedido.getVlDesconto().replace(".", ",")
                             + "&percdesconto=" + cl_ItemPedido.getPercDesconto().replace(".", ",")
                             + "&cdrefestoque=" + vf_CdRefEstoque
-                            + "&observacao=" + cl_ItemPedido.getObservacao().replace("Ç", "C").replace("ç", "c").replace(" ", "espaco")
+                            + "&observacao=" + substituirCaracteres(cl_ItemPedido.getObservacao().replace(" ", "espaco"))
                             + "&filial=" + cl_Filial.getCdFilial() + "";
 
                     HttpPost httppost = new HttpPost(url);
@@ -797,5 +801,21 @@ public class SYNC_Pedidos extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    public String removeAccent(final String str) {
+        String strNoAccent = Normalizer.normalize(str, Normalizer.Form.NFD);
+        strNoAccent = strNoAccent.replaceAll("[^A-Za-z0-9]","");
+        return strNoAccent;
+    }
+
+    public String substituirCaracteres(String str){
+        String strReplaced = str.replace("Ç", "CEDILHAMAIUSCULO").replace("ç", "cedilhaminusculo");
+        strReplaced = strReplaced.replace("$", "CARACTERECIFRAO").replace("%", "CARACTEREPORCENTAGEM");
+        strReplaced = strReplaced.replace("&", "CARACTEREECOMERCIAL").replace("#", "CARACTEREJOGODAVELHA");
+        strReplaced = strReplaced.replace("'", "").replace("\\", "CARACTEBARRAINVERTIDA");
+        strReplaced = strReplaced.replace("/", "CARACTEREBARRANORMAL").replace("*", "CARACTEASTERISCO");
+
+        return strReplaced;
     }
 }

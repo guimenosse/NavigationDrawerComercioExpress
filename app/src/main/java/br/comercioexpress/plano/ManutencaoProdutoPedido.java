@@ -721,23 +721,26 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
 
             } else {
 
-                if (percdescmaxvendedor > 0) {
-                    double VA_vlDesconto = percdescmaxvendedor;
-                    double porcentagem = VA_vlDesconto / 100;
-                    double resultado = vltotal * porcentagem;
-                    vlmaxdescpermitido = String.format("%.2f", resultado);
-                }
+                if (VA_vlUnitarioProduto > VL_valorBruto) {
 
-                if (!tb_descontoProduto.getText().toString().trim().equals("")) {
+                }else{
+                    if (percdescmaxvendedor > 0) {
+                        double VA_vlDesconto = percdescmaxvendedor;
+                        double porcentagem = VA_vlDesconto / 100;
+                        double resultado = vltotal * porcentagem;
+                        vlmaxdescpermitido = String.format("%.2f", resultado);
+                    }
 
-                    double vf_ValorBruto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."));
-                    double VA_vlDesconto = Double.parseDouble(tb_descontoProduto.getText().toString());
-                    double vf_ValorLiquido =  vf_ValorBruto - (vf_ValorBruto * (VA_vlDesconto / 100));
+                    if (!tb_descontoProduto.getText().toString().trim().equals("")) {
 
-                    DecimalFormat fmt = new DecimalFormat("0.00");   //limita o número de casas decimais
-                    String vf_VlLiquidoFormatado = fmt.format(vf_ValorLiquido);
-                    double vlTotalLiquido = Double.parseDouble(tb_quantidadeProduto.getText().toString()) * Double.parseDouble(vf_VlLiquidoFormatado.replace(",", "."));
-                    valor = String.format("%.2f", vlTotalLiquido);;
+                        double vf_ValorBruto = Double.parseDouble(cl_Produto.getVlUnitario().replace(",", "."));
+                        double VA_vlDesconto = Double.parseDouble(tb_descontoProduto.getText().toString());
+                        double vf_ValorLiquido =  vf_ValorBruto - (vf_ValorBruto * (VA_vlDesconto / 100));
+
+                        DecimalFormat fmt = new DecimalFormat("0.00");   //limita o número de casas decimais
+                        String vf_VlLiquidoFormatado = fmt.format(vf_ValorLiquido);
+                        double vlTotalLiquido = Double.parseDouble(tb_quantidadeProduto.getText().toString()) * Double.parseDouble(vf_VlLiquidoFormatado.replace(",", "."));
+                        valor = String.format("%.2f", vlTotalLiquido);;
 
 
                     /*double porcentagem = VA_vlDesconto / 100;
@@ -747,14 +750,16 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                     DecimalFormat fmt = new DecimalFormat("0.00");   //limita o número de casas decimais
                     String vf_VlTotalFormatado = fmt.format(vltotal);
                     valor = vf_VlTotalFormatado;*/
-                    //valor = String.format("%.2f", vltotal);
+                        //valor = String.format("%.2f", vltotal);
+                    }
+
+                    if (!tb_descontoProduto.getText().toString().trim().equals("")) {
+                        valorPercDesconto = tb_descontoProduto.getText().toString();
+                    }
+
+                    valorTotalDesconto = String.format("%.2f", vldesconto);
                 }
 
-                if (!tb_descontoProduto.getText().toString().trim().equals("")) {
-                    valorPercDesconto = tb_descontoProduto.getText().toString();
-                }
-
-                valorTotalDesconto = String.format("%.2f", vldesconto);
             }
 
             String valorunitarioteste = String.format("%.2f", VA_vlUnitarioProduto);

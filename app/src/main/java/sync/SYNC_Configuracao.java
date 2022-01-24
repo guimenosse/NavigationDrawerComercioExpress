@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.security.KeyStore;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -152,5 +153,11 @@ public class SYNC_Configuracao {
         }
 
         return true;
+    }
+
+    public String removeAccent(final String str) {
+        String strNoAccent = Normalizer.normalize(str, Normalizer.Form.NFD);
+        strNoAccent = strNoAccent.replaceAll("[^\\p{ASCII}]", "");
+        return strNoAccent;
     }
 }

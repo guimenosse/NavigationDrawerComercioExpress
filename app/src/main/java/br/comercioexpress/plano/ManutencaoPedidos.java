@@ -22,6 +22,7 @@ import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -1105,8 +1106,9 @@ public class ManutencaoPedidos extends AppCompatActivity {
             String outDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PDFs/" ;
              */
 
-            pathFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PedidosPDF/";
+            pathFile = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
 
+            pathFile = getFilesDir().getAbsolutePath() + File.separator + "PedidosPDF/";
             //Comando original
             //pathFile = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
 
@@ -1115,8 +1117,11 @@ public class ManutencaoPedidos extends AppCompatActivity {
                 dir.getParentFile().mkdirs();
             }
 
+            Uri uri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".provider", dir);
+
             FileOutputStream fOut = new FileOutputStream(dir);
             fOut.flush();
+
 
             PdfWriter.getInstance(document, fOut);
             document.open();
@@ -1255,7 +1260,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
         } finally {
             document.close();
             if(vf_Gerou){
-                MensagemUtil.addMsg(ManutencaoPedidos.this, "PDF do pedido gerado com sucesso na pasta " + Environment.getExternalStorageDirectory() + "/PedidosPDF/");
+                MensagemUtil.addMsg(ManutencaoPedidos.this, "PDF do pedido gerado com sucesso na pasta " + pathFile);
             }
         }
 
