@@ -1108,7 +1108,12 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             pathFile = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
 
-            pathFile = getFilesDir().getAbsolutePath() + File.separator + "PedidosPDF/";
+            String backupDirectoryPath = getApplicationContext().getExternalFilesDir(null) +
+                    "/" + "PedidosPDF/";
+
+            //pathFile = getFilesDir()  .getAbsolutePath();
+            pathFile = getFilesDir().getCanonicalPath();
+            pathFile = backupDirectoryPath;
             //Comando original
             //pathFile = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
 
@@ -1117,7 +1122,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
                 dir.getParentFile().mkdirs();
             }
 
-            Uri uri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".provider", dir);
+                Uri uri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".provider", dir);
 
             FileOutputStream fOut = new FileOutputStream(dir);
             fOut.flush();
@@ -1127,7 +1132,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
             document.open();
 
             /*try {
-                Drawable d = getResources().getDrawable(R.drawable.logo_expres_mobile);
+                Drawable d = getResources().getDrawable(R.,.drawable.logo_expres_mobile);
                 BitmapDrawable bitDw = ((BitmapDrawable) d);
                 Bitmap bmp = bitDw.getBitmap();
                 Bitmap resized = Bitmap.createScaledBitmap(bmp, (int)(bmp.getWidth()*0.25), (int)(bmp.getHeight()*0.25), true);
@@ -1266,7 +1271,9 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
         if(vf_Gerou){
 
-            Uri uri_Arquivo = Uri.parse(pathFile + filename);
+            File dir = new File(pathFile, filename);
+            Uri uri_Arquivo = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".provider", dir);
+            //Uri uri_Arquivo = Uri.parse(pathFile + filename);
 
             try {
 

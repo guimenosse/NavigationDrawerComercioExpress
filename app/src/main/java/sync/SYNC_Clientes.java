@@ -108,6 +108,7 @@ public class SYNC_Clientes {
                     cl_Cliente.setId("0");
                 }
 
+
                 try {
                     if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)).trim().equals("")) {
                         cl_Cliente.setCdCliente(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.CDCLIENTE)));
@@ -116,6 +117,13 @@ public class SYNC_Clientes {
                     }
                 }catch (Exception e){
                     cl_Cliente.setCdCliente("0");
+                }
+
+
+                //33,00
+                if(cl_Cliente.getCdCliente().equals("33") || cl_Cliente.getCdCliente().equals("33,00")){
+                    String teste = "";
+                    String teste2 = teste;
                 }
 
                 try {
@@ -624,6 +632,12 @@ public class SYNC_Clientes {
                         }
 
                         cl_Clientes.setCdCliente(jObject.getString("CdCliente"));
+
+                        if(cl_Clientes.getCdCliente().equals("33") || cl_Clientes.getCdCliente().equals("33,00")){
+                            String teste = "";
+                            String teste2 = teste;
+                        }
+
                         cl_Clientes.setCep(jObject.getString("Cep"));
                         cl_Clientes.setNumEndereco(jObject.getString("NumEndereco"));
                         cl_Clientes.setUf(jObject.getString("Uf"));
