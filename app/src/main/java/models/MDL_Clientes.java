@@ -237,4 +237,19 @@ public class MDL_Clientes {
         db.close();
     }
 
+    public Cursor fuBuscaCPFCNPJCadastrado(String cpfCnpj){
+        Cursor cursor;
+        String[] campos = {banco.CNPJ};
+        String where = CriaBanco.CNPJ + " = '" + cpfCnpj + "'";
+        db = banco.getReadableDatabase();
+        cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null);
+
+        if(cursor != null){
+            cursor.moveToFirst();
+        }
+        db.close();
+
+        return cursor;
+    }
+
 }

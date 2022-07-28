@@ -207,8 +207,8 @@ public class BancoController {
     public String carregaClienteByCGC(String CGC){
         Cursor cursor;
         String validou = "N";
-        String[] campos = {CriaBanco.RZSOCIAL};
-        String where = CriaBanco.CNPJ + "= '" + CGC + "'";
+        String[] campos = {CriaBanco.RZSOCIAL, CriaBanco.CNPJ};
+        String where = CriaBanco.CNPJ + " = '" + CGC + ".0000'";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELA, campos, where, null, null, null, null, null);
 

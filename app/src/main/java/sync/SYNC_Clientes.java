@@ -120,12 +120,6 @@ public class SYNC_Clientes {
                 }
 
 
-                //33,00
-                if(cl_Cliente.getCdCliente().equals("33") || cl_Cliente.getCdCliente().equals("33,00")){
-                    String teste = "";
-                    String teste2 = teste;
-                }
-
                 try {
                     if (!rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.RZSOCIAL)).equals("null") && !rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.RZSOCIAL)).trim().equals("")) {
                         cl_Cliente.setNomeRzSocial(rs_Cliente.getString(rs_Cliente.getColumnIndex(CriaBanco.RZSOCIAL)).replace("'", ""));
