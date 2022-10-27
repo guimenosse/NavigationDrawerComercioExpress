@@ -34,7 +34,7 @@ public class CTL_Produtos {
 
     public boolean fuInserirProdutoFilial(){
 
-        if(mdl_Produtos.fuInserirProdutoFilial(cl_Produtos.getCdProduto(), cl_Produtos.getDescricao(), cl_Produtos.getEstoqueAtual(),
+        if(mdl_Produtos.fuInserirProdutoFilial(cl_Produtos.getCdProduto(), cl_Produtos.getDescricao(), cl_Produtos.getComplementoDescricao(), cl_Produtos.getEstoqueAtual(),
                 cl_Produtos.getVlUnitario(), cl_Produtos.getVlAtacado(), cl_Produtos.getDtUltimaAlteracao(), cl_Produtos.getDescMaxPermitido(),
                 cl_Produtos.getDescMaxPermitidoA(), cl_Produtos.getDescMaxPermitidoB(), cl_Produtos.getDescMaxPermitidoC(),
                 cl_Produtos.getDescMaxPermitidoD(), cl_Produtos.getDescMaxPermitidoE(), cl_Produtos.getDescMaxPermitidoFidelidade(),
@@ -67,6 +67,14 @@ public class CTL_Produtos {
                         }
                     } catch (Exception e) {
                         cl_Produtos.setDescricao("");
+                    }
+
+                    try {
+                        if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)).equals("null")) {
+                            cl_Produtos.setComplementoDescricao(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)));
+                        }
+                    } catch (Exception e) {
+                        cl_Produtos.setComplementoDescricao("");
                     }
 
                     try {
@@ -215,6 +223,14 @@ public class CTL_Produtos {
                         }
                     } catch (Exception e) {
                         cl_Produtos.setDescricao("");
+                    }
+
+                    try {
+                        if (!rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)).equals("null")) {
+                            cl_Produtos.setComplementoDescricao(rs_Produto.getString(rs_Produto.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)));
+                        }
+                    } catch (Exception e) {
+                        cl_Produtos.setComplementoDescricao("");
                     }
 
                     try {

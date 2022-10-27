@@ -19,7 +19,7 @@ public class MDL_Produtos {
 
     public Cursor rs_Produto;
 
-    public String [] arr_CamposProduto = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO,
+    public String [] arr_CamposProduto = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.COMPLEMENTODESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO,
             banco.VALORATACADO,
             banco.DESCMAXPERMITIDO, banco.DESCMAXPERMITIDOA, banco.DESCMAXPERMITIDOB, banco.DESCMAXPERMITIDOC,
             banco.DESCMAXPERMITIDOD, banco.DESCMAXPERMITIDOE, banco.DESCMAXPERMITIDOFIDELIDADE, banco.QTDEDISPONIVEL,
@@ -32,7 +32,7 @@ public class MDL_Produtos {
     }
 
 
-    public boolean fuInserirProdutoFilial(String cdproduto, String descricao, String estoqueatual, String valorunitario,
+    public boolean fuInserirProdutoFilial(String cdproduto, String descricao, String complementodescricao, String estoqueatual, String valorunitario,
                                        String valoratacado,
                                        String dtultalteracao, String maxdescpermitido, String maxdescpermitidoa,
                                        String maxdescpermitidob, String maxdescpermitidoc, String maxdescpermitidod,
@@ -44,6 +44,7 @@ public class MDL_Produtos {
         valores = new ContentValues();
         valores.put(CriaBanco.CDPRODUTO, cdproduto);
         valores.put(CriaBanco.DESCRICAO, descricao);
+        valores.put(CriaBanco.COMPLEMENTODESCRICAO, complementodescricao);
         valores.put(CriaBanco.ESTOQUEATUAL, estoqueatual);
         valores.put(CriaBanco.VALORUNITARIO, valorunitario);
         valores.put(CriaBanco.VALORATACADO, valoratacado);
@@ -249,5 +250,30 @@ public class MDL_Produtos {
         }
         db.close();
         return cursor;
+    }
+
+    public Boolean adicionarColunaComplementoDescricao(){
+        try{
+            String sql = "ALTER TABLE " + banco.TABELAPRODUTOS + " ADD COLUMN " + banco.COMPLEMENTODESCRICAO + " text ";
+            db = banco.getReadableDatabase();
+            db.execSQL(sql);
+
+            return true;
+        }catch (Exception e){
+            Cursor cursor;
+            String[] campos = {banco.COMPLEMENTODESCRICAO};
+            db = banco.getReadableDatabase();
+            cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, null, null, null, null, null);
+
+            if(cursor != null){
+                cursor.moveToFirst();
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+
+
     }
 }

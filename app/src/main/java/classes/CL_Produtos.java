@@ -5,6 +5,7 @@ public class CL_Produtos {
     protected String id;
     protected String cdProduto;
     protected String descricao;
+    protected String complementoDescricao;
     protected String estoqueAtual;
     protected String vlUnitario;
     protected String vlAtacado;
@@ -25,6 +26,7 @@ public class CL_Produtos {
         this.id = "";
         this.cdProduto = "";
         this.descricao = "";
+        this.complementoDescricao = "";
         this.estoqueAtual = "";
         this.vlUnitario = "";
         this.vlAtacado = "";
@@ -61,6 +63,14 @@ public class CL_Produtos {
     }
 
     public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public String getComplementoDescricao() {
+        return descricao;
+    }
+
+    public void setComplementoDescricao(String descricao) {
         this.descricao = descricao;
     }
 

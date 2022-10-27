@@ -61,6 +61,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static  final String TABELAPRODUTOS = "cadpro";
     public static final String CDPRODUTO = "cdproduto";
     public static final String DESCRICAO = "descricao";
+    public static final String COMPLEMENTODESCRICAO = "complementodescricao";
     public static final String ESTOQUEATUAL = "estoqueatual";
     public static final String VALORUNITARIO = "valorunitario";
     public static final String VALORATACADO = "valoratacado";
@@ -217,6 +218,7 @@ public class CriaBanco extends SQLiteOpenHelper {
                 DTULTALTERACAO + " datetime)";
 
         db.execSQL(sql);
+
 
         sql = "CREATE TABLE " + TABELAMESTREPEDIDO + "(" +
                 ID + " integer primary key autoincrement, " +

@@ -54,6 +54,7 @@ import java.util.List;
 import classes.CL_Usuario;
 import controllers.CTL_Usuario;
 import models.CriaBanco;
+import models.MDL_Produtos;
 import sync.SYNC_Clientes;
 import sync.SYNC_Configuracao;
 import sync.SYNC_Produtos;
@@ -215,6 +216,14 @@ public class LoginActivity extends AppCompatActivity {
         if(!sync_Clientes.FU_SincronizarTodosClientesServidor()){
             return false;
         }
+
+        //Realizar inclusão da coluna de complemento de descrição
+
+        MDL_Produtos mdl_Produtos = new MDL_Produtos(vc_Context);
+        if(!mdl_Produtos.adicionarColunaComplementoDescricao()){
+            return false;
+        }
+
 
         SYNC_Produtos sync_Produtos = new SYNC_Produtos(vc_Context);
 
