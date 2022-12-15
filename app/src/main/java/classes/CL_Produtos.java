@@ -67,11 +67,11 @@ public class CL_Produtos {
     }
 
     public String getComplementoDescricao() {
-        return descricao;
+        return complementoDescricao;
     }
 
-    public void setComplementoDescricao(String descricao) {
-        this.descricao = descricao;
+    public void setComplementoDescricao(String complementoDescricao) {
+        this.complementoDescricao = complementoDescricao;
     }
 
     public String getEstoqueAtual() {

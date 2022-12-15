@@ -175,8 +175,13 @@ public class ManutencaoProdutoPedido extends AppCompatActivity {
                 cl_ItemPedido = new CL_ItemPedido();
 
                 try {
-                    lb_descricaoProduto.setText(cl_Produto.getDescricao().toUpperCase());
-                    cl_ItemPedido.setDescricao(cl_Produto.getDescricao().toUpperCase());
+                    //lb_descricaoProduto.setText(cl_Produto.getDescricao().toUpperCase());
+                    String descricaoCompleta = cl_Produto.getDescricao().toUpperCase();
+                    if(!cl_Produto.getComplementoDescricao().toUpperCase().trim().equals((""))){
+                        descricaoCompleta += " - " + cl_Produto.getComplementoDescricao().toUpperCase();
+                    }
+                    lb_descricaoProduto.setText(descricaoCompleta.toUpperCase());
+                    cl_ItemPedido.setDescricao(descricaoCompleta.toUpperCase());
                 } catch (Exception e) {
                     lb_descricaoProduto.setText("");
                     cl_ItemPedido.setDescricao("");

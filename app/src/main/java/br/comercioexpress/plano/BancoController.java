@@ -626,7 +626,7 @@ public class BancoController {
     public Cursor carregaProdutosCompleto(){
 
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.QTDEDISPONIVEL, banco.VALORUNITARIO, banco.VALORATACADO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.COMPLEMENTODESCRICAO, banco.ESTOQUEATUAL, banco.QTDEDISPONIVEL, banco.VALORUNITARIO, banco.VALORATACADO};
         String orderBy = CriaBanco.DESCRICAO;
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, null, null, null, null, orderBy, null);
@@ -658,7 +658,7 @@ public class BancoController {
     //-------------------- Função para carregamento do produto de acordo com seu id ----------------------------------------
     public Cursor carregaProdutosById(int id){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO, banco.DESCMAXPERMITIDO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.COMPLEMENTODESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.VALORATACADO, banco.DESCMAXPERMITIDO};
         String where = CriaBanco.ID + "=" + id;
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null, null);
@@ -673,7 +673,7 @@ public class BancoController {
     //-------------------- Função para carregamento do produto de acordo com seu código de produto ----------------------------------------
     public Cursor carregaDadosProdutosByCdProduto(String cdproduto){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.DESCMAXPERMITIDO, banco.VALORATACADO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.COMPLEMENTODESCRICAO, banco.ESTOQUEATUAL, banco.VALORUNITARIO, banco.DESCMAXPERMITIDO, banco.VALORATACADO};
         String where = CriaBanco.CDPRODUTO + "='" + cdproduto + "'";
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, where, null, null, null, null, null);
@@ -949,8 +949,9 @@ public class BancoController {
 
     public Cursor carregaProdutosDescricaoPedido(String descricao){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.ESTOQUEATUAL, banco.QTDEDISPONIVEL, banco.VALORUNITARIO, banco.VALORATACADO};
+        String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.COMPLEMENTODESCRICAO, banco.ESTOQUEATUAL, banco.QTDEDISPONIVEL, banco.VALORUNITARIO, banco.VALORATACADO};
         String where = "(" + CriaBanco.DESCRICAO + " LIKE '%" + descricao + "%'";
+        where += " OR " + CriaBanco.COMPLEMENTODESCRICAO + " LIKE '%" + descricao + "%'";
         where += " OR " + CriaBanco.CDPRODUTO + " LIKE '%" + descricao + "%')";
 
         String orderBy = CriaBanco.DESCRICAO;

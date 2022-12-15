@@ -95,7 +95,12 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
         if (cursor != null) {
             while(!cursor.isAfterLast()) {
                 codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
-                descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+                //descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+                String descricaoCompleta = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO));
+                if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)).trim().equals((""))){
+                    descricaoCompleta += " - " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO));
+                }
+                descricao.add(descricaoCompleta);
                 if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
                     itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)) + " / Quantidade disponível: " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
                 }else{
@@ -215,7 +220,12 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
                     try {
                         while (!cursor.isAfterLast()) {
                             codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
-                            descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+                            //descricao.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+                            String descricaoCompleta = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO));
+                            if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)).trim().equals((""))){
+                                descricaoCompleta += " - " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO));
+                            }
+                            descricao.add(descricaoCompleta);
                             if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
                                 itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)) + " / Quantidade disponível: " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
                             }else{

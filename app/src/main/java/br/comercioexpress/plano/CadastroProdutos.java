@@ -53,8 +53,11 @@ public class CadastroProdutos extends AppCompatActivity {
 
         try {
             if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)).equals("null")) {
-                String descricaoCompleta = lb_descricao.getText().toString() + " - " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO));
-                lb_descricao.setText(descricaoCompleta);
+                if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)).trim().equals("")) {
+                    String descricaoCompleta = lb_descricao.getText().toString() + " - " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO));
+                    lb_descricao.setText(descricaoCompleta);
+                }
+
             }
         }catch (Exception e){
             //lb_descricao.setText("");

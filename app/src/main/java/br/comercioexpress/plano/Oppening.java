@@ -19,6 +19,8 @@ import java.util.TimerTask;
 import android.os.Handler;
 import android.util.Log;
 
+import models.MDL_Produtos;
+
 public class Oppening extends AppCompatActivity {
 
     private Timer timerAtual = new Timer();
@@ -118,6 +120,12 @@ public class Oppening extends AppCompatActivity {
                         BancoController crud = new BancoController(getBaseContext());
                         String validou = crud.validaLogin();
 
+                        try{
+                            MDL_Produtos mdl_Produtos = new MDL_Produtos(getBaseContext());
+                            mdl_Produtos.adicionarColunaComplementoDescricao();
+                        }catch (Exception ex_Complemento){
+
+                        }
 
 
                         if (validou.equals("N")) {

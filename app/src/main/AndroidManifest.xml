@@ -25,15 +25,21 @@
         <activity
             android:name=".HomeActivity"
             android:label="Seleção de Clientes"
+            android:exported="true"
+            tools:node="merge"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Cliente"
             android:label="Cadastro de Clientes"
+            android:exported="true"
+            tools:node="merge"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
+            android:exported="true"
+            tools:node="merge"
             android:theme="@style/AppTheme.Login" />
         <activity
             android:name=".Pedidos"
@@ -44,6 +50,8 @@
             android:name=".Oppening"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
+            android:exported="true"
+            tools:node="merge"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

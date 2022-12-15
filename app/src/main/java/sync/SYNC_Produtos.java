@@ -146,12 +146,14 @@ public class SYNC_Produtos {
 
 
                         cl_Produtos.setCdProduto(jObject.getString("CdProduto"));
-                        if(cl_Produtos.getCdProduto().equals("3986")){
-                            String teste = e.getString("post3");
-                            String testando =  teste + "";
-                        }
                         cl_Produtos.setDescricao(e.getString("post2"));
-                        cl_Produtos.setComplementoDescricao(e.getString("post3"));
+
+                        try{
+                            String complementoDescricao = e.getString("postComplemento");
+                            cl_Produtos.setComplementoDescricao(complementoDescricao);
+                        }catch (Exception e_Complemento){
+                            cl_Produtos.setComplementoDescricao("");
+                        }
 
                         if (!cl_Produtos.getDescricao().equals("null")) {
 

@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion '27.0.3'
 
     compileOptions {
@@ -13,9 +13,9 @@ android {
     defaultConfig {
         applicationId "br.comercioexpress.plano"
         minSdkVersion 19
-        targetSdkVersion 30
-        versionCode 20
-        versionName "5.0"
+        targetSdkVersion 31
+        versionCode 22
+        versionName "5.2"
         multiDexEnabled true
     }
     buildTypes {
