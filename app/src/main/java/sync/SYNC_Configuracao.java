@@ -3,6 +3,13 @@ package sync;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -37,8 +44,10 @@ import java.util.List;
 import br.comercioexpress.plano.Funcoes;
 import br.comercioexpress.plano.MySSLSocketFactory;
 import classes.CL_Configuracao;
+import classes.CL_ConfiguracaoAPI;
 import classes.CL_Filial;
 import classes.CL_Usuario;
+import classes.CL_UsuarioAPI;
 import controllers.CTL_Configuracao;
 import controllers.CTL_Usuario;
 import models.MDL_Produtos;
@@ -59,6 +68,8 @@ public class SYNC_Configuracao {
 
     int TIMEOUT_MILLISEC = 10000;
 
+    String bodyString = "";
+
     public SYNC_Configuracao(Context context){
 
         this.vc_Context = context;
@@ -69,8 +80,61 @@ public class SYNC_Configuracao {
         cl_Usuario= new CL_Usuario();
         ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
 
+        cl_Usuario = ctl_Usuario.fuSelecionarUsuarioAPI();
+        bodyString = ctl_Usuario.buildRequestBodyString(cl_Usuario);
+
     }
 
+    public boolean FU_SincronizarConfiguracoesAPI(){
+
+        try {
+
+            OkHttpClient client = new OkHttpClient();
+
+            // Construir a string e logá-la
+
+
+            // Criar o RequestBody
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody bodyUsuario = RequestBody.create(mediaType, bodyString);
+
+            Request request = new Request.Builder()
+                    .url("http://35.247.249.209:70/SelecionarConfiguracaoCliente")
+                    .method("POST", bodyUsuario)
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            int vf_Response = response.code();
+
+            if(vf_Response == 200){
+                String jsonResponse = response.body().string();
+
+                // Parsing JSON to Java object using Gson
+                Gson gson = new Gson();
+                CL_ConfiguracaoAPI cl_configuracaoAPI = gson.fromJson(jsonResponse, CL_ConfiguracaoAPI.class);
+
+                cl_Configuracao.setFgControlaEstoquePedido(cl_configuracaoAPI.fgControlaEstoquePedido);
+                cl_Configuracao.setFgPrecoIndividualizado(cl_configuracaoAPI.precoIndividualizado);
+                ctl_Configuracao = new CTL_Configuracao(vc_Context, cl_Configuracao);
+
+                if(!ctl_Configuracao.fuAtualizarConfiguracoes()){
+                    return false;
+                }
+
+
+            }else{
+                return false;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+    //Funções antigas do WebService em PHP
     public boolean FU_SincronizarFgControlaEstoquePedido(){
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());

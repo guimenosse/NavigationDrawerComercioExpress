@@ -3,6 +3,7 @@ package classes;
 public class CL_Usuario {
 
     protected String id;
+    protected String cdUsuario;
     protected String usuario;
     protected String senha;
     protected String cdClienteBanco;
@@ -11,14 +12,25 @@ public class CL_Usuario {
     protected String dtUltimaSincronizacao;
 
 
+    protected String ip;
+    protected String usuarioSQL;
+    protected String senhaSQL;
+    protected String nmBanco;
+
     public CL_Usuario(){
         this.id = "";
+        this.cdUsuario = "";
         this.usuario = "";
         this.senha = "";
         this.cdClienteBanco = "";
         this.nmUsuarioSistema = "";
         this.cdVendedorDefault = "";
         this.dtUltimaSincronizacao = "";
+
+        this.ip = "";
+        this.usuarioSQL = "";
+        this.senhaSQL = "";
+        this.nmBanco = "";
     }
 
     public String getId() {
@@ -27,6 +39,14 @@ public class CL_Usuario {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getCdUsuario() {
+        return id;
+    }
+
+    public void setCdUsuario(String cdUsuario) {
+        this.cdUsuario = cdUsuario;
     }
 
     public String getUsuario() {
@@ -76,4 +96,37 @@ public class CL_Usuario {
     public void setDtUltimaSincronizacao(String dtUltimaSincronizacao) {
         this.dtUltimaSincronizacao = dtUltimaSincronizacao;
     }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getUsuarioSQL() {
+        return usuarioSQL;
+    }
+
+    public void setUsuarioSQL(String usuarioSQL) {
+        this.usuarioSQL = usuarioSQL;
+    }
+
+    public String getSenhaSQL() {
+        return senhaSQL;
+    }
+
+    public void setSenhaSQL(String senhaSQL) {
+        this.senhaSQL = senhaSQL;
+    }
+
+    public String getNmBanco() {
+        return nmBanco;
+    }
+
+    public void setNmBanco(String nmBanco) {
+        this.nmBanco = nmBanco;
+    }
+
 }

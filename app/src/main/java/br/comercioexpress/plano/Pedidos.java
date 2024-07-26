@@ -76,6 +76,7 @@ import controllers.CTL_Usuario;
 import models.CriaBanco;
 import models.MDL_Usuario;
 import sync.SYNC_Clientes;
+import sync.SYNC_Configuracao;
 import sync.SYNC_Filial;
 import sync.SYNC_Pedidos;
 import sync.SYNC_Produtos;
@@ -117,6 +118,7 @@ public class Pedidos extends AppCompatActivity
     SYNC_Clientes sync_Clientes;
     SYNC_Produtos sync_Produtos;
     SYNC_Filial sync_Filial;
+    SYNC_Configuracao sync_Configuracao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +134,7 @@ public class Pedidos extends AppCompatActivity
         sync_Clientes = new SYNC_Clientes(getApplicationContext());
         sync_Produtos = new SYNC_Produtos(getApplicationContext());
         sync_Filial = new SYNC_Filial(getApplicationContext());
+        sync_Configuracao = new SYNC_Configuracao(getApplicationContext());
 
         vc_Context = getApplicationContext();
 
@@ -332,7 +335,7 @@ public class Pedidos extends AppCompatActivity
 
             if(ctl_Clientes.fuSelecionarCliente()){
                 if(cl_Clientes.getFgSincronizado().equals("N")){
-                    if(sync_Clientes.FU_SincronizarClientePedido(cl_Clientes)){
+                    if(sync_Clientes.FU_SincronizarClientesPedidoAPI(cl_Clientes)){
                         cl_Pedidos.setCdCliente(cl_Clientes.getCdCliente());
                     }else{
                         vc_Mensagem = sync_Clientes.mensagem;
@@ -341,7 +344,7 @@ public class Pedidos extends AppCompatActivity
                 }
             }
 
-            if (sync_Pedidos.FU_EnviarPedido(cl_Pedidos)) {
+            if (sync_Pedidos.FU_EnviarPedidoAPI(cl_Pedidos)) {
                 return true;
             } else {
                 return false;
@@ -717,31 +720,35 @@ public class Pedidos extends AppCompatActivity
         CTL_Clientes ctl_Clientes = new CTL_Clientes(vc_Context, cl_Clientes);
 
         if(ctl_Clientes.fuSelecionarClientesNaoSincronizados()){
-            if(!sync_Clientes.FU_SincronizarClientes(ctl_Clientes.rs_Cliente)){
+            if(!sync_Clientes.FU_SincronizarClientesAPI(ctl_Clientes.rs_Cliente)){
                 return false;
             }
         }
 
-        if(!sync_Clientes.FU_SincronizarTodosClientesServidor()){
+        if(!sync_Clientes.FU_SincronizarTodosClientesAPI()){
             return false;
         }
 
-        if(!sync_Produtos.FU_SincronizarTodosProdutosServidor()){
+        if(!sync_Produtos.FU_SincronizarProdutosAPI()){
             return false;
         }
 
-        if(!sync_Clientes.FU_SincronizarConfiguracaoPrecoIndividualizado()){
+        /*if(!sync_Clientes.FU_SincronizarConfiguracaoPrecoIndividualizado()){
+            return false;
+        }*/
+
+        if(!sync_Configuracao.FU_SincronizarConfiguracoesAPI()){
             return false;
         }
 
 
         if(cl_Filial.getPrecoIndividualizado().equals("S")){
-            if(!sync_Produtos.FU_SincronizarPrecosIndividualizadosProdutos()){
+            if(!sync_Produtos.FU_SincronizarPrecosIndividualizadosProdutosAPI()){
                 return false;
             }
         }
 
-        if(!sync_Clientes.FU_SincronizarTipoCliente()){
+        if(!sync_Clientes.FU_SincronizarTiposClienteAPI()){
             return false;
         }
 
@@ -810,7 +817,7 @@ public class Pedidos extends AppCompatActivity
             Cursor rs_Pedidos = ctl_Pedidos.rs_Pedido;
 
             if(fuConsisteEnvioTodosPedidosAbertos()) {
-                if (sync_Pedidos.FU_EnviarTodosPedidos(rs_Pedidos)) {
+                if (sync_Pedidos.FU_EnviarTodosPedidosAPI(rs_Pedidos)) {
                     vc_Mensagem = "";
                     return true;
                 } else {

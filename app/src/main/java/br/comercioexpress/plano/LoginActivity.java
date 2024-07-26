@@ -180,7 +180,44 @@ public class LoginActivity extends AppCompatActivity {
 
     protected boolean FU_SincronizarLogin(){
 
-        if(!sync_Usuario.FU_ValidaLogin(usuarioString, senhaString)){
+        if(!sync_Usuario.FU_BuscaUsuarioCadastradoAPI(usuarioString, senhaString)){
+            vc_Mensagem = "Usuário ou senha incorretos!";
+            return false;
+        }
+
+        SYNC_Configuracao sync_Configuracao = new SYNC_Configuracao(vc_Context);
+
+        if(!sync_Configuracao.FU_SincronizarConfiguracoesAPI()){
+            return false;
+        }
+
+        SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
+
+        if(!sync_Clientes.FU_SincronizarTiposClienteAPI()){
+            vc_Mensagem = "Não foi possivel realizar a sincronização dos tipos de cliente. Favor verificar a conexão com a internet e o banco de dados!";
+            return false;
+        }
+
+        if(!sync_Clientes.FU_SincronizarTodosClientesAPI()){
+            return false;
+        }
+
+        SYNC_Produtos sync_Produtos = new SYNC_Produtos(vc_Context);
+
+        if(!sync_Produtos.FU_SincronizarProdutosAPI()){
+            return false;
+        }
+
+        CL_Usuario cl_Usuario = new CL_Usuario();
+        CTL_Usuario ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
+
+        ctl_Usuario.cl_Usuario.setDtUltimaSincronizacao(funcoes.getDateTime());
+
+        if(!ctl_Usuario.fuAtualizarSincronizacao()){
+            return false;
+        }
+
+        /*if(!sync_Usuario.FU_ValidaLogin(usuarioString, senhaString)){
             vc_Mensagem = "Usuário ou senha incorretos!";
             return false;
         }
@@ -200,22 +237,12 @@ public class LoginActivity extends AppCompatActivity {
             return false;
         }
 
-        SYNC_Configuracao sync_Configuracao = new SYNC_Configuracao(vc_Context);
-
-        if(!sync_Configuracao.FU_SincronizarFgControlaEstoquePedido()){
-            return false;
-        }
-
-        SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
-
-        if(!sync_Clientes.FU_SincronizarTipoCliente()){
-            vc_Mensagem = "Não foi possivel realizar a sincronização dos tipos de cliente. Favor verificar a conexão com a internet e o banco de dados!";
-            return false;
-        }
-
         if(!sync_Clientes.FU_SincronizarTodosClientesServidor()){
             return false;
-        }
+        }*/
+
+
+        /*
 
         //Realizar inclusão da coluna de complemento de descrição
 
@@ -224,21 +251,7 @@ public class LoginActivity extends AppCompatActivity {
             return false;
         }
 
-
-        SYNC_Produtos sync_Produtos = new SYNC_Produtos(vc_Context);
-
-        if(!sync_Produtos.FU_SincronizarTodosProdutosServidor()){
-            return false;
-        }
-
-        CL_Usuario cl_Usuario = new CL_Usuario();
-        CTL_Usuario ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
-
-        ctl_Usuario.cl_Usuario.setDtUltimaSincronizacao(funcoes.getDateTime());
-
-        if(!ctl_Usuario.fuAtualizarSincronizacao()){
-            return false;
-        }
+        */
 
         return true;
     }

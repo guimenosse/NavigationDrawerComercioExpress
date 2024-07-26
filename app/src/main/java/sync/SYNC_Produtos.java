@@ -3,6 +3,14 @@ package sync;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -35,10 +43,14 @@ import java.util.List;
 
 import br.comercioexpress.plano.Funcoes;
 import br.comercioexpress.plano.MySSLSocketFactory;
+import classes.CL_Clientes;
 import classes.CL_Configuracao;
 import classes.CL_Filial;
 import classes.CL_Produtos;
+import classes.CL_ProdutosAPI;
+import classes.CL_TiposCliente;
 import classes.CL_Usuario;
+import controllers.CTL_Clientes;
 import controllers.CTL_Configuracao;
 import controllers.CTL_Filial;
 import controllers.CTL_Produtos;
@@ -68,6 +80,8 @@ public class SYNC_Produtos {
 
     int TIMEOUT_MILLISEC = 10000;
 
+    String bodyString = "";
+
     public SYNC_Produtos(Context context){
 
         this.vc_Context = context;
@@ -76,16 +90,187 @@ public class SYNC_Produtos {
 
         cl_Usuario= new CL_Usuario();
         ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
+        cl_Usuario = ctl_Usuario.fuSelecionarUsuarioAPI();
+        bodyString = ctl_Usuario.buildRequestBodyString(cl_Usuario);
 
         cl_Configuracao = new CL_Configuracao();
         ctl_Configuracao = new CTL_Configuracao(vc_Context, cl_Configuracao);
-        ctl_Configuracao.fuCarregarFgControlaEstoquePedido();
+        ctl_Configuracao.fuCarregarConfiguracoes();
 
         cl_Filial = new CL_Filial();
         CTL_Filial ctl_Filial = new CTL_Filial(context, cl_Filial);
         ctl_Filial.fuBuscaCdFilialSelecionada();
     }
 
+    public boolean FU_SincronizarProdutosAPI(){
+
+        try {
+
+            OkHttpClient client = new OkHttpClient();
+
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody bodyUsuario = RequestBody.create(mediaType, bodyString);
+
+            Request request = new Request.Builder()
+                    .url("http://35.247.249.209:70/SelecionarProdutosExpress")
+                    .method("POST", bodyUsuario)
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            int vf_Response = response.code();
+
+            if(vf_Response == 200){
+                String jsonResponse = response.body().string();
+
+                if(!mdl_Produtos.fuDeletarTodosProdutos()){
+                    return false;
+                }
+
+                // Parsing JSON to Java object using Gson
+                Gson gson = new Gson();
+                List<CL_ProdutosAPI> produtos = gson.fromJson(jsonResponse, new TypeToken<List<CL_ProdutosAPI>>(){}.getType());
+                // Agora você pode adicionar os novos tipos de cliente ao seu banco de dados ou lista
+                for (CL_ProdutosAPI produto : produtos) {
+
+                    cl_Produtos = new CL_Produtos();
+                    cl_Produtos.setCdProduto(produto.getCdProduto());
+                    cl_Produtos.setDescricao(produto.getDescricao());
+                    try{
+                        String complementoDescricao = produto.getComplemento();
+                        cl_Produtos.setComplementoDescricao(complementoDescricao);
+                    }catch (Exception e_Complemento){
+                        cl_Produtos.setComplementoDescricao("");
+                    }
+
+                    if (!cl_Produtos.getDescricao().equals("null")) {
+                        cl_Produtos.setEstoqueAtual(produto.getEstAtual());
+                        cl_Produtos.setVlUnitario(produto.getVlVenda());
+                        cl_Produtos.setVlAtacado(produto.getVlAtacado());
+                        cl_Produtos.setDtUltimaAlteracao(produto.getDtUltimaAlteracao());
+
+                        String vf_Desconto = "0";
+                        if(Double.parseDouble(produto.getPercDescMaxVendedor()) > 0) {
+                            vf_Desconto = produto.getPercDescMaxVendedor();
+                        }else if(Double.parseDouble(produto.getDescCategoria()) > 0) {
+                            vf_Desconto = produto.getDescCategoria();
+                        }else if(Double.parseDouble(produto.getDescDepartamento()) > 0) {
+                            vf_Desconto = produto.getDescDepartamento();
+                        }
+                        cl_Produtos.setDescMaxPermitido(vf_Desconto);
+
+                        cl_Produtos.setDescMaxPermitidoA(produto.getDescontoA());
+                        cl_Produtos.setDescMaxPermitidoB(produto.getDescontoB());
+                        cl_Produtos.setDescMaxPermitidoC(produto.getDescontoC());
+                        cl_Produtos.setDescMaxPermitidoD(produto.getDescontoD());
+                        cl_Produtos.setDescMaxPermitidoE(produto.getDescontoE());
+                        cl_Produtos.setDescMaxPermitidoFidelidade(produto.getDescontoFidelidade());
+                        cl_Produtos.setCdRefEstoque(produto.getCdRefEstoque());
+
+                        if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
+                            double vf_QtdePedSaida = Double.parseDouble(produto.getQtdePedSaida());
+                            double vf_EstAtual = Double.parseDouble(produto.getEstAtual());
+                            double vf_QtdeDisponivel = vf_EstAtual - vf_QtdePedSaida;
+
+                            cl_Produtos.setQtdeDisponivel(String.valueOf(vf_QtdeDisponivel));
+                        }else{
+                            cl_Produtos.setQtdeDisponivel("");
+                        }
+
+                        ctl_Produtos =  new CTL_Produtos(vc_Context, cl_Produtos);
+
+
+                        if(!ctl_Produtos.fuInserirProdutoFilial()){
+
+                        }
+                    }
+                }
+            }else{
+                return false;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean FU_SincronizarPrecosIndividualizadosProdutosAPI(){
+
+        try {
+
+            OkHttpClient client = new OkHttpClient();
+
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody bodyUsuario = RequestBody.create(mediaType, bodyString);
+
+            Request request = new Request.Builder()
+                    .url("http://35.247.249.209:70/SelecionarProdutosExpressIndividualizado/")
+                    .method("POST", bodyUsuario)
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            int vf_Response = response.code();
+
+            if(vf_Response == 200){
+                String jsonResponse = response.body().string();
+
+                MDL_Produtos mdl_Produtos = new MDL_Produtos(vc_Context);
+
+                // Parsing JSON to Java object using Gson
+                Gson gson = new Gson();
+                List<CL_ProdutosAPI> produtos = gson.fromJson(jsonResponse, new TypeToken<List<CL_ProdutosAPI>>(){}.getType());
+                // Agora você pode adicionar os novos tipos de cliente ao seu banco de dados ou lista
+                for (CL_ProdutosAPI produto : produtos) {
+
+                    try {
+
+                        if (!produto.getCdProduto().equals("null")) {
+
+                            String VA_CdProduto = produto.getCdProduto();
+
+                            if(Double.parseDouble(produto.getVlVenda()) > 0){
+                                mdl_Produtos.fuAtualizarValorUnitarioFilial(VA_CdProduto, produto.getVlVenda());
+                            }
+                            if (Double.parseDouble(produto.getDescontoA()) > 0) {
+                                mdl_Produtos.fuAtualizarValorUnitarioFilial(VA_CdProduto, produto.getDescontoA());
+                            }
+                            if (Double.parseDouble(produto.getDescontoB()) > 0) {
+                                mdl_Produtos.fuAtualizarValorUnitarioFilial(VA_CdProduto, produto.getDescontoB());
+                            }
+                            if (Double.parseDouble(produto.getDescontoC()) > 0) {
+                                mdl_Produtos.fuAtualizarValorUnitarioFilial(VA_CdProduto, produto.getDescontoC());
+                            }
+                            if (Double.parseDouble(produto.getDescontoD()) > 0) {
+                                mdl_Produtos.fuAtualizarValorUnitarioFilial(VA_CdProduto, produto.getDescontoD());
+                            }
+                            if (Double.parseDouble(produto.getDescontoE()) > 0) {
+                                mdl_Produtos.fuAtualizarValorUnitarioFilial(VA_CdProduto, produto.getDescontoE());
+                            }
+                            if (Double.parseDouble(produto.getDescontoFidelidade()) > 0) {
+                                mdl_Produtos.fuAtualizarValorUnitarioFilial(VA_CdProduto, produto.getDescontoFidelidade());
+                            }
+
+                        }
+                    }catch(Exception e3) {
+                        return false;
+                    }
+
+                }
+            }else{
+                return false;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+    //Funções antigas do WebService em PHP
     public boolean FU_SincronizarTodosProdutosServidor(){
 
         try {

@@ -13,7 +13,7 @@ public class MDL_Filial {
     private CriaBanco banco;
 
     //
-    public String [] arr_CamposFilial = {banco.ID, banco.CDFILIAL, banco.FILIAL, banco.FGSELECIONADA, banco.FGTROCAFILIAL, banco.PRECOINDIVIDUALIZADO};
+    public String [] arr_CamposFilial = {banco.ID, banco.CDFILIAL, banco.FILIAL, banco.FGSELECIONADA, banco.FGTROCAFILIAL, banco.FGPRECOINDIVIDUALIZADO};
 
     public MDL_Filial(Context context)
     {
@@ -161,7 +161,7 @@ public class MDL_Filial {
 
     public Cursor fuBuscarConfiguracaoPrecoIndividualizado(){
         Cursor cursor;
-        String[] campos = {banco.ID, banco.PRECOINDIVIDUALIZADO};
+        String[] campos = {banco.ID, banco.FGPRECOINDIVIDUALIZADO};
         db = banco.getReadableDatabase();
         cursor = db.query(CriaBanco.TABELAFILIAL, campos, null, null, null, null, null);
 
@@ -182,7 +182,7 @@ public class MDL_Filial {
 
 
             valores = new ContentValues();
-            valores.put(CriaBanco.PRECOINDIVIDUALIZADO, fgPrecoIndividualizado);
+            valores.put(CriaBanco.FGPRECOINDIVIDUALIZADO, fgPrecoIndividualizado);
 
             resultado = db.update(CriaBanco.TABELAFILIAL, valores, null, null);
             db.close();

@@ -4,6 +4,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import android.content.Context;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -28,12 +37,81 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import classes.CL_Clientes;
+import classes.CL_Filial;
+import classes.CL_TiposCliente;
+import classes.CL_Usuario;
+import controllers.CTL_Clientes;
+import controllers.CTL_Filial;
+import controllers.CTL_Usuario;
+import models.MDL_Clientes;
+
 /**
  * Created by Desenvolvimento on 12/05/2016.
  */
 public class Funcoes {
 
     int countCli;
+
+    CL_Usuario cl_Usuario;
+    CTL_Usuario ctl_Usuario;
+
+    Context vc_Context;
+
+    int TIMEOUT_MILLISEC = 10000;
+
+    String bodyString = "";
+
+    public Funcoes(){
+
+    }
+
+    public Funcoes(Context context){
+
+        this.vc_Context = context;
+
+        cl_Usuario= new CL_Usuario();
+        ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
+        cl_Usuario = ctl_Usuario.fuSelecionarUsuarioAPI();
+        bodyString = ctl_Usuario.buildRequestBodyString(cl_Usuario);
+
+    }
+
+    public boolean FU_VerificaAutorizacaoAPI(String cdsistema, String cdfuncao){
+
+        try {
+
+            OkHttpClient client = new OkHttpClient();
+
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody bodyUsuario = RequestBody.create(mediaType, bodyString);
+
+            Request request = new Request.Builder()
+                    .url("http://35.247.249.209:70/VerificarAutorizacao/" + cdsistema + "/" + cdfuncao)
+                    .method("POST", bodyUsuario)
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            int vf_Response = response.code();
+
+            if(vf_Response == 200){
+                String jsonResponse = response.body().string();
+
+                if (!jsonResponse.equals("null") && !jsonResponse.equals("") && jsonResponse.equals("true")) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            }else{
+                return false;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+    }
 
     public boolean verificaAutorizacao(String cdsistema, String cdfuncao, String usuario, String cdclientebanco) {
 

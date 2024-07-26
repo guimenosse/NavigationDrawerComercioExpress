@@ -1,5 +1,6 @@
 package controllers;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -51,6 +52,62 @@ public class CTL_Usuario {
             cl_Usuario.setUsuario("");
             return false;
         }
+    }
+
+    /*this.cdClienteBanco = "";
+        this.nmUsuarioSistema = "";
+        this.cdVendedorDefault = "";
+        this.dtUltimaSincronizacao = "";
+
+        this.ip = "";
+        this.usuarioSQL = "";
+        this.senhaSQL = "";
+        this.nmBanco = "";*/
+
+    @SuppressLint("Range")
+    public CL_Usuario fuSelecionarUsuarioAPI(){
+        CL_Usuario cl_UsuarioAPI = new CL_Usuario();
+        try {
+
+            rs_Usuario = mdl_Usuario.fuSelecionarUsuarioAPI();
+
+            if (rs_Usuario != null) {
+                rs_Usuario.moveToFirst();
+                cl_UsuarioAPI.setCdUsuario(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.CDUSUARIO)));
+                cl_UsuarioAPI.setUsuario(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.USUARIOLOGIN)));
+                cl_UsuarioAPI.setSenha(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.SENHALOGIN)));
+                cl_UsuarioAPI.setCdClienteBanco(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.CDCLIENTEBANCO)));
+                cl_UsuarioAPI.setNmUsuarioSistema(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.NMUSUARIOSISTEMA)));
+                cl_UsuarioAPI.setCdVendedorDefault(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.CDVENDEDORDEFAULT)));
+                cl_UsuarioAPI.setIp(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.IP)));
+                cl_UsuarioAPI.setUsuarioSQL(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.USUARIOSQL)));
+                cl_UsuarioAPI.setSenhaSQL(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.SENHASQL)));
+                cl_UsuarioAPI.setNmBanco(rs_Usuario.getString(rs_Usuario.getColumnIndex(CriaBanco.NMBANCO)));
+            }else{
+                cl_UsuarioAPI.setCdUsuario("");
+            }
+
+            rs_Usuario.close();
+
+
+        }catch (Exception e){
+            cl_UsuarioAPI.setCdUsuario("");
+        }
+
+        return cl_UsuarioAPI;
+    }
+
+    public String buildRequestBodyString(CL_Usuario cl_UsuarioAPI) {
+        return "cdUsuario=" + cl_UsuarioAPI.getCdUsuario()
+                + "&usuario=" + cl_UsuarioAPI.getUsuario()
+                + "&senha=" + cl_UsuarioAPI.getSenha()
+                + "&cdCliente=" + cl_UsuarioAPI.getCdClienteBanco()
+                + "&nmUsuarioSistema=" + cl_UsuarioAPI.getNmUsuarioSistema()
+                + "&ip=" + cl_UsuarioAPI.getIp()
+                + "&usuarioSQL=" + cl_UsuarioAPI.getUsuarioSQL()
+                + "&senhaSQL=" + cl_UsuarioAPI.getSenhaSQL()
+                + "&nmBanco=" + cl_UsuarioAPI.getNmBanco()
+                + "&cdVendedorDefault=" + cl_UsuarioAPI.getCdVendedorDefault();
     }
 
     public boolean fuSelecionarCdClienteBanco(){

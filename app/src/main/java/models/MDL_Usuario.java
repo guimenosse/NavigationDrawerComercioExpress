@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import classes.CL_Usuario;
 import models.CriaBanco;
 
 public class MDL_Usuario {
@@ -47,6 +48,57 @@ public class MDL_Usuario {
         }catch (Exception e){
             return false;
         }
+    }
+
+    public boolean fuSalvarUsuarioAPI(CL_Usuario usuario){
+
+        try {
+            ContentValues valores;
+            db = banco.getWritableDatabase();
+
+            db.delete(banco.TABELALOGIN, null, null);
+            db.close();
+
+            db = banco.getWritableDatabase();
+
+            valores = new ContentValues();
+            valores.put(banco.CDUSUARIO, usuario.getCdUsuario());
+            valores.put(banco.USUARIOLOGIN, usuario.getUsuario());
+            valores.put(banco.SENHALOGIN, usuario.getSenha());
+            valores.put(banco.CDVENDEDORDEFAULT, usuario.getCdVendedorDefault());
+            valores.put(banco.NMUSUARIOSISTEMA, usuario.getNmUsuarioSistema());
+            valores.put(banco.CDCLIENTEBANCO, usuario.getCdClienteBanco());
+            valores.put(banco.IP, usuario.getIp());
+            valores.put(banco.USUARIOSQL, usuario.getUsuarioSQL());
+            valores.put(banco.SENHASQL, usuario.getSenhaSQL());
+            valores.put(banco.NMBANCO, usuario.getNmBanco());
+
+            long resultado = db.insert(banco.TABELALOGIN, null, valores);
+            db.close();
+
+            if(resultado == -1){
+                return false;
+            }else{
+                return true;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    public Cursor fuSelecionarUsuarioAPI() {
+        Cursor cursor;
+        String[] campos = {banco.CDUSUARIO, banco.USUARIOLOGIN, banco.SENHALOGIN, banco.CDVENDEDORDEFAULT, banco.NMUSUARIOSISTEMA, banco.CDCLIENTEBANCO, banco.IP, banco.USUARIOSQL, banco.SENHASQL, banco.NMBANCO};
+        db = banco.getReadableDatabase();
+        cursor = db.query(banco.TABELALOGIN, campos, null, null, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        db.close();
+
+        return cursor;
+
     }
 
     public boolean fuInserirCdClienteBanco(String cdCliente){

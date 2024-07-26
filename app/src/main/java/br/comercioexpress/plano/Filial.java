@@ -396,11 +396,19 @@ public class Filial extends AppCompatActivity {
 
     protected boolean FU_Sincronizar(){
 
-        if(!sync_Filial.FU_SincronizarFilial()){
+        /*if(!sync_Filial.FU_SincronizarFilial()){
+            return false;
+        }*/
+
+        if(!sync_Filial.FU_SincronizarFilialAPI()){
             return false;
         }
 
-        if(!sync_Filial.FU_SincronizarAutorizacaoUsuario()){
+        /*if(!sync_Filial.FU_SincronizarAutorizacaoUsuario()){
+            return false;
+        }*/
+
+        if(!sync_Filial.FU_SincronizarAutorizacaoUsuarioAPI()){
             return false;
         }
 
@@ -409,15 +417,15 @@ public class Filial extends AppCompatActivity {
 
     protected boolean FU_SincronizarPrecoFilial(){
 
-        if(!sync_Clientes.FU_SincronizarConfiguracaoPrecoIndividualizado()){
+        /*if(!sync_Clientes.FU_SincronizarConfiguracaoPrecoIndividualizado()){
             return false;
-        }
+        }*/
 
         CL_Filial cl_Filial = new CL_Filial();
         CTL_Filial ctl_Filial = new CTL_Filial(vc_Context, cl_Filial);
 
         if(cl_Filial.getPrecoIndividualizado().equals("S")){
-            if(!sync_Produtos.FU_SincronizarPrecosIndividualizadosProdutos()){
+            if(!sync_Produtos.FU_SincronizarPrecosIndividualizadosProdutosAPI()){
                 return false;
             }
         }

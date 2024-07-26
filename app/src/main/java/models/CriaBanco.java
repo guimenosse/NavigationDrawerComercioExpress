@@ -44,11 +44,16 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final int VERSAO = 1;
 
     public static final String TABELALOGIN = "login";
+    public static final String CDUSUARIO = "cdusuario";
     public static final String USUARIOLOGIN = "usuario";
     public static final String SENHALOGIN = "senha";
     public static final String CDVENDEDORDEFAULT = "cdvendedor";
     public static final String NMUSUARIOSISTEMA = "nmusuariosistema";
     public static final String CDCLIENTEBANCO = "cdclientebanco";
+    public static final String IP = "ip";
+    public static final String USUARIOSQL = "usuariosql";
+    public static final String SENHASQL = "senhasql";
+    public static final String NMBANCO = "nmbanco";
 
     public static final String TABELASINCRONIZACAO = "sincronizacao";
     public static final String DTULTSINCRONIZACAO = "ultdtsincronizacao";
@@ -57,6 +62,7 @@ public class CriaBanco extends SQLiteOpenHelper {
 
     public static final String TABELACONFIGURACAO = "configuracao";
     public static final String FGCONTROLAESTOQUEPEDIDO = "fgcontrolaestoquepedido";
+    public static final String FGPRECOINDIVIDUALIZADO = "fgprecoindividualizado";
 
     public static  final String TABELAPRODUTOS = "cadpro";
     public static final String CDPRODUTO = "cdproduto";
@@ -97,10 +103,10 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String OBSERVACAOITEMPEDIDO = "observacaoitempedido";
 
     public static final String TABELABANCODADOS = "bancodados";
-    public static final String IP = "ip";
+    //public static final String IP = "ip";
     public static final String USUARIOBANCO = "usuario";
     public static final String SENHABANCO = "senha";
-    public static final String NMBANCO = "nmbanco";
+    //public static final String NMBANCO = "nmbanco";
 
     public static final String TABELATIPCLIENTE = "tipcli";
     public static final String CDTIPO = "cdtipo";
@@ -111,7 +117,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public static final String FILIAL = "filial";
     public static final String FGSELECIONADA = "fgselecionada";
     public static final String FGTROCAFILIAL = "fgtrocafilial";
-    public static final String PRECOINDIVIDUALIZADO = "precoindividualizado";
+
 
     public CriaBanco(Context context){
 
@@ -126,9 +132,14 @@ public class CriaBanco extends SQLiteOpenHelper {
                 + ID + " integer primary key autoincrement, "
                 + USUARIOLOGIN + " text, "
                 + SENHALOGIN + " text, "
+                + CDUSUARIO + " text, "
                 + CDVENDEDORDEFAULT + " text, "
                 + CDCLIENTEBANCO + " text, "
-                + NMUSUARIOSISTEMA + " text "
+                + NMUSUARIOSISTEMA + " text, "
+                + IP + " text, "
+                + USUARIOSQL + " text, "
+                + SENHASQL + " text, "
+                + NMBANCO + " text "
                 + ")";
 
         db.execSQL(sql);
@@ -143,12 +154,13 @@ public class CriaBanco extends SQLiteOpenHelper {
         db.execSQL(sql);
 
         sql = "CREATE TABLE IF NOT EXISTS " + TABELACONFIGURACAO + "("
-                + FGCONTROLAESTOQUEPEDIDO + " text"
+                + FGCONTROLAESTOQUEPEDIDO + " text DEFAULT 'N', "
+                + FGPRECOINDIVIDUALIZADO + " text DEFAULT 'N' "
                 + ")";
 
         db.execSQL(sql);
 
-        sql = "INSERT INTO " + TABELACONFIGURACAO + " VALUES ('N')";
+        sql = "INSERT INTO " + TABELACONFIGURACAO + " VALUES ('N', 'N')";
         db.execSQL(sql);
 
         sql = "CREATE TABLE " + TABELATIPCLIENTE + "("
@@ -203,6 +215,7 @@ public class CriaBanco extends SQLiteOpenHelper {
                 ID + " integer primary key autoincrement, " +
                 CDPRODUTO + " text, " +
                 DESCRICAO + " text, " +
+                COMPLEMENTODESCRICAO + " text, " +
                 ESTOQUEATUAL + " integer, " +
                 VALORUNITARIO + " real, " +
                 VALORATACADO + " real, " +
@@ -262,7 +275,8 @@ public class CriaBanco extends SQLiteOpenHelper {
                 FILIAL + " text, " +
                 FGSELECIONADA + " text, " +
                 FGTROCAFILIAL + " text, " +
-                PRECOINDIVIDUALIZADO + " text DEFAULT 'N')";
+                FGCONTROLAESTOQUEPEDIDO + " text DEFAULT 'N', " +
+                FGPRECOINDIVIDUALIZADO + " text DEFAULT 'N')";
 
         db.execSQL(sql);
 

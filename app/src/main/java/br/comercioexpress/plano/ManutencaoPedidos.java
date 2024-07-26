@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -57,6 +59,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -1075,13 +1078,13 @@ public class ManutencaoPedidos extends AppCompatActivity {
         if(ctl_Clientes.fuSelecionarCliente()){
             if(cl_Clientes.getFgSincronizado().equals("N")){
                 SYNC_Clientes sync_Clientes = new SYNC_Clientes(getApplicationContext());
-                if(sync_Clientes.FU_SincronizarClientePedido(cl_Clientes)){
+                if(sync_Clientes.FU_SincronizarClientesPedidoAPI(cl_Clientes)){
                     cl_Pedidos.setCdCliente(cl_Clientes.getCdCliente());
                 }
             }
         }
 
-        if(sync_Pedidos.FU_EnviarPedido(cl_Pedidos)){
+        if(sync_Pedidos.FU_EnviarPedidoAPI(cl_Pedidos)){
             return true;
         }else{
             return false;
@@ -1089,6 +1092,128 @@ public class ManutencaoPedidos extends AppCompatActivity {
     }
 
     private void suCriarPDF() {
+
+        boolean vf_Gerou = true;
+        Document document = new Document();
+        String filename = "pedido_" + cl_Pedidos.getNumPedido() + ".pdf";
+
+        try {
+            document = new Document(PageSize.A4);
+
+            // Use MediaStore to save the PDF
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS + "/PedidosPDF");
+
+            Uri uri = getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
+
+            if (uri == null) {
+                throw new IOException("Failed to create new MediaStore record.");
+            }
+
+            OutputStream outputStream = getContentResolver().openOutputStream(uri);
+            if (outputStream == null) {
+                throw new IOException("Failed to get output stream.");
+            }
+
+            PdfWriter.getInstance(document, outputStream);
+            document.open();
+
+            // Adicione seu conteúdo ao documento
+            Paragraph preface = new Paragraph();
+            addEmptyLine(preface, 1);
+            Paragraph pa_Titulo = new Paragraph();
+            pa_Titulo.setAlignment(Element.ALIGN_CENTER);
+            pa_Titulo.setFont(catFont);
+            pa_Titulo.add("PEDIDO Nº" + cl_Pedidos.getNumPedido());
+            preface.add(pa_Titulo);
+
+            addEmptyLine(preface, 2);
+            preface.setFont(normalFont);
+            preface.add("Data de emissão: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getDtEmissao());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Cliente: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getNomeRzSocial());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Quantidade de produtos: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getQtdeItens());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Valor dos produtos: ");
+            preface.setFont(subFont);
+            preface.add("R$" + String.format("%.2f", Double.parseDouble(cl_Pedidos.getVlTotalItens())));
+            addEmptyLine(preface, 1);
+
+            CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
+            cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
+
+            CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(getApplicationContext(), cl_ItemPedido);
+
+            if (ctl_ItemPedido.fuCarregaTodosItensPedido()) {
+                addEmptyLine(preface, 1);
+                preface.setFont(subFont);
+                preface.add("PRODUTOS DO PEDIDO:");
+                addEmptyLine(preface, 2);
+
+                createTable(preface, ctl_ItemPedido.rs_ItemPedido);
+                addEmptyLine(preface, 2);
+            }
+
+            preface.setFont(normalFont);
+            preface.add("Valor do desconto: ");
+            preface.setFont(subFont);
+            preface.add("R$" + cl_Pedidos.getVlDesconto());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Valor do frete: ");
+            preface.setFont(subFont);
+            preface.add("R$" + String.format("%.2f", Double.parseDouble(cl_Pedidos.getVlFrete())));
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Condição do pagamento: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getCondPgto());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Observação do pedido: ");
+            preface.setFont(subFont);
+            preface.add(cl_Pedidos.getObsPedido());
+            addEmptyLine(preface, 1);
+            preface.setFont(normalFont);
+            preface.add("Valor total do pedido: ");
+            preface.setFont(subFont);
+            preface.add("R$" + cl_Pedidos.getVlTotal().replace(".", ","));
+
+            document.add(preface);
+
+            document.close();
+            outputStream.close();
+            vf_Gerou = true;
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "PDF do pedido gerado com sucesso na pasta " + Environment.DIRECTORY_DOCUMENTS + "/PedidosPDF");
+
+            // Share the PDF
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("application/pdf");
+            sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            startActivity(Intent.createChooser(sharingIntent, "Share PDF using"));
+
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+            vf_Gerou = false;
+            MensagemUtil.addMsg(ManutencaoPedidos.this, "Não foi possível gerar o PDF");
+        }
+    }
+
+    //Função antiga do su_CriaPDF
+/*
+    private void suCriarPDF_OLD() {
 
         boolean vf_Gerou = true;
         Document document = new Document();
@@ -1101,10 +1226,10 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             document = new Document(PageSize.A4);
 
-            /*
-            Comando para buscar no armazenamento interno:
-            String outDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PDFs/" ;
-             */
+
+            //Comando para buscar no armazenamento interno:
+            //String outDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PDFs/" ;
+
 
             pathFile = Environment.getExternalStorageDirectory() + "/PedidosPDF/";
 
@@ -1130,25 +1255,6 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             PdfWriter.getInstance(document, fOut);
             document.open();
-
-            /*try {
-                Drawable d = getResources().getDrawable(R.,.drawable.logo_expres_mobile);
-                BitmapDrawable bitDw = ((BitmapDrawable) d);
-                Bitmap bmp = bitDw.getBitmap();
-                Bitmap resized = Bitmap.createScaledBitmap(bmp, (int)(bmp.getWidth()*0.25), (int)(bmp.getHeight()*0.25), true);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                resized.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                //bmp.setWidth(200);
-                //bmp.setHeight(50);
-                Image image = Image.getInstance(stream.toByteArray());
-
-                document.add(image);
-
-            }
-            catch(IOException ex)
-            {
-
-            }*/
 
             Paragraph preface = new Paragraph();
             // We add one empty line
@@ -1232,19 +1338,6 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
             //createTable(preface);
 
-
-
-           /* preface.add(new Paragraph("Report generated by: " + System.getProperty("user.name") + ", " + new Date(), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    smallBold));
-            preface.add(new Paragraph("This document describes something which is very important ",
-                    smallBold));
-
-            addEmptyLine(preface, 8);
-
-            preface.add(new Paragraph("This document is a preliminary version and not subject to your license agreement or any other agreement with vogella.com ;-).",
-                    redFont));*/
-
-
             document.add(preface);
 
 
@@ -1278,7 +1371,8 @@ public class ManutencaoPedidos extends AppCompatActivity {
             try {
 
                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-                sharingIntent.setType("*/*");
+                //REMOVER ESSE ESPAÇO ENTRE A BARRA E OS *
+                sharingIntent.setType("* / *");
                 sharingIntent.putExtra(Intent.EXTRA_STREAM, uri_Arquivo);
                 startActivity(Intent.createChooser(sharingIntent, "Share image using"));
 
@@ -1289,7 +1383,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
         }
 
     }
-
+*/
     private static void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Paragraph(" "));

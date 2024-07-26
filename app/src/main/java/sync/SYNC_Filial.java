@@ -3,6 +3,14 @@ package sync;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -37,8 +45,12 @@ import br.comercioexpress.plano.BancoController;
 import br.comercioexpress.plano.Funcoes;
 import br.comercioexpress.plano.MySSLSocketFactory;
 import classes.CL_Filial;
+import classes.CL_FilialAPI;
+import classes.CL_Produtos;
+import classes.CL_ProdutosAPI;
 import classes.CL_Usuario;
 import controllers.CTL_Filial;
+import controllers.CTL_Produtos;
 import controllers.CTL_Usuario;
 import models.MDL_Filial;
 
@@ -59,6 +71,8 @@ public class SYNC_Filial {
 
     int TIMEOUT_MILLISEC = 10000;
 
+    String bodyString = "";
+
     public SYNC_Filial(Context context){
         this.vc_Context = context;
         this.mdl_Filial = new MDL_Filial(context);
@@ -66,9 +80,100 @@ public class SYNC_Filial {
 
         cl_Usuario= new CL_Usuario();
         ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
+        cl_Usuario = ctl_Usuario.fuSelecionarUsuarioAPI();
+        bodyString = ctl_Usuario.buildRequestBodyString(cl_Usuario);
 
     }
 
+    public boolean FU_SincronizarFilialAPI(){
+        try {
+
+            OkHttpClient client = new OkHttpClient();
+
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody bodyUsuario = RequestBody.create(mediaType, bodyString);
+
+            Request request = new Request.Builder()
+                    .url("http://35.247.249.209:70/SelecionarFilialExpress")
+                    .method("POST", bodyUsuario)
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            int vf_Response = response.code();
+
+            if(vf_Response == 200){
+                String jsonResponse = response.body().string();
+
+                if(!mdl_Filial.fuDeletarFilial()){
+                    return false;
+                }
+
+                // Parsing JSON to Java object using Gson
+                Gson gson = new Gson();
+                List<CL_FilialAPI> filiais = gson.fromJson(jsonResponse, new TypeToken<List<CL_FilialAPI>>(){}.getType());
+                // Agora você pode adicionar os novos tipos de cliente ao seu banco de dados ou lista
+                for (CL_FilialAPI filial : filiais) {
+
+                    if (!filial.getNmFilial().equals("null") && !filial.getNmFilial().trim().equals("")) {
+                        if(!mdl_Filial.fuInserirFilial(String.valueOf(filial.getCdFilial()), filial.getNmFilial(), "N", "N")){
+                            return false;
+                        }
+                    }else{
+                        return false;
+                    }
+                }
+            }else{
+                return false;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public boolean FU_SincronizarAutorizacaoUsuarioAPI(){
+
+        try {
+
+            OkHttpClient client = new OkHttpClient();
+
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody bodyUsuario = RequestBody.create(mediaType, bodyString);
+
+            Request request = new Request.Builder()
+                    .url("http://35.247.249.209:70/VerificarAutorizacao/PAR/CBFILIAL")
+                    .method("POST", bodyUsuario)
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            int vf_Response = response.code();
+
+            if(vf_Response == 200){
+                String jsonResponse = response.body().string();
+
+                if (!jsonResponse.equals("null") && !jsonResponse.equals("") && jsonResponse.equals("true")) {
+                    if (!mdl_Filial.fuAtualizarAutorizaTrocaFilial("S")) {
+                        return false;
+                    }
+                }
+
+            }else{
+                return false;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+    //Funções antigas do WebService em PHP
     public boolean FU_SincronizarFilial(){
 
         try {
@@ -149,7 +254,6 @@ public class SYNC_Filial {
         }
         return true;
     }
-
     public boolean FU_SincronizarAutorizacaoUsuario(){
 
         try {

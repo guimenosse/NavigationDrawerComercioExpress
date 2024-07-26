@@ -4,6 +4,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -38,6 +45,7 @@ import br.comercioexpress.plano.Funcoes;
 import br.comercioexpress.plano.MySSLSocketFactory;
 import classes.CL_Filial;
 import classes.CL_Usuario;
+import classes.CL_UsuarioAPI;
 import controllers.CTL_Filial;
 import controllers.CTL_Usuario;
 import models.CriaBanco;
@@ -61,12 +69,15 @@ public class SYNC_Usuario {
 
     int TIMEOUT_MILLISEC = 10000;
 
+
+
     public SYNC_Usuario(Context context){
         this.vc_Context = context;
         this.mdl_Usuario = new MDL_Usuario(context);
         this.funcoes = new Funcoes();
 
         cl_Usuario= new CL_Usuario();
+
         //ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
 
         cl_Filial = new CL_Filial();
@@ -74,6 +85,70 @@ public class SYNC_Usuario {
         ctl_Filial.fuBuscaCdFilialSelecionada();
     }
 
+    public boolean FU_BuscaUsuarioCadastradoAPI(String usuario, String senha){
+        try {
+
+            OkHttpClient client = new OkHttpClient();
+
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody body = RequestBody.create(mediaType, "");
+            Request request = new Request.Builder()
+                    .url("http://35.247.249.209:70/SelecionarBancoCliente/" + usuario + "/" + senha)
+                    .method("GET", null)
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+
+            if(response.code() == 200) {
+
+                String jsonResponse = response.body().string();
+                //System.out.println("Response JSON: " + jsonResponse);
+
+                // Parsing JSON to Java object using Gson
+                Gson gson = new Gson();
+                CL_UsuarioAPI classTestUsuario = gson.fromJson(jsonResponse, CL_UsuarioAPI.class);
+
+                // Displaying the parsed data
+                int vf_CdUsuario = classTestUsuario.cdUsuario;
+                String vf_Usuario = classTestUsuario.usuario;
+                String vf_Senha = classTestUsuario.senha;
+                int vf_CdCliente = classTestUsuario.cdCliente;
+                String vf_FgBI = classTestUsuario.fgBI;
+                String vf_FgMaster = classTestUsuario.fgMaster;
+                String vf_NmUsuarioSistema = classTestUsuario.nmUsuarioSistema;
+                String vf_Ip = classTestUsuario.ip;
+                String vf_UsuarioSQL = classTestUsuario.usuarioSQL;
+                String vf_SenhaSQL = classTestUsuario.senhaSQL;
+                String vf_NmBanco = classTestUsuario.nmBanco;
+                int vf_CdVendedorDefault = classTestUsuario.cdVendedorDefault;
+
+                cl_Usuario.setCdUsuario(String.valueOf(vf_CdUsuario));
+                cl_Usuario.setUsuario(vf_Usuario);
+                cl_Usuario.setSenha(vf_Senha);
+                cl_Usuario.setCdClienteBanco(String.valueOf(vf_CdCliente));
+                cl_Usuario.setNmUsuarioSistema(vf_NmUsuarioSistema);
+                cl_Usuario.setIp(vf_Ip);
+                cl_Usuario.setUsuarioSQL(vf_UsuarioSQL);
+                cl_Usuario.setSenhaSQL(vf_SenhaSQL);
+                cl_Usuario.setNmBanco(vf_NmBanco);
+                cl_Usuario.setCdVendedorDefault(String.valueOf(vf_CdVendedorDefault));
+
+                if (mdl_Usuario.fuSalvarUsuarioAPI(cl_Usuario)) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    //Funções antigas do WebService em PHP
     public boolean FU_ValidaLogin(String usuario, String senha){
 
         try {

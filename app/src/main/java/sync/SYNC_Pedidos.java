@@ -5,6 +5,12 @@ import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import classes.CL_Produtos;
 import classes.CL_Usuario;
 import controllers.CTL_Produtos;
@@ -74,6 +80,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
 
     int TIMEOUT_MILLISEC = 10000;
 
+    String bodyStringUsuario = "";
 
     public SYNC_Pedidos(Context context){
 
@@ -81,14 +88,596 @@ public class SYNC_Pedidos extends AppCompatActivity {
         this.mdl_Pedidos = new MDL_Pedidos(context);
         this.funcoes = new Funcoes();
 
-        cl_Usuario = new CL_Usuario();
+        cl_Usuario= new CL_Usuario();
         ctl_Usuario = new CTL_Usuario(vc_Context, cl_Usuario);
+
+        cl_Usuario = ctl_Usuario.fuSelecionarUsuarioAPI();
+        bodyStringUsuario = ctl_Usuario.buildRequestBodyString(cl_Usuario);
 
         cl_Filial = new CL_Filial();
         CTL_Filial ctl_Filial = new CTL_Filial(context, cl_Filial);
         ctl_Filial.fuBuscaCdFilialSelecionada();
     }
 
+    public String buildRequestBodyPedidoString(CL_Pedidos cl_Pedido) {
+        return "{"
+                + "\"cdFilial\": \"" + cl_Filial.getCdFilial() + "\"," // Ajuste conforme necessário
+                + "\"nrPedido\": \"" + cl_Pedido.getNumPedido() + "\","
+                + "\"vlTotal\": \"" + cl_Pedido.getVlTotal() + "\","
+                + "\"dtEmissao\": \"" + cl_Pedido.getDtEmissao() + "\","
+                + "\"cdVendedor\": \"" + cl_Pedido.getCdVendedor() + "\","
+                + "\"cdEmitente\": \"" + cl_Pedido.getCdCliente() + "\"," // Ajuste conforme necessário
+                + "\"rzSocial\": \"" + cl_Pedido.getNomeRzSocial() + "\","
+                + "\"cgc\": \"" + cl_Pedido.getCdCliente() + "\"," // Ajuste conforme necessário
+                + "\"percDesconto\": \"" + cl_Pedido.getPercDesconto() + "\","
+                + "\"vlDesconto\": \"" + cl_Pedido.getVlDesconto() + "\","
+                + "\"vlFrete\": \"" + cl_Pedido.getVlFrete() + "\","
+                + "\"observacao=\": \"" + cl_Pedido.getObsPedido() + "\","
+                + "\"ip\": \"" + cl_Usuario.getIp() + "\","
+                + "\"usuarioSQL\": \"" + cl_Usuario.getUsuarioSQL() + "\","
+                + "\"senhaSQL\": \"" + cl_Usuario.getSenhaSQL() + "\","
+                + "\"nmBanco\": \"" + cl_Usuario.getNmBanco() + "\""
+                + "}";
+    }
+
+    public String buildRequestBodyPedidoItemString(CL_ItemPedido cl_ItemPedido) {
+
+        String vf_CdRefEstoque = "";
+
+        //Mandar junto o CdRefEstoque do produto.
+        CL_Produtos cl_Produtos = new CL_Produtos();
+        cl_Produtos.setCdProduto(cl_ItemPedido.getCdProduto());
+
+        CTL_Produtos ctl_Produtos = new CTL_Produtos(vc_Context, cl_Produtos);
+
+        try{
+            vf_CdRefEstoque = ctl_Produtos.fuBuscarCdRefEstoque();
+        }catch (Exception e){
+            vf_CdRefEstoque = "";
+        }
+
+        return "{"
+                + "\"cdFilial\": \"" + cl_Filial.getCdFilial() + "\"," // Ajuste conforme necessário
+                + "\"nrPedido\": \"" + cl_ItemPedido.getNumPedido() + "\","
+                + "\"cdProduto\": \"" + cl_ItemPedido.getCdProduto() + "\","
+                + "\"id\": \"" + cl_ItemPedido.getId() + "\","
+                + "\"qtde\": \"" + cl_ItemPedido.getQtde() + "\","
+                + "\"vlUnitario\": \"" + cl_ItemPedido.getVlUnitario() + "\"," // Ajuste conforme necessário
+                + "\"vlTotal\": \"" + cl_ItemPedido.getVlTotal() + "\","
+                + "\"dtEmissao\": \"" + cl_Pedidos.getDtEmissao() + "\"," // Ajuste conforme necessário
+                + "\"descricao\": \"" + cl_ItemPedido.getPercDesconto() + "\","
+                + "\"cdRefEstoque\": \"" + vf_CdRefEstoque + "\","
+                + "\"unidade\": \"" + "" + "\","
+                + "\"vlDesconto=\": \"" + cl_ItemPedido.getVlDesconto() + "\","
+                + "\"percDesconto=\": \"" + cl_ItemPedido.getPercDesconto() + "\","
+                + "\"observacao=\": \"" + cl_ItemPedido.getObservacao() + "\","
+                + "\"ip\": \"" + cl_Usuario.getIp() + "\","
+                + "\"usuarioSQL\": \"" + cl_Usuario.getUsuarioSQL() + "\","
+                + "\"senhaSQL\": \"" + cl_Usuario.getSenhaSQL() + "\","
+                + "\"nmBanco\": \"" + cl_Usuario.getNmBanco() + "\""
+                + "}";
+    }
+
+    public boolean FU_EnviarTodosPedidosAPI(Cursor rs_Pedido){
+        try {
+            if (rs_Pedido != null) {
+                while (!rs_Pedido.isAfterLast()) {
+
+                    cl_Pedidos = new CL_Pedidos();
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.ID)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.ID)).trim().equals("")) {
+                            cl_Pedidos.setNumPedido(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.ID)));
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setNumPedido("0");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).equals("null")
+                                && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).trim().equals("")) {
+
+                            String vf_VlTotal = "";
+
+                            CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
+                            cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
+
+                            CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(vc_Context, cl_ItemPedido);
+
+                            double vf_VlTotalDouble = 0;
+                            if (ctl_ItemPedido.fuCarregaTodosItensPedido()) {
+                                Cursor rs_ItemPedido = ctl_ItemPedido.rs_ItemPedido;
+                                while (!rs_ItemPedido.isAfterLast()) {
+                                    vf_VlTotalDouble = vf_VlTotalDouble + Double.parseDouble(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).replace(",", "."));
+                                    rs_ItemPedido.moveToNext();
+                                }
+                            }
+
+                            if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)).trim().equals("")) {
+                                vf_VlTotalDouble = vf_VlTotalDouble + Double.parseDouble(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)).replace(",", "."));
+                            }
+
+                            if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).trim().equals("")) {
+                                vf_VlTotalDouble = vf_VlTotalDouble - Double.parseDouble(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).replace(",", "."));
+                            }
+
+                            vf_VlTotal = String.format("%.2f", vf_VlTotalDouble);
+                            cl_Pedidos.setVlTotal(vf_VlTotal);
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setVlTotal("0");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)).trim().equals("")) {
+                            cl_Pedidos.setDtEmissao(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.DTEMISSAO)));
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setDtEmissao(funcoes.getDateTime());
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CDVENDEDOR)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CDVENDEDOR)).trim().equals("")) {
+                            cl_Pedidos.setCdVendedor(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CDVENDEDOR)));
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setCdVendedor("0");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)).trim().equals("")) {
+                            cl_Pedidos.setCdCliente(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CDEMITENTE)));
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setCdCliente("0");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)).trim().equals("")) {
+                            cl_Pedidos.setNomeRzSocial(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.RZSOCIAL)));
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setNomeRzSocial("");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).trim().equals("")) {
+                            cl_Pedidos.setPercDesconto(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)));
+                        } else {
+                            cl_Pedidos.setPercDesconto("0");
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setPercDesconto("0");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).trim().equals("")) {
+                            cl_Pedidos.setVlDesconto(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)));
+                        } else {
+                            cl_Pedidos.setVlDesconto("0");
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setVlDesconto("0");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)).trim().equals("")) {
+                            cl_Pedidos.setVlFrete(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.VLFRETE)));
+                        } else {
+                            cl_Pedidos.setVlFrete("0");
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setVlFrete("0");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CONDPGTO)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CONDPGTO)).trim().equals("")) {
+                            cl_Pedidos.setCondPgto(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.CONDPGTO)));
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setCondPgto("DINHEIRO");
+                    }
+
+                    try {
+                        if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.OBS)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.OBS)).trim().equals("")) {
+                            cl_Pedidos.setObsPedido(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.OBS)));
+                        } else {
+                            cl_Pedidos.setObsPedido("espaco");
+                        }
+                    } catch (Exception e) {
+                        cl_Pedidos.setObsPedido("espaco");
+                    }
+
+                    cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido() + "  CONDIÇÃO DE PAGAMENTO INFORMADA: " + cl_Pedidos.getCondPgto() + "");
+                    cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido());
+
+                    try {
+                        CL_Clientes cl_Cliente = new CL_Clientes();
+                        cl_Cliente.setCdCliente(cl_Pedidos.getCdCliente());
+
+                        CTL_Clientes ctl_Cliente = new CTL_Clientes(this.vc_Context, cl_Cliente);
+
+                        if (ctl_Cliente.fuSelecionarClienteSincronizacao("cdCliente")) {
+                            if (cl_Cliente.getFgSincronizado().equals("N")) {
+                                SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
+                                if (sync_Clientes.FU_SincronizarClientesPedidoAPI(cl_Cliente)) {
+                                    cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
+                                } else {
+                                    mensagem = sync_Clientes.mensagem;
+                                    return false;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        try {
+                            CL_Clientes cl_Cliente = new CL_Clientes();
+                            cl_Cliente.setCdCliente(cl_Pedidos.getCdCliente());
+
+                            CTL_Clientes ctl_Cliente = new CTL_Clientes(this.vc_Context, cl_Cliente);
+
+                            if (ctl_Cliente.fuSelecionarClienteSincronizacao("cpfCnpj")) {
+                                if (cl_Cliente.getFgSincronizado().equals("N")) {
+                                    SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
+                                    if (sync_Clientes.FU_SincronizarClientesPedidoAPI(cl_Cliente)) {
+                                        cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
+                                    } else {
+                                        mensagem = sync_Clientes.mensagem;
+                                        return false;
+                                    }
+                                }
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+
+
+                    String bodyStringPedido = buildRequestBodyPedidoString(cl_Pedidos);
+
+                    try {
+
+                        OkHttpClient client = new OkHttpClient();
+
+                        //MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+                        MediaType mediaType = MediaType.parse("application/json");
+                        RequestBody bodyPedido = RequestBody.create(mediaType, bodyStringPedido);
+
+                        String urlAPI = "http://35.247.249.209:70/InserirPedidoExpress/";
+                        Request request = new Request.Builder()
+                                .url(urlAPI)
+                                .method("POST", bodyPedido)
+                                .addHeader("Content-Type", "application/json")
+                                .build();
+                        Response response = client.newCall(request).execute();
+
+                        int vf_Response = response.code();
+
+                        if (vf_Response == 200) {
+                            String jsonResponse = response.body().string();
+                            String vf_NumPedidoServidor = jsonResponse;
+                            int indexPonto = vf_NumPedidoServidor.indexOf(".");
+                            String vf_NumPedidoServidorInt = "";
+                            if (indexPonto == -1) {
+                                vf_NumPedidoServidorInt = vf_NumPedidoServidor;
+                            } else {
+                                vf_NumPedidoServidorInt = vf_NumPedidoServidor.substring(0, indexPonto).replace(".", "");
+                            }
+
+                            cl_Pedidos.setNumPedidoServidor(vf_NumPedidoServidorInt);
+                            ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
+
+                            ctl_Pedidos.fuAlterarNumPedidoServidor();
+
+                            if (FU_SincronizaItemPedidoAPI(vf_NumPedidoServidorInt)) {
+                                FU_AlteraSituacaoPedidoAPI(vf_NumPedidoServidorInt, cl_Filial.getCdFilial());
+
+                                cl_Pedidos.setFgSituacao("E");
+                                CTL_Pedidos vf_Ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
+                                vf_Ctl_Pedidos.fuAlterarSituacaoPedido();
+                            } else {
+                                return false;
+                            }
+
+                        } else {
+                            return false;
+                        }
+
+                    } catch (Exception e) {
+                        return false;
+                    }
+
+                    rs_Pedido.moveToNext();
+                }
+            }
+        } catch (Throwable t) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean FU_EnviarPedidoAPI(CL_Pedidos cl_Pedido){
+        try {
+            cl_Pedidos = cl_Pedido;
+
+            cl_Pedidos.setObsPedido("  CONDIÇÃO DE PAGAMENTO INFORMADA: " + cl_Pedidos.getCondPgto() + " " + cl_Pedidos.getObsPedido());
+            cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido());
+
+
+            String vf_CdCliente = cl_Pedidos.getCdCliente();
+            try {
+                int vf_IndexPontoCdCliente = cl_Pedido.getCdCliente().indexOf(".");
+                vf_CdCliente = vf_CdCliente.substring(0, vf_IndexPontoCdCliente).replace(".", "");
+                cl_Pedidos.setCdCliente(vf_CdCliente);
+            }catch (Exception e_Cliente){
+                cl_Pedidos.setCdCliente(vf_CdCliente);
+            }
+
+            String bodyStringPedido = buildRequestBodyPedidoString(cl_Pedidos);
+
+            try {
+
+                OkHttpClient client = new OkHttpClient();
+
+                //MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+                MediaType mediaType = MediaType.parse("application/json");
+                RequestBody bodyPedido = RequestBody.create(mediaType, bodyStringPedido);
+
+                String urlAPI = "http://35.247.249.209:70/InserirPedidoExpress/";
+                Request request = new Request.Builder()
+                        .url(urlAPI)
+                        .method("POST", bodyPedido)
+                        .addHeader("Content-Type", "application/json")
+                        .build();
+                Response response = client.newCall(request).execute();
+
+                int vf_Response = response.code();
+
+                if(vf_Response == 200){
+                    String jsonResponse = response.body().string();
+                    String vf_NumPedidoServidor = jsonResponse;
+                    int indexPonto = vf_NumPedidoServidor.indexOf(".");
+                    String vf_NumPedidoServidorInt = "";
+                    if(indexPonto == -1){
+                        vf_NumPedidoServidorInt = vf_NumPedidoServidor;
+                    }else{
+                        vf_NumPedidoServidorInt = vf_NumPedidoServidor.substring(0, indexPonto).replace(".", "");
+                    }
+
+                    cl_Pedidos.setNumPedidoServidor(vf_NumPedidoServidorInt);
+                    ctl_Pedidos = new CTL_Pedidos(vc_Context, cl_Pedidos);
+
+                    ctl_Pedidos.fuAlterarNumPedidoServidor();
+
+                    if (FU_SincronizaItemPedidoAPI(vf_NumPedidoServidorInt)) {
+                        FU_AlteraSituacaoPedidoAPI(vf_NumPedidoServidorInt, cl_Filial.getCdFilial());
+                    } else {
+                        return false;
+                    }
+
+                }else{
+                    return false;
+                }
+
+            }catch (Exception e){
+                return false;
+            }
+
+        } catch (Throwable t) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean FU_SincronizaItemPedidoAPI(String numPedidoServidor) {
+        try {
+
+            //cl_Pedidos.getNumPedido();
+            CL_ItemPedido cl_ItemPedido = new CL_ItemPedido();
+            cl_ItemPedido.setNumPedido(cl_Pedidos.getNumPedido());
+
+            CTL_ItemPedido ctl_ItemPedido = new CTL_ItemPedido(vc_Context, cl_ItemPedido);
+
+            int id = 0;
+
+            if (ctl_ItemPedido.fuCarregaTodosItensPedido()) {
+
+                Cursor rs_ItemPedido = ctl_ItemPedido.rs_ItemPedido;
+
+                while (!rs_ItemPedido.isAfterLast()) {
+
+                    cl_ItemPedido = new CL_ItemPedido();
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.ID)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.ID)).trim().equals("")) {
+                            cl_ItemPedido.setId(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.ID)).replace("", ""));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setId("0");
+                    }
+
+                    id += 1;
+                    cl_ItemPedido.setId(String.valueOf(id));
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDO)).trim().equals("")) {
+                            cl_ItemPedido.setNumPedido(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.NUMPEDIDO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setNumPedido("0");
+                    }
+
+                    cl_ItemPedido.setNumPedido(numPedidoServidor);
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)).trim().equals("")) {
+                            cl_ItemPedido.setCdProduto(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setCdProduto("0");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)).trim().equals("")) {
+                            cl_ItemPedido.setDescricao(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.DESCRICAO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setDescricao("");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)).trim().equals("")) {
+                            cl_ItemPedido.setQtde(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.QTDE)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setQtde("0");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)).trim().equals("")) {
+                            cl_ItemPedido.setPercDesconto(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.PERCDESCONTO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setPercDesconto("0");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLMAXDESCPERMITIDO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLMAXDESCPERMITIDO)).trim().equals("")) {
+                            cl_ItemPedido.setVlMaxDescPermitido(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLMAXDESCPERMITIDO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setVlMaxDescPermitido("0");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)).trim().equals("")) {
+                            cl_ItemPedido.setVlDesconto(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLDESCONTO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setVlDesconto("0");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLUNITARIO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLUNITARIO)).trim().equals("")) {
+                            cl_ItemPedido.setVlUnitario(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLUNITARIO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setVlUnitario("0");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLLIQUIDO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLLIQUIDO)).trim().equals("")) {
+                            cl_ItemPedido.setVlLiquido(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLLIQUIDO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setVlLiquido("0");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)).trim().equals("")) {
+                            cl_ItemPedido.setVlTotal(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.VLTOTAL)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setVlTotal("0");
+                    }
+
+                    try {
+                        if (!rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).equals("null") && !rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)).trim().equals("")) {
+                            cl_ItemPedido.setObservacao(rs_ItemPedido.getString(rs_ItemPedido.getColumnIndexOrThrow(CriaBanco.OBSERVACAOITEMPEDIDO)));
+                        }
+                    } catch (Exception e) {
+                        cl_ItemPedido.setObservacao("");
+                    }
+
+                    String vf_CdRefEstoque = "";
+
+                    //Mandar junto o CdRefEstoque do produto.
+                    CL_Produtos cl_Produtos = new CL_Produtos();
+                    cl_Produtos.setCdProduto(cl_ItemPedido.getCdProduto());
+
+                    CTL_Produtos ctl_Produtos = new CTL_Produtos(vc_Context, cl_Produtos);
+
+                    try {
+                        vf_CdRefEstoque = ctl_Produtos.fuBuscarCdRefEstoque();
+                    } catch (Exception e) {
+                        vf_CdRefEstoque = "";
+                    }
+
+                    String bodyStringItemPedido = buildRequestBodyPedidoItemString(cl_ItemPedido);
+
+                    try {
+
+                        OkHttpClient client = new OkHttpClient();
+
+                        //MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+                        MediaType mediaType = MediaType.parse("application/json");
+                        RequestBody bodyItemPedido = RequestBody.create(mediaType, bodyStringItemPedido);
+
+                        String urlAPI = "http://35.247.249.209:70/InserirPedidoItemExpress/";
+                        Request request = new Request.Builder()
+                                .url(urlAPI)
+                                .method("POST", bodyItemPedido)
+                                .addHeader("Content-Type", "application/json")
+                                .build();
+                        Response response = client.newCall(request).execute();
+
+                        int vf_Response = response.code();
+
+                        if (vf_Response == 200) {
+
+                        } else {
+                            return false;
+                        }
+
+                    } catch (Exception e) {
+                        return false;
+                    }
+
+                    rs_ItemPedido.moveToNext();
+
+                }
+            }
+
+        } catch (Throwable t) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean FU_AlteraSituacaoPedidoAPI(String numPedido, String cdFilial){
+        try {
+
+            OkHttpClient client = new OkHttpClient();
+
+            //MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody bodyUsuario = RequestBody.create(mediaType, bodyStringUsuario);
+
+            String urlAPI = "http://35.247.249.209:70/AlterarSituacaoPedido/" + cdFilial + "/" + numPedido;
+            Request request = new Request.Builder()
+                    .url(urlAPI)
+                    .method("POST", bodyUsuario)
+                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            Response response = client.newCall(request).execute();
+
+            int vf_Response = response.code();
+
+            if (vf_Response == 200) {
+
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    //Funções antigas do WebService em PHP
     public boolean FU_EnviarPedido(CL_Pedidos cl_Pedido){
 
         try {
@@ -347,7 +936,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                     if(ctl_Cliente.fuSelecionarClienteSincronizacao("cdCliente")){
                         if (cl_Cliente.getFgSincronizado().equals("N")) {
                             SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
-                            if(sync_Clientes.FU_SincronizarClientePedido(cl_Cliente)){
+                            if(sync_Clientes.FU_SincronizarClientesPedidoAPI(cl_Cliente)){
                                 cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
                             }else{
                                 mensagem = sync_Clientes.mensagem;
@@ -365,7 +954,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                         if(ctl_Cliente.fuSelecionarClienteSincronizacao("cpfCnpj")) {
                             if (cl_Cliente.getFgSincronizado().equals("N")) {
                                 SYNC_Clientes sync_Clientes = new SYNC_Clientes(vc_Context);
-                                if(sync_Clientes.FU_SincronizarClientePedido(cl_Cliente)){
+                                if(sync_Clientes.FU_SincronizarClientesPedidoAPI(cl_Cliente)){
                                     cl_Pedidos.setCdCliente(cl_Cliente.getCdCliente());
                                 }else{
                                     mensagem = sync_Clientes.mensagem;

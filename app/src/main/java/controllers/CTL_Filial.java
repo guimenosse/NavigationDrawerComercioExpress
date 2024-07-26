@@ -177,7 +177,7 @@ public class CTL_Filial {
                 if (rs_Filial.getCount() > 0) {
                     rs_Filial.moveToFirst();
                     while (!rs_Filial.isAfterLast()) {
-                        cl_Filial.setPrecoIndividualizado(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.PRECOINDIVIDUALIZADO)));
+                        cl_Filial.setPrecoIndividualizado(rs_Filial.getString(rs_Filial.getColumnIndex(CriaBanco.FGPRECOINDIVIDUALIZADO)));
                         rs_Filial.moveToNext();
                     }
                 } else {

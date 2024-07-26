@@ -350,7 +350,8 @@ public class Opcoes extends AppCompatActivity
         CTL_Clientes ctl_Clientes = new CTL_Clientes(vc_Context, cl_Clientes);
 
         if(ctl_Clientes.fuSelecionarClientesNaoSincronizados()){
-            if(!sync_Clientes.FU_SincronizarClientes(ctl_Clientes.rs_Cliente)){
+            //if(!sync_Clientes.FU_SincronizarClientes(ctl_Clientes.rs_Cliente)){
+            if(!sync_Clientes.FU_SincronizarClientesAPI(ctl_Clientes.rs_Cliente)){
                 if(sync_Clientes.mensagem.equals("")){
                     mensagem = "";
                 }else{
@@ -360,30 +361,30 @@ public class Opcoes extends AppCompatActivity
             }
         }
 
-        if(!sync_Clientes.FU_SincronizarTodosClientesServidor()){
+        if(!sync_Clientes.FU_SincronizarTodosClientesAPI()){
             return false;
         }
 
-        if(!sync_Configuracao.FU_SincronizarFgControlaEstoquePedido()){
+        if(!sync_Configuracao.FU_SincronizarConfiguracoesAPI()){
             return false;
         }
 
-        if(!sync_Produtos.FU_SincronizarTodosProdutosServidor()){
+        if(!sync_Produtos.FU_SincronizarProdutosAPI()){
             return false;
         }
 
-        if(!sync_Clientes.FU_SincronizarConfiguracaoPrecoIndividualizado()){
+        /*if(!sync_Clientes.FU_SincronizarConfiguracaoPrecoIndividualizado()){
             return false;
-        }
+        }*/
 
 
         if(cl_Filial.getPrecoIndividualizado().equals("S")){
-            if(!sync_Produtos.FU_SincronizarPrecosIndividualizadosProdutos()){
+            if(!sync_Produtos.FU_SincronizarPrecosIndividualizadosProdutosAPI()){
                 return false;
             }
         }
 
-        if(!sync_Clientes.FU_SincronizarTipoCliente()){
+        if(!sync_Clientes.FU_SincronizarTiposClienteAPI()){
             return false;
         }
 
