@@ -17,10 +17,12 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -38,6 +40,7 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.itextpdf.text.BadElementException;
@@ -1212,8 +1215,8 @@ public class ManutencaoPedidos extends AppCompatActivity {
     }
 
     //Função antiga do su_CriaPDF
-/*
-    private void suCriarPDF_OLD() {
+
+    /*private void suCriarPDF() {
 
         boolean vf_Gerou = true;
         Document document = new Document();
@@ -1382,8 +1385,8 @@ public class ManutencaoPedidos extends AppCompatActivity {
 
         }
 
-    }
-*/
+    }*/
+
     private static void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Paragraph(" "));
@@ -1498,7 +1501,7 @@ public class ManutencaoPedidos extends AppCompatActivity {
                     public void onClick(DialogInterface arg0, int arg1) {
                         //fuVerificaPermissaoStorage();
                         ActivityCompat.requestPermissions(ManutencaoPedidos.this,
-                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.MANAGE_EXTERNAL_STORAGE},
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                                 1);
                     }
                 });
@@ -1546,4 +1549,6 @@ public class ManutencaoPedidos extends AppCompatActivity {
         }
     }
 
+
 }
+

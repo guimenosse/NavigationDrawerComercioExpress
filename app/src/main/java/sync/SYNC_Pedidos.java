@@ -112,7 +112,7 @@ public class SYNC_Pedidos extends AppCompatActivity {
                 + "\"percDesconto\": \"" + cl_Pedido.getPercDesconto() + "\","
                 + "\"vlDesconto\": \"" + cl_Pedido.getVlDesconto() + "\","
                 + "\"vlFrete\": \"" + cl_Pedido.getVlFrete() + "\","
-                + "\"observacao=\": \"" + cl_Pedido.getObsPedido() + "\","
+                + "\"observacao\": \"" + cl_Pedido.getObsPedido() + "\","
                 + "\"ip\": \"" + cl_Usuario.getIp() + "\","
                 + "\"usuarioSQL\": \"" + cl_Usuario.getUsuarioSQL() + "\","
                 + "\"senhaSQL\": \"" + cl_Usuario.getSenhaSQL() + "\","
@@ -148,9 +148,9 @@ public class SYNC_Pedidos extends AppCompatActivity {
                 + "\"descricao\": \"" + cl_ItemPedido.getPercDesconto() + "\","
                 + "\"cdRefEstoque\": \"" + vf_CdRefEstoque + "\","
                 + "\"unidade\": \"" + "" + "\","
-                + "\"vlDesconto=\": \"" + cl_ItemPedido.getVlDesconto() + "\","
-                + "\"percDesconto=\": \"" + cl_ItemPedido.getPercDesconto() + "\","
-                + "\"observacao=\": \"" + cl_ItemPedido.getObservacao() + "\","
+                + "\"vlDesconto\": \"" + cl_ItemPedido.getVlDesconto() + "\","
+                + "\"percDesconto\": \"" + cl_ItemPedido.getPercDesconto() + "\","
+                + "\"observacao\": \"" + cl_ItemPedido.getObservacao() + "\","
                 + "\"ip\": \"" + cl_Usuario.getIp() + "\","
                 + "\"usuarioSQL\": \"" + cl_Usuario.getUsuarioSQL() + "\","
                 + "\"senhaSQL\": \"" + cl_Usuario.getSenhaSQL() + "\","
@@ -282,14 +282,15 @@ public class SYNC_Pedidos extends AppCompatActivity {
                         if (!rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.OBS)).equals("null") && !rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.OBS)).trim().equals("")) {
                             cl_Pedidos.setObsPedido(rs_Pedido.getString(rs_Pedido.getColumnIndexOrThrow(CriaBanco.OBS)));
                         } else {
-                            cl_Pedidos.setObsPedido("espaco");
+                            cl_Pedidos.setObsPedido("");
                         }
                     } catch (Exception e) {
-                        cl_Pedidos.setObsPedido("espaco");
+                        cl_Pedidos.setObsPedido("");
                     }
 
-                    cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido() + "  CONDIÇÃO DE PAGAMENTO INFORMADA: " + cl_Pedidos.getCondPgto() + "");
-                    cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido());
+                    //cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido() + "  CONDIÇÃO DE PAGAMENTO INFORMADA: " + cl_Pedidos.getCondPgto() + "");
+                    cl_Pedidos.setObsPedido("  CONDIÇÃO DE PAGAMENTO INFORMADA: " + cl_Pedidos.getCondPgto() + " - " + cl_Pedidos.getObsPedido());
+                    //cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido());
 
                     try {
                         CL_Clientes cl_Cliente = new CL_Clientes();
@@ -329,6 +330,15 @@ public class SYNC_Pedidos extends AppCompatActivity {
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
+                    }
+
+                    String vf_CdCliente = cl_Pedidos.getCdCliente();
+                    try {
+                        int vf_IndexPontoCdCliente = cl_Pedidos.getCdCliente().indexOf(".");
+                        vf_CdCliente = vf_CdCliente.substring(0, vf_IndexPontoCdCliente).replace(".", "");
+                        cl_Pedidos.setCdCliente(vf_CdCliente);
+                    }catch (Exception e_Cliente){
+                        cl_Pedidos.setCdCliente(vf_CdCliente);
                     }
 
 
@@ -400,8 +410,8 @@ public class SYNC_Pedidos extends AppCompatActivity {
         try {
             cl_Pedidos = cl_Pedido;
 
-            cl_Pedidos.setObsPedido("  CONDIÇÃO DE PAGAMENTO INFORMADA: " + cl_Pedidos.getCondPgto() + " " + cl_Pedidos.getObsPedido());
-            cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido());
+            cl_Pedidos.setObsPedido("  CONDIÇÃO DE PAGAMENTO INFORMADA: " + cl_Pedidos.getCondPgto() + " - " + cl_Pedidos.getObsPedido());
+            //cl_Pedidos.setObsPedido(cl_Pedidos.getObsPedido());
 
 
             String vf_CdCliente = cl_Pedidos.getCdCliente();
