@@ -254,8 +254,15 @@ public class ManutencaoPedidos extends AppCompatActivity {
             suDuplicarPedido();
             return true;
         }else if(id == R.id.action_gerarpdf){
-
-            fuVerificaPermissaoStorage();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                // Versão do Android é menor que API nível 14 (Ice Cream Sandwich)
+                // Faça alguma coisa aqui, como chamar sua função específica
+                fuVerificaPermissaoStorage();
+            } else {
+                suCriarPDF();
+                // Versão do Android é maior ou igual a API nível 14
+                // Outra lógica, se necessário
+            }
 
             return true;
         }else if(id == R.id.action_excluirpedido){
