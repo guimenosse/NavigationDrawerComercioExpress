@@ -3,10 +3,14 @@ package br.comercioexpress.plano;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.core.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -17,8 +21,6 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +45,6 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
 
     //sv_ProdutosPedidos
 
-    MaterialSearchView sv_ProdutosPedidos;
-
-
     MenuItem me_BuscarProduto, me_Concluir;
 
     @Override
@@ -59,8 +58,8 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
         ctl_Configuracao = new CTL_Configuracao(getApplicationContext(), cl_Configuracao);
         ctl_Configuracao.fuCarregarFgControlaEstoquePedido();
 
-        sv_ProdutosPedidos = (MaterialSearchView) findViewById(R.id.sv_ProdutosPedidos);
-        sv_ProdutosPedidos.setVoiceSearch(true); //or false
+        //sv_ProdutosPedidos = (MaterialSearchView) findViewById(R.id.sv_ProdutosPedidos);
+        //sv_ProdutosPedidos.setVoiceSearch(true); //or false
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -192,7 +191,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
 
         final TextView lb_TituloProdutos = (TextView) findViewById(R.id.lb_TituloProdutosPedidos);
 
-                sv_ProdutosPedidos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+        /*sv_ProdutosPedidos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
                         return false;
@@ -316,7 +315,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
                 me_BuscarProduto.setVisible(true);
                 lb_TituloProdutos.setWidth(550);
             }
-        });
+        });*/
 
 
     }
@@ -327,7 +326,7 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.adicionarproduto, menu);
         MenuItem item = menu.findItem(R.id.buscar_produto);
 
-        sv_ProdutosPedidos.setMenuItem(item);
+        //sv_ProdutosPedidos.setMenuItem(item);
 
         me_BuscarProduto = menu.findItem(R.id.buscar_produto);
         return true;
@@ -359,14 +358,14 @@ public class AdicionarProdutosCustomizada extends AppCompatActivity {
 
                 return true;
 
-            case R.id.action_settings:
+            /*case R.id.action_settings:
                 Intent intent = new Intent();
                 intent.putExtra("numpedido", numpedido);
                 setResult(2, intent);
                 //intent.putExtra("codigo", codigo);
                 //startActivity(intent);
                 finish();
-                return true;
+                return true;*/
 
         }
 

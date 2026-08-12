@@ -7,12 +7,21 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.NavUtils;
+
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
@@ -20,8 +29,6 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +61,7 @@ public class Produtos extends AppCompatActivity
     ListView lista;
 
 
-    MaterialSearchView sv_Produtos;
+    //MaterialSearchView sv_Produtos;
 
     MenuItem me_BuscarProduto;
 
@@ -69,8 +76,8 @@ public class Produtos extends AppCompatActivity
         ctl_Configuracao = new CTL_Configuracao(getApplicationContext(), cl_Configuracao);
         ctl_Configuracao.fuCarregarFgControlaEstoquePedido();
 
-        sv_Produtos = (MaterialSearchView) findViewById(R.id.sv_Produtos);
-        sv_Produtos.setVoiceSearch(true); //or false
+        /*sv_Produtos = (MaterialSearchView) findViewById(R.id.sv_Produtos);
+        sv_Produtos.setVoiceSearch(true); //or false*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -135,33 +142,47 @@ public class Produtos extends AppCompatActivity
         List<String> valorProduto = new ArrayList<>();
         List<String> valorAtacado = new ArrayList<>();
 
+        String ultimoCdProduto = "";
+
         if (cursor != null) {
             while(!cursor.isAfterLast()) {
-                codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
-                String descricaoCompleta = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO));
-                if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)).trim().equals((""))){
-                    descricaoCompleta += " - " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO));
-                }
-                descricao.add(descricaoCompleta);
+                try{
+                    ultimoCdProduto = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO));
+                    if(ultimoCdProduto.equals(("82"))) {
+                        String testando = "";
+                    }
+                        codigo.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.CDPRODUTO)));
+                        String descricaoCompleta = cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.DESCRICAO));
+                        if(!cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO)).trim().equals((""))){
+                            descricaoCompleta += " - " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.COMPLEMENTODESCRICAO));
+                        }
+                        descricao.add(descricaoCompleta);
 
-                if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
-                    itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)) + " / Quantidade disponível: " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
-                }else{
-                    itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
-                }
-                VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
-                if(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)) != null) {
-                    VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
-                }
-                else {
-                    VA_ValorAtacado = "0";
+                        if(cl_Configuracao.getFgControlaEstoquePedido().equals("S")){
+                            itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)) + " / Quantidade disponível: " + cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.QTDEDISPONIVEL)));
+                        }else{
+                            itensRestantes.add(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.ESTOQUEATUAL)));
+                        }
+                        VA_ValorProduto = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORUNITARIO)).replace(",", ".")));
+                        if(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)) != null) {
+                            VA_ValorAtacado = String.format("%.2f", Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(CriaBanco.VALORATACADO)).replace(",", ".")));
+                        }
+                        else {
+                            VA_ValorAtacado = "0";
+                        }
+
+                        valorProduto.add(VA_ValorProduto);
+                        valorAtacado.add(VA_ValorAtacado);
+                        VA_ContProdutos = VA_ContProdutos + 1;
+
+
+
+                    cursor.moveToNext();
+                }catch (Exception e){
+                    String teste = e.getMessage();
+                    String teste2 = teste;
                 }
 
-                valorProduto.add(VA_ValorProduto);
-                valorAtacado.add(VA_ValorAtacado);
-                VA_ContProdutos = VA_ContProdutos + 1;
-
-                cursor.moveToNext();
             }
         }
 
@@ -357,7 +378,7 @@ public class Produtos extends AppCompatActivity
 
         final TextView lb_TituloProdutos = (TextView) findViewById(R.id.lb_TituloProdutos);
 
-        sv_Produtos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+        /*sv_Produtos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -497,7 +518,7 @@ public class Produtos extends AppCompatActivity
                 me_BuscarProduto.setVisible(true);
                 lb_TituloProdutos.setWidth(550);
             }
-        });
+        });*/
 
     }
 
@@ -518,7 +539,7 @@ public class Produtos extends AppCompatActivity
         getMenuInflater().inflate(R.menu.produtos, menu);
         MenuItem item = menu.findItem(R.id.buscar_produto);
 
-        sv_Produtos.setMenuItem(item);
+        //sv_Produtos.setMenuItem(item);
 
         me_BuscarProduto = menu.findItem(R.id.buscar_produto);
         return true;

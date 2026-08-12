@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:fitsSystemWindows="true"
-    tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.Produtos">
+    tools:context="br.comercioexpress.plano.Produtos">
 
-    <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout android:layout_height="wrap_content"
         android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -24,21 +24,12 @@
                 android:textColor="@color/corBranca"
                 android:textSize="20dp"/>
 
-            <com.miguelcatalan.materialsearchview.MaterialSearchView
-                android:id="@+id/sv_Produtos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Buscar pelo código ou descrição"
-                style="@style/MaterialSearchViewStyle"
-                >
 
-            </com.miguelcatalan.materialsearchview.MaterialSearchView>
+        </androidx.appcompat.widget.Toolbar>
 
-        </android.support.v7.widget.Toolbar>
-
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_produtos" />
 
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

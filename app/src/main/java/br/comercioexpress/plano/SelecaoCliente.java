@@ -3,8 +3,21 @@ package br.comercioexpress.plano;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.NavUtils;
+
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -18,8 +31,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +43,7 @@ public class SelecaoCliente extends AppCompatActivity {
     private ListView lista;
     private Toast toast;
 
-    MaterialSearchView sv_ClientesPedido;
+    //MaterialSearchView sv_ClientesPedido;
     MenuItem me_BuscarCliente, me_Cancelar;
 
     @Override
@@ -52,8 +63,8 @@ public class SelecaoCliente extends AppCompatActivity {
             Log.d("FGBLOQUEIO", "Coluna já incluida anteriormente");
         }
 
-        sv_ClientesPedido = (MaterialSearchView) findViewById(R.id.sv_ClientesPedidos);
-        sv_ClientesPedido.setVoiceSearch(true); //or false
+        /*sv_ClientesPedido = (MaterialSearchView) findViewById(R.id.sv_ClientesPedidos);
+        sv_ClientesPedido.setVoiceSearch(true); //or false*/
 
         carregaListaClientes("");
 
@@ -85,7 +96,7 @@ public class SelecaoCliente extends AppCompatActivity {
 
         final TextView lb_TituloClientesPedidos = (TextView) findViewById(R.id.lb_TituloClientesPedidos);
 
-        sv_ClientesPedido.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+        /*sv_ClientesPedido.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -117,7 +128,7 @@ public class SelecaoCliente extends AppCompatActivity {
                 me_BuscarCliente.setVisible(true);
                 lb_TituloClientesPedidos.setWidth(550);
             }
-        });
+        });*/
     }
 
     @Override
@@ -126,7 +137,7 @@ public class SelecaoCliente extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.selecaocliente, menu);
         MenuItem item = menu.findItem(R.id.buscar_clientepedido);
 
-        sv_ClientesPedido.setMenuItem(item);
+        //sv_ClientesPedido.setMenuItem(item);
 
         me_BuscarCliente = menu.findItem(R.id.buscar_clientepedido);
         return true;
@@ -150,13 +161,13 @@ public class SelecaoCliente extends AppCompatActivity {
 
             // Id correspondente ao botão Up/Home da actionbar
 
-            case R.id.action_settings:
+            /*case R.id.action_settings:
                 Intent intent = new Intent();
                 setResult(0, intent);
                 //intent.putExtra("codigo", codigo);
                 //startActivity(intent);
                 finish();
-                return true;
+                return true;*/
         }
 
         return super.onOptionsItemSelected(item);

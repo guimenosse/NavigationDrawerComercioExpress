@@ -10,7 +10,7 @@
     tools:showIn="@layout/app_bar_produtos"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.Produtos">
+    tools:context="br.comercioexpress.plano.Produtos">
 
     <EditText
         android:id="@+id/tb_buscarprodutoPedido"

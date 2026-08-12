@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_manutencao_pedidos"
-    tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos"
+    tools:context="br.comercioexpress.plano.ManutencaoPedidos"
     android:focusable="true"
     android:orientation="vertical"
     android:fillViewport="true"
@@ -54,7 +54,7 @@
                 app:layout_constraintTop_toTopOf="@+id/img_SelecionarCliente"
                 />
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_AddClienteVenda"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
                 app:layout_constraintTop_toTopOf="@+id/img_SelecionarProduto"
                 />
 
-            <android.support.design.widget.FloatingActionButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_AddProdutoVenda"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

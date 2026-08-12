@@ -4,17 +4,26 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.NavUtils;
+
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+
+import androidx.core.content.FileProvider;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
@@ -23,8 +32,6 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +63,7 @@ public class HomeActivity extends AppCompatActivity
 
     int countCli;
 
-    MaterialSearchView sv_Clientes;
+    //MaterialSearchView sv_Clientes;
 
     MenuItem me_BuscarCliente;
 
@@ -75,8 +82,8 @@ public class HomeActivity extends AppCompatActivity
             Log.d("FGBLOQUEIO", "Coluna já incluida anteriormente");
         }
 
-        sv_Clientes = (MaterialSearchView) findViewById(R.id.sv_Clientes);
-        sv_Clientes.setVoiceSearch(true); //or false
+        /*sv_Clientes = (MaterialSearchView) findViewById(R.id.sv_Clientes);
+        sv_Clientes.setVoiceSearch(true); //or false*/
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -131,7 +138,7 @@ public class HomeActivity extends AppCompatActivity
 
         final TextView lb_TituloClientes = (TextView) findViewById(R.id.lb_TituloClientes);
 
-        sv_Clientes.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+        /*sv_Clientes.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -163,7 +170,7 @@ public class HomeActivity extends AppCompatActivity
                 me_BuscarCliente.setVisible(true);
                 lb_TituloClientes.setWidth(550);
             }
-        });
+        });*/
 
     }
 
@@ -183,7 +190,7 @@ public class HomeActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.home, menu);
         MenuItem item = menu.findItem(R.id.buscar_cliente);
 
-        sv_Clientes.setMenuItem(item);
+        //sv_Clientes.setMenuItem(item);
 
         me_BuscarCliente = menu.findItem(R.id.buscar_cliente);
         return true;

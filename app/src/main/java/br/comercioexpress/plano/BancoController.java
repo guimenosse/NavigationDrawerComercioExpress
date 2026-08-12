@@ -629,7 +629,7 @@ public class BancoController {
         String[] campos = {banco.ID, banco.CDPRODUTO, banco.DESCRICAO, banco.COMPLEMENTODESCRICAO, banco.ESTOQUEATUAL, banco.QTDEDISPONIVEL, banco.VALORUNITARIO, banco.VALORATACADO};
         String orderBy = CriaBanco.DESCRICAO;
         db = banco.getReadableDatabase();
-        cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, null, null, null, null, orderBy, null);
+        cursor = db.query(CriaBanco.TABELAPRODUTOS, campos, null, null, null, null, orderBy, "14500");
 
         if(cursor != null){
             cursor.moveToFirst();

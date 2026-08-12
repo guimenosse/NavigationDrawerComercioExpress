@@ -8,7 +8,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_filial"
-    tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.Filial">
+    tools:context="br.comercioexpress.plano.Filial">
 
     <EditText
         android:id="@+id/tb_buscarfilial"

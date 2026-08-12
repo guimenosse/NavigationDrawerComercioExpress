@@ -10,15 +10,25 @@ import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.design.widget.FloatingActionButton;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.NavUtils;
+
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
+
 import android.util.Log;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
@@ -27,8 +37,6 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
@@ -108,7 +116,7 @@ public class Pedidos extends AppCompatActivity
 
     String codigo_lista, vc_Mensagem = "";
 
-    MaterialSearchView sv_Pedidos;
+    //MaterialSearchView sv_Pedidos;
 
     MenuItem me_ExcluirPedidos;
     MenuItem me_Sincronizar;
@@ -127,8 +135,8 @@ public class Pedidos extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        sv_Pedidos = (MaterialSearchView) findViewById(R.id.sv_Pedidos);
-        sv_Pedidos.setVoiceSearch(true); //or false
+        /*sv_Pedidos = (MaterialSearchView) findViewById(R.id.sv_Pedidos);
+        sv_Pedidos.setVoiceSearch(true); //or false*/
 
         sync_Pedidos = new SYNC_Pedidos(getApplicationContext());
         sync_Clientes = new SYNC_Clientes(getApplicationContext());
@@ -199,7 +207,7 @@ public class Pedidos extends AppCompatActivity
 
         final TextView lb_TituloPedidos = (TextView) findViewById(R.id.lb_TituloPedidos);
 
-        sv_Pedidos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+        /*sv_Pedidos.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -240,7 +248,7 @@ public class Pedidos extends AppCompatActivity
 
                 lb_TituloPedidos.setWidth(550);
             }
-        });
+        });*/
 
     }
 
@@ -363,7 +371,7 @@ public class Pedidos extends AppCompatActivity
         getMenuInflater().inflate(R.menu.pedidos, menu);
         MenuItem item = menu.findItem(R.id.buscar_pedido);
 
-        sv_Pedidos.setMenuItem(item);
+        //sv_Pedidos.setMenuItem(item);
 
         me_ExcluirPedidos = menu.findItem(R.id.action_excluirtodospedidos);
         me_Sincronizar = menu.findItem(R.id.sincronizar_pedidos);

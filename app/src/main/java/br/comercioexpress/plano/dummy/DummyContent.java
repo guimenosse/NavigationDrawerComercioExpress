@@ -1,4 +1,4 @@
-package com.example.desenvolvimento.navigationdrawercomercioexpress.dummy;
+package br.comercioexpress.plano.dummy;
 
 import java.util.ArrayList;
 import java.util.HashMap;

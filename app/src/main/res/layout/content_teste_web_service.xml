@@ -8,7 +8,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_teste_web_service"
-    tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.TesteWebService">
+    tools:context="br.comercioexpress.plano.TesteWebService">
 
     <Button
         android:layout_width="wrap_content"

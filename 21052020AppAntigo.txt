@@ -220,7 +220,7 @@ index 9c0c1e8..63e03db 100755
 @@ -2,7 +2,6 @@
  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
      xmlns:tools="http://schemas.android.com/tools"
-     package="com.example.desenvolvimento.navigationdrawercomercioexpress">
+     package="br.comercioexpress.plano">
 -
      <!-- To auto-complete the email text field in the login form with the user's emails -->
      <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -284,7 +284,7 @@ index 9c0c1e8..63e03db 100755
 +            android:theme="@style/AppTheme.NoActionBar">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.HomeActivity" />
+                 android:value="br.comercioexpress.plano.HomeActivity" />
 @@ -66,17 +64,15 @@
          <activity
              android:name=".Produtos"
@@ -300,9 +300,9 @@ index 9c0c1e8..63e03db 100755
 +            android:theme="@style/AppTheme.NoActionBar">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
--                android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.Produtos"
+-                android:value="br.comercioexpress.plano.Produtos"
 -                />
-+                android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.Produtos" />
++                android:value="br.comercioexpress.plano.Produtos" />
          </activity>
          <activity
              android:name=".ManutencaoPedidos"
@@ -314,7 +314,7 @@ index 9c0c1e8..63e03db 100755
 +            android:windowSoftInputMode="stateHidden">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.Pedidos" />
+                 android:value="br.comercioexpress.plano.Pedidos" />
 @@ -94,7 +90,7 @@
              android:name=".SelecaoCliente"
              android:label="@string/title_activity_selecao_cliente"
@@ -323,7 +323,7 @@ index 9c0c1e8..63e03db 100755
 +            android:theme="@style/AppTheme.NoActionBar">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos" />
+                 android:value="br.comercioexpress.plano.ManutencaoPedidos" />
 @@ -103,7 +99,7 @@
              android:name=".AdicionarProdutos"
              android:label="@string/title_activity_adicionar_produtos"
@@ -332,7 +332,7 @@ index 9c0c1e8..63e03db 100755
 +            android:theme="@style/AppTheme.NoActionBar">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos" />
+                 android:value="br.comercioexpress.plano.ManutencaoPedidos" />
 @@ -112,7 +108,7 @@
              android:name=".ListaCustomizadaProdutos"
              android:label="SelecionarProdutos"
@@ -341,7 +341,7 @@ index 9c0c1e8..63e03db 100755
 +            android:theme="@style/AppTheme.NoActionBar">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos" />
+                 android:value="br.comercioexpress.plano.ManutencaoPedidos" />
 @@ -121,7 +117,7 @@
              android:name=".AdicionarProdutosCustomizada"
              android:label="@string/title_activity_adicionar_produtos_customizada"
@@ -350,7 +350,7 @@ index 9c0c1e8..63e03db 100755
 +            android:theme="@style/AppTheme.NoActionBar">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos" />
+                 android:value="br.comercioexpress.plano.ManutencaoPedidos" />
 @@ -130,7 +126,7 @@
              android:name=".ManutencaoProdutoPedido"
              android:label="@string/title_activity_manutencao_produto_pedido"
@@ -359,7 +359,7 @@ index 9c0c1e8..63e03db 100755
 +            android:theme="@style/AppTheme.NoActionBar">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.AdicionarProdutosCustomizada" />
+                 android:value="br.comercioexpress.plano.AdicionarProdutosCustomizada" />
 @@ -139,11 +135,11 @@
              android:name=".Filial"
              android:label="@string/title_activity_filial"
@@ -368,7 +368,7 @@ index 9c0c1e8..63e03db 100755
 +            android:theme="@style/AppTheme.NoActionBar">
              <meta-data
                  android:name="android.support.PARENT_ACTIVITY"
-                 android:value="com.example.desenvolvimento.navigationdrawercomercioexpress.Opcoes" />
+                 android:value="br.comercioexpress.plano.Opcoes" />
          </activity>
      </application>
  
@@ -1363,7 +1363,7 @@ index 1cb9cea..9ab9580 100755
 +++ b/app/src/main/java/com/example/desenvolvimento/navigationdrawercomercioexpress/CadastroClientes.java
 @@ -10,6 +10,8 @@ import android.support.design.widget.Snackbar;
  import android.support.v7.app.AppCompatActivity;
- import android.support.v7.widget.Toolbar;
+ import androidx.appcompat.widget.Toolbar;
  import android.text.TextUtils;
 +import android.view.Menu;
 +import android.view.MenuItem;
@@ -2571,7 +2571,7 @@ index a39f9d6..b644487 100755
 --- a/app/src/main/java/com/example/desenvolvimento/navigationdrawercomercioexpress/ManutencaoPedidos.java
 +++ b/app/src/main/java/com/example/desenvolvimento/navigationdrawercomercioexpress/ManutencaoPedidos.java
 @@ -1,17 +1,27 @@
- package com.example.desenvolvimento.navigationdrawercomercioexpress;
+ package br.comercioexpress.plano;
  
 +import android.annotation.SuppressLint;
  import android.app.AlertDialog;
@@ -2591,13 +2591,13 @@ index a39f9d6..b644487 100755
  import android.os.Bundle;
 +import android.os.Environment;
  import android.os.StrictMode;
- import android.support.design.widget.FloatingActionButton;
+ import com.google.android.material.floatingactionbutton.FloatingActionButton;
  import android.support.design.widget.Snackbar;
 +import android.support.v4.app.ActivityCompat;
 +import android.support.v4.app.ActivityOptionsCompat;
  import android.support.v4.app.NavUtils;
  import android.support.v7.app.AppCompatActivity;
- import android.support.v7.widget.Toolbar;
+ import androidx.appcompat.widget.Toolbar;
 @@ -34,6 +44,27 @@ import android.widget.SimpleCursorAdapter;
  import android.widget.TextView;
  import android.widget.Toast;
@@ -6659,7 +6659,7 @@ index 0000000..07edfa4
 --- /dev/null
 +++ b/app/src/main/java/com/example/desenvolvimento/navigationdrawercomercioexpress/MoneyTextWatcher.java
 @@ -0,0 +1,64 @@
-+package com.example.desenvolvimento.navigationdrawercomercioexpress;
++package br.comercioexpress.plano;
 +
 +
 +import android.text.Editable;
@@ -6777,7 +6777,7 @@ diff --git a/app/src/main/java/com/example/desenvolvimento/navigationdrawercomer
 index edfb986..1185e9f 100755
 --- a/app/src/main/java/com/example/desenvolvimento/navigationdrawercomercioexpress/Oppening.java
 +++ b/app/src/main/java/com/example/desenvolvimento/navigationdrawercomercioexpress/Oppening.java
-@@ -2,8 +2,17 @@ package com.example.desenvolvimento.navigationdrawercomercioexpress;
+@@ -2,8 +2,17 @@ package br.comercioexpress.plano;
  
  import android.content.Intent;
  import android.database.Cursor;
@@ -8270,13 +8270,13 @@ index 0000000..f06c7fc
 --- /dev/null
 +++ b/app/src/main/java/com/example/desenvolvimento/navigationdrawercomercioexpress/VisaoGeralNova.java
 @@ -0,0 +1,401 @@
-+package com.example.desenvolvimento.navigationdrawercomercioexpress;
++package br.comercioexpress.plano;
 +
 +import android.app.AlertDialog;
 +import android.app.DatePickerDialog;
 +import android.content.Intent;
 +import android.os.Bundle;
-+import android.support.design.widget.FloatingActionButton;
++import com.google.android.material.floatingactionbutton.FloatingActionButton;
 +import android.support.design.widget.Snackbar;
 +import android.view.View;
 +import android.support.v4.view.GravityCompat;
@@ -8286,7 +8286,7 @@ index 0000000..f06c7fc
 +import android.support.v4.widget.DrawerLayout;
 +
 +import android.support.v7.app.AppCompatActivity;
-+import android.support.v7.widget.Toolbar;
++import androidx.appcompat.widget.Toolbar;
 +import android.view.Menu;
 +import android.widget.Button;
 +import android.widget.DatePicker;
@@ -8682,7 +8682,7 @@ index 0000000..fc7bd17
 +import android.content.Context;
 +import android.database.Cursor;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +import classes.CL_Clientes;
 +import models.MDL_Clientes;
@@ -9260,8 +9260,8 @@ index 0000000..1e3dbe9
 +import android.content.Context;
 +import android.database.Cursor;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
++import br.comercioexpress.plano.CriaBanco;
++import br.comercioexpress.plano.Funcoes;
 +
 +import classes.CL_ItemPedido;
 +import models.MDL_ItemPedido;
@@ -9757,8 +9757,8 @@ index 0000000..b40322d
 +import android.content.Context;
 +import android.database.Cursor;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
++import br.comercioexpress.plano.CriaBanco;
++import br.comercioexpress.plano.Funcoes;
 +
 +import classes.CL_ItemPedido;
 +import classes.CL_Pedidos;
@@ -10097,8 +10097,8 @@ index 0000000..f6a0e22
 +import android.content.Context;
 +import android.database.Cursor;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
++import br.comercioexpress.plano.CriaBanco;
++import br.comercioexpress.plano.Funcoes;
 +
 +import classes.CL_Produtos;
 +import models.MDL_Produtos;
@@ -10399,7 +10399,7 @@ index 0000000..eea907a
 +import android.content.Context;
 +import android.database.Cursor;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +import classes.CL_Usuario;
 +import models.MDL_Usuario;
@@ -10448,7 +10448,7 @@ index 0000000..be90603
 +import android.content.Context;
 +import android.database.Cursor;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +import java.util.ArrayList;
 +import java.util.List;
@@ -10646,7 +10646,7 @@ index 0000000..34c4256
 +import android.database.Cursor;
 +import android.database.sqlite.SQLiteDatabase;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +public class MDL_Clientes {
 +
@@ -10760,7 +10760,7 @@ index 0000000..5e77cdb
 +import android.database.Cursor;
 +import android.database.sqlite.SQLiteDatabase;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +public class MDL_Filial {
 +
@@ -10809,7 +10809,7 @@ index 0000000..c429539
 +import android.database.Cursor;
 +import android.database.sqlite.SQLiteDatabase;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +public class MDL_ItemPedido {
 +
@@ -11012,7 +11012,7 @@ index 0000000..65bb0e4
 +import android.database.Cursor;
 +import android.database.sqlite.SQLiteDatabase;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +public class MDL_Pedidos {
 +
@@ -11370,7 +11370,7 @@ index 0000000..572c1eb
 +import android.database.Cursor;
 +import android.database.sqlite.SQLiteDatabase;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +public class MDL_Produtos {
 +
@@ -11529,7 +11529,7 @@ index 0000000..8ee20f5
 +import android.database.Cursor;
 +import android.database.sqlite.SQLiteDatabase;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
++import br.comercioexpress.plano.CriaBanco;
 +
 +public class MDL_Usuario {
 +
@@ -11601,10 +11601,10 @@ index 0000000..16d9e3d
 +import android.util.Log;
 +import android.widget.Toast;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.BancoController;
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.MySSLSocketFactory;
++import br.comercioexpress.plano.BancoController;
++import br.comercioexpress.plano.CriaBanco;
++import br.comercioexpress.plano.Funcoes;
++import br.comercioexpress.plano.MySSLSocketFactory;
 +
 +import org.apache.http.HttpVersion;
 +import org.apache.http.NameValuePair;
@@ -11772,9 +11772,9 @@ index 0000000..ead9b57
 +import android.support.v7.app.AppCompatActivity;
 +import android.util.Log;
 +
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.CriaBanco;
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.Funcoes;
-+import com.example.desenvolvimento.navigationdrawercomercioexpress.MySSLSocketFactory;
++import br.comercioexpress.plano.CriaBanco;
++import br.comercioexpress.plano.Funcoes;
++import br.comercioexpress.plano.MySSLSocketFactory;
 +
 +import org.apache.http.HttpVersion;
 +import org.apache.http.NameValuePair;
@@ -13079,13 +13079,13 @@ index d08d419..589e8b4 100755
 --- a/app/src/main/res/layout/activity_adicionar_produtos_customizada.xml
 +++ b/app/src/main/res/layout/activity_adicionar_produtos_customizada.xml
 @@ -9,13 +9,46 @@
-     <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
+     <com.google.android.material.appbar.AppBarLayout android:layout_height="wrap_content"
          android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
  
--        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+-        <androidx.appcompat.widget.Toolbar android:id="@+id/toolbar"
 -            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
 -            android:background="?attr/colorPrimary" app:popupTheme="@style/AppTheme.PopupOverlay" />
-+        <android.support.v7.widget.Toolbar
++        <androidx.appcompat.widget.Toolbar
 +            android:id="@+id/toolbar"
 +            android:layout_width="match_parent"
 +            android:layout_height="?attr/actionBarSize"
@@ -13110,13 +13110,13 @@ index d08d419..589e8b4 100755
 +
 +            </com.miguelcatalan.materialsearchview.MaterialSearchView>
 +
-+        </android.support.v7.widget.Toolbar>
++        </androidx.appcompat.widget.Toolbar>
  
-     </android.support.design.widget.AppBarLayout>
+     </com.google.android.material.appbar.AppBarLayout>
  
      <include layout="@layout/content_adicionar_produtos_customizada" />
  
-+    <android.support.design.widget.FloatingActionButton
++    <com.google.android.material.floatingactionbutton.FloatingActionButton
 +        android:id="@+id/fab_SalvarProdutosPedido"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
@@ -13127,7 +13127,7 @@ index d08d419..589e8b4 100755
 +        app:borderWidth="0dp"
 +        />
  
- </android.support.design.widget.CoordinatorLayout>
+ </androidx.coordinatorlayout.widget.CoordinatorLayout>
 diff --git a/app/src/main/res/layout/activity_cadastro_clientes.xml b/app/src/main/res/layout/activity_cadastro_clientes.xml
 index 23be774..09d833d 100755
 --- a/app/src/main/res/layout/activity_cadastro_clientes.xml
@@ -13136,7 +13136,7 @@ index 23be774..09d833d 100755
  
      <include layout="@layout/content_cadastro_clientes" />
  
-+    <android.support.design.widget.FloatingActionButton
++    <com.google.android.material.floatingactionbutton.FloatingActionButton
 +        android:id="@+id/fab_SalvarCliente"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
@@ -13148,7 +13148,7 @@ index 23be774..09d833d 100755
 +        />
 +
  
- </android.support.design.widget.CoordinatorLayout>
+ </androidx.coordinatorlayout.widget.CoordinatorLayout>
 diff --git a/app/src/main/res/layout/activity_home.xml b/app/src/main/res/layout/activity_home.xml
 index e2a92b7..98e2992 100755
 --- a/app/src/main/res/layout/activity_home.xml
@@ -13194,7 +13194,7 @@ index b7c9dae..b2d9fcd 100755
      android:paddingTop="@dimen/activity_vertical_margin"
 -    android:background="@color/white"
 +    android:background="@drawable/gradient"
-     tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.LoginActivity">
+     tools:context="br.comercioexpress.plano.LoginActivity">
  
      <!-- Login progress -->
 @@ -24,6 +28,7 @@
@@ -13255,7 +13255,7 @@ index 8b3505f..8ba6f18 100755
  
      <include layout="@layout/content_manutencao_pedidos" />
  
-+    <android.support.design.widget.FloatingActionButton
++    <com.google.android.material.floatingactionbutton.FloatingActionButton
 +        android:id="@+id/fab_SalvarPedido"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
@@ -13266,7 +13266,7 @@ index 8b3505f..8ba6f18 100755
 +        app:borderWidth="0dp"
 +        />
  
- </android.support.design.widget.CoordinatorLayout>
+ </androidx.coordinatorlayout.widget.CoordinatorLayout>
 diff --git a/app/src/main/res/layout/activity_manutencao_produto_pedido.xml b/app/src/main/res/layout/activity_manutencao_produto_pedido.xml
 index 0384aae..24c6d0a 100755
 --- a/app/src/main/res/layout/activity_manutencao_produto_pedido.xml
@@ -13275,7 +13275,7 @@ index 0384aae..24c6d0a 100755
  
      <include layout="@layout/content_manutencao_produto_pedido" />
  
-+    <android.support.design.widget.FloatingActionButton
++    <com.google.android.material.floatingactionbutton.FloatingActionButton
 +        android:id="@+id/fab_SalvarManutencaoProdutoPedido"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
@@ -13286,7 +13286,7 @@ index 0384aae..24c6d0a 100755
 +        app:borderWidth="0dp"
 +        />
  
- </android.support.design.widget.CoordinatorLayout>
+ </androidx.coordinatorlayout.widget.CoordinatorLayout>
 diff --git a/app/src/main/res/layout/activity_opcoes.xml b/app/src/main/res/layout/activity_opcoes.xml
 index 675619c..17f3339 100755
 --- a/app/src/main/res/layout/activity_opcoes.xml
@@ -13321,7 +13321,7 @@ index 9a15c31..f20c547 100755
      android:paddingBottom="@dimen/activity_vertical_margin"
 -    android:background="@drawable/fundo_oppening_tres"
 +    android:background="@drawable/gradient"
-     tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.Oppening">
+     tools:context="br.comercioexpress.plano.Oppening">
  
 +    <ImageView
 +        android:id="@+id/img_LogoCentro"
@@ -13388,20 +13388,20 @@ index 312e5b2..eacdd6c 100755
 --- a/app/src/main/res/layout/activity_selecao_cliente.xml
 +++ b/app/src/main/res/layout/activity_selecao_cliente.xml
 @@ -9,14 +9,35 @@
-     <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
+     <com.google.android.material.appbar.AppBarLayout android:layout_height="wrap_content"
          android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
  
--        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+-        <androidx.appcompat.widget.Toolbar android:id="@+id/toolbar"
 -            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
 -            android:background="?attr/colorPrimary" app:popupTheme="@style/AppTheme.PopupOverlay" />
-+        <android.support.v7.widget.Toolbar
++        <androidx.appcompat.widget.Toolbar
 +            android:id="@+id/toolbar"
 +            android:layout_width="match_parent"
 +            android:layout_height="?attr/actionBarSize"
 +            android:background="?attr/colorPrimary"
 +            app:popupTheme="@style/AppTheme.PopupOverlay" >
  
--    </android.support.design.widget.AppBarLayout>
+-    </com.google.android.material.appbar.AppBarLayout>
 +            <TextView
 +                android:id="@+id/lb_TituloClientesPedidos"
 +                android:layout_width="wrap_content"
@@ -13421,13 +13421,13 @@ index 312e5b2..eacdd6c 100755
 +
 +            </com.miguelcatalan.materialsearchview.MaterialSearchView>
  
-+        </android.support.v7.widget.Toolbar>
++        </androidx.appcompat.widget.Toolbar>
  
-+    </android.support.design.widget.AppBarLayout>
++    </com.google.android.material.appbar.AppBarLayout>
 +
 +    <include layout="@layout/content_selecao_cliente" />
  
- </android.support.design.widget.CoordinatorLayout>
+ </androidx.coordinatorlayout.widget.CoordinatorLayout>
 diff --git a/app/src/main/res/layout/activity_sincronizar.xml b/app/src/main/res/layout/activity_sincronizar.xml
 index df10912..1b2c75e 100755
 --- a/app/src/main/res/layout/activity_sincronizar.xml
@@ -13480,13 +13480,13 @@ index 6f7689c..1645312 100755
 --- a/app/src/main/res/layout/app_bar_home.xml
 +++ b/app/src/main/res/layout/app_bar_home.xml
 @@ -9,17 +9,45 @@
-     <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
+     <com.google.android.material.appbar.AppBarLayout android:layout_height="wrap_content"
          android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
  
--        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+-        <androidx.appcompat.widget.Toolbar android:id="@+id/toolbar"
 -            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
 -            android:background="?attr/colorPrimary" app:popupTheme="@style/AppTheme.PopupOverlay" />
-+        <android.support.v7.widget.Toolbar
++        <androidx.appcompat.widget.Toolbar
 +            android:id="@+id/toolbar"
 +            android:layout_width="match_parent"
 +            android:layout_height="?attr/actionBarSize"
@@ -13511,17 +13511,17 @@ index 6f7689c..1645312 100755
 +
 +            </com.miguelcatalan.materialsearchview.MaterialSearchView>
 +
-+        </android.support.v7.widget.Toolbar>
++        </androidx.appcompat.widget.Toolbar>
  
-     </android.support.design.widget.AppBarLayout>
+     </com.google.android.material.appbar.AppBarLayout>
  
      <include layout="@layout/content_home" />
  
--    <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
+-    <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/fab"
 -        android:layout_width="wrap_content" android:layout_height="wrap_content"
 -        android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
 -        android:src="@android:drawable/ic_input_add" />
-+    <android.support.design.widget.FloatingActionButton
++    <com.google.android.material.floatingactionbutton.FloatingActionButton
 +        android:id="@+id/fab"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
@@ -13531,26 +13531,26 @@ index 6f7689c..1645312 100755
 +        android:backgroundTint="@color/corVerde"
 +        app:borderWidth="0dp"/>
  
- </android.support.design.widget.CoordinatorLayout>
+ </androidx.coordinatorlayout.widget.CoordinatorLayout>
 diff --git a/app/src/main/res/layout/app_bar_pedidos.xml b/app/src/main/res/layout/app_bar_pedidos.xml
 index ef0f196..ee00bcd 100755
 --- a/app/src/main/res/layout/app_bar_pedidos.xml
 +++ b/app/src/main/res/layout/app_bar_pedidos.xml
 @@ -6,20 +6,51 @@
      android:layout_height="match_parent" android:fitsSystemWindows="true"
-     tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.Pedidos">
+     tools:context="br.comercioexpress.plano.Pedidos">
  
--    <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
+-    <com.google.android.material.appbar.AppBarLayout android:layout_height="wrap_content"
 -        android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
-+    <android.support.design.widget.AppBarLayout
++    <com.google.android.material.appbar.AppBarLayout
 +        android:layout_height="wrap_content"
 +        android:layout_width="match_parent"
 +        android:theme="@style/AppTheme.AppBarOverlay">
  
--        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+-        <androidx.appcompat.widget.Toolbar android:id="@+id/toolbar"
 -            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
 -            android:background="?attr/colorPrimary" app:popupTheme="@style/AppTheme.PopupOverlay" />
-+        <android.support.v7.widget.Toolbar
++        <androidx.appcompat.widget.Toolbar
 +            android:id="@+id/toolbar"
 +            android:layout_width="match_parent"
 +            android:layout_height="?attr/actionBarSize"
@@ -13575,17 +13575,17 @@ index ef0f196..ee00bcd 100755
 +
 +            </com.miguelcatalan.materialsearchview.MaterialSearchView>
 +
-+        </android.support.v7.widget.Toolbar>
++        </androidx.appcompat.widget.Toolbar>
  
-     </android.support.design.widget.AppBarLayout>
+     </com.google.android.material.appbar.AppBarLayout>
  
      <include layout="@layout/content_pedidos" />
  
--    <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
+-    <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/fab"
 -        android:layout_width="wrap_content" android:layout_height="wrap_content"
 -        android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
 -        android:src="@android:drawable/ic_input_add" />
-+    <android.support.design.widget.FloatingActionButton
++    <com.google.android.material.floatingactionbutton.FloatingActionButton
 +        android:id="@+id/fab"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
@@ -13596,19 +13596,19 @@ index ef0f196..ee00bcd 100755
 +        app:borderWidth="0dp"
 +        />
  
- </android.support.design.widget.CoordinatorLayout>
+ </androidx.coordinatorlayout.widget.CoordinatorLayout>
 diff --git a/app/src/main/res/layout/app_bar_produtos.xml b/app/src/main/res/layout/app_bar_produtos.xml
 index bfc653f..8a5932f 100755
 --- a/app/src/main/res/layout/app_bar_produtos.xml
 +++ b/app/src/main/res/layout/app_bar_produtos.xml
 @@ -9,9 +9,32 @@
-     <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
+     <com.google.android.material.appbar.AppBarLayout android:layout_height="wrap_content"
          android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
  
--        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+-        <androidx.appcompat.widget.Toolbar android:id="@+id/toolbar"
 -            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
 -            android:background="?attr/colorPrimary" app:popupTheme="@style/AppTheme.PopupOverlay" />
-+        <android.support.v7.widget.Toolbar
++        <androidx.appcompat.widget.Toolbar
 +            android:id="@+id/toolbar"
 +            android:layout_width="match_parent"
 +            android:layout_height="?attr/actionBarSize"
@@ -13633,9 +13633,9 @@ index bfc653f..8a5932f 100755
 +
 +            </com.miguelcatalan.materialsearchview.MaterialSearchView>
 +
-+        </android.support.v7.widget.Toolbar>
++        </androidx.appcompat.widget.Toolbar>
  
-     </android.support.design.widget.AppBarLayout>
+     </com.google.android.material.appbar.AppBarLayout>
  
 diff --git a/app/src/main/res/layout/app_bar_visao_geral_nova.xml b/app/src/main/res/layout/app_bar_visao_geral_nova.xml
 new file mode 100644
@@ -13644,26 +13644,26 @@ index 0000000..c3829e6
 +++ b/app/src/main/res/layout/app_bar_visao_geral_nova.xml
 @@ -0,0 +1,80 @@
 +<?xml version="1.0" encoding="utf-8"?>
-+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
++<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
 +    xmlns:app="http://schemas.android.com/apk/res-auto"
 +    xmlns:tools="http://schemas.android.com/tools"
 +    android:layout_width="match_parent"
 +    android:layout_height="match_parent"
 +    tools:context=".VisaoGeralNova">
 +
-+    <android.support.design.widget.AppBarLayout
++    <com.google.android.material.appbar.AppBarLayout
 +        android:layout_width="match_parent"
 +        android:layout_height="wrap_content"
 +        android:theme="@style/AppTheme.AppBarOverlay">
 +
-+        <android.support.v7.widget.Toolbar
++        <androidx.appcompat.widget.Toolbar
 +            android:id="@+id/toolbar"
 +            android:layout_width="match_parent"
 +            android:layout_height="?attr/actionBarSize"
 +            android:background="?attr/colorPrimary"
 +            app:popupTheme="@style/AppTheme.PopupOverlay" />
 +
-+    </android.support.design.widget.AppBarLayout>
++    </com.google.android.material.appbar.AppBarLayout>
 +
 +    <include layout="@layout/content_visao_geral_nova" />
 +
@@ -13722,7 +13722,7 @@ index 0000000..c3829e6
 +
 +    </com.github.clans.fab.FloatingActionMenu>
 +
-+</android.support.design.widget.CoordinatorLayout>
++</androidx.coordinatorlayout.widget.CoordinatorLayout>
 \ No newline at end of file
 diff --git a/app/src/main/res/layout/content_adicionar_produtos_customizada.xml b/app/src/main/res/layout/content_adicionar_produtos_customizada.xml
 index 162f7ca..ca8307d 100755
@@ -13982,7 +13982,7 @@ index dea1b14..f411d1e 100755
 +    android:layout_height="match_parent"
      app:layout_behavior="@string/appbar_scrolling_view_behavior"
      tools:showIn="@layout/activity_manutencao_pedidos"
-     tools:context="com.example.desenvolvimento.navigationdrawercomercioexpress.ManutencaoPedidos"
+     tools:context="br.comercioexpress.plano.ManutencaoPedidos"
      android:focusable="true"
 +    android:orientation="vertical"
 +    android:fillViewport="true"
@@ -14030,7 +14030,7 @@ index dea1b14..f411d1e 100755
 +                app:layout_constraintTop_toTopOf="@+id/img_SelecionarCliente"
 +                />
 +
-+            <android.support.design.widget.FloatingActionButton
++            <com.google.android.material.floatingactionbutton.FloatingActionButton
 +                android:id="@+id/fab_AddClienteVenda"
 +                android:layout_width="wrap_content"
 +                android:layout_height="wrap_content"
@@ -14088,7 +14088,7 @@ index dea1b14..f411d1e 100755
 +                app:layout_constraintTop_toTopOf="@+id/img_SelecionarProduto"
 +                />
 +
-+            <android.support.design.widget.FloatingActionButton
++            <com.google.android.material.floatingactionbutton.FloatingActionButton
 +                android:id="@+id/fab_AddProdutoVenda"
 +                android:layout_width="wrap_content"
 +                android:layout_height="wrap_content"
